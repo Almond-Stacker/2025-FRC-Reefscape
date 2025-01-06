@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants;
-import frc.robot.Constants.Photon;
-import frc.robot.Constants.Photon.tag7;
 import frc.robot.commands.positionRelativeToAprilTag;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;

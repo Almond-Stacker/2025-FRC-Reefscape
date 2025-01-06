@@ -7,9 +7,12 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
@@ -45,6 +48,8 @@ public class PhotonSubsystem extends SubsystemBase{
         results = camera.getAllUnreadResults();
         targetSeen = false;
         if(results.isEmpty()) {
+            targetYaw = 0;
+            targetRange = 0;
             return;
         } 
         pipelineResult = results.get(results.size() - 1);
@@ -63,6 +68,7 @@ public class PhotonSubsystem extends SubsystemBase{
                                 Units.degreesToRadians(target.getPitch()));
             }
         }
+        setSmartdashboardData();
     }   
     
     public void setTargetID(int id) {
@@ -97,5 +103,15 @@ public class PhotonSubsystem extends SubsystemBase{
            return (desiredAngle - targetYaw) * Constants.Photon.angleConstant * TunerConstants.kSpeedAt12Volts.magnitude();
         }
         return 0;
+    }
+
+    private void setSmartdashboardData() {
+        SmartDashboard.putNumber(camera.getName() + " current ID", targetID);
+        SmartDashboard.putNumber(camera.getName() + " target height", targetHeightOffGround);
+        SmartDashboard.putNumber(camera.getName() + " desired distance", desiredDistance);
+        SmartDashboard.putNumber(camera.getName() + " desired angle", desiredAngle);
+        SmartDashboard.putNumber(camera.getName() + " target yaw", targetYaw);
+        SmartDashboard.putNumber(camera.getName() + " target range", targetRange);
+        SmartDashboard.putBoolean(camera.getName() + " target seen", targetSeen);
     }
 }
