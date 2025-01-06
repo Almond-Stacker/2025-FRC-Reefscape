@@ -10,7 +10,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.math.util.Units;
-
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
@@ -37,8 +36,8 @@ public class PhotonSubsystem extends SubsystemBase{
         this.cameraHeightOffGround = cameraHeightOffGround;
         this.targetHeightOffGround = targetHeightOffGround;
         this.cameraPitch = Units.degreesToRadians(cameraPitch);
-        this.desiredDistance = desiredDistance;
-        this.desiredAngle = desiredAngle;
+        this.desiredDistance = 0;
+        this.desiredAngle = 0;
     }
 
     @Override 
@@ -78,16 +77,24 @@ public class PhotonSubsystem extends SubsystemBase{
         cameraHeightOffGround = height;
     }
 
+    public void setDesiredDistance(double desiredDistance) {
+        this.desiredDistance = desiredDistance;
+    }
+
+    public void setDesiredAngle(double desiredAngle) {
+        this.desiredAngle = desiredAngle;
+    }
+
     public double getForwardOutput() {
         if(targetSeen) {
-            return -(desiredDistance - targetRange) * TunerConstants.kSpeedAt12Volts.magnitude();
+            return -(desiredDistance - targetRange) * TunerConstants.kSpeedAt12Volts.magnitude() * Constants.Photon.driveConstant;
         }
         return 0;
     }
 
     public double getTurnOutput() {
         if(targetSeen) {
-           return (desiredAngle - targetYaw) * 0.04 * TunerConstants.kSpeedAt12Volts.magnitude();
+           return (desiredAngle - targetYaw) * Constants.Photon.angleConstant * TunerConstants.kSpeedAt12Volts.magnitude();
         }
         return 0;
     }
