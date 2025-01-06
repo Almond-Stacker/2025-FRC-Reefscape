@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
-import javax.xml.crypto.dsig.Transform;
-
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -11,12 +9,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
 public class PhotonSubsystem extends SubsystemBase{
@@ -70,6 +65,18 @@ public class PhotonSubsystem extends SubsystemBase{
             }
         }
     }   
+    
+    public void setTargetID(int id) {
+        targetID = id;
+    }
+
+    public void setTargetHeightOffGround(double height) {
+        targetHeightOffGround = height;
+    }
+
+    public void setCameraHeightOffGround(double height) {
+        cameraHeightOffGround = height;
+    }
 
     public double getForwardOutput() {
         if(targetSeen) {
