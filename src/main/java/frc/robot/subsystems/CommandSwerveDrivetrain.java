@@ -45,16 +45,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
+    /* Swerve requests to apply during SysId characterization */
+    private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
+    private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
+    private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation(); 
+
     /** Swerve request to apply during field-centric path following */
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
     private final PIDController m_pathXController = new PIDController(10, 0, 0);
     private final PIDController m_pathYController = new PIDController(10, 0, 0);
     private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
-
-    /* Swerve requests to apply during SysId characterization */
-    private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
-    private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
-    private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -125,8 +125,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * the devices themselves. If they need the devices, they can access them through
      * getters in the classes.
      *
-     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-     * @param modules             Constants for each specific module
+     * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
+     * @param modules               Constants for each specific module
      */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
@@ -145,11 +145,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * the devices themselves. If they need the devices, they can access them through
      * getters in the classes.
      *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param modules                    Constants for each specific module
+     * @param drivetrainConstants     Drivetrain-wide constants for the swerve drive
+     * @param odometryUpdateFrequency The frequency to run the odometry loop. If
+     *                                unspecified or set to 0 Hz, this is 250 Hz on
+     *                                CAN FD, and 100 Hz on CAN 2.0.
+     * @param modules                 Constants for each specific module
      */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
@@ -169,17 +169,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * the devices themselves. If they need the devices, they can access them through
      * getters in the classes.
      *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation  The standard deviation for odometry calculation
+     * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
+     * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
+     *                                  unspecified or set to 0 Hz, this is 250 Hz on
+     *                                  CAN FD, and 100 Hz on CAN 2.0.
+     * @param odometryStandardDeviation The standard deviation for odometry calculation
      *                                  in the form [x, y, theta]ᵀ, with units in meters
      *                                  and radians
      * @param visionStandardDeviation   The standard deviation for vision calculation
      *                                  in the form [x, y, theta]ᵀ, with units in meters
      *                                  and radians
-     * @param modules                    Constants for each specific module
+     * @param modules                   Constants for each specific module
      */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
@@ -195,33 +195,64 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Creates a new auto factory for this drivetrain.
+     * Returns a command that applies the specified control request to this swerve drivetrain.
      *
-     * @return AutoFactory for this drivetrain
+     * @param request Function returning the request to apply
+     * @return Command to run
      */
+    public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
+        return run(() -> this.setControl(requestSupplier.get()));
+    }
+
+    /**
+     * Runs the SysId Quasistatic test in the given direction for the routine
+     * specified by {@link #m_sysIdRoutineToApply}.
+     *
+     * @param direction Direction of the SysId Quasistatic test
+     * @return Command to run
+     */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutineToApply.quasistatic(direction);
+    }
+
+    /**
+     * Runs the SysId Dynamic test in the given direction for the routine
+     * specified by {@link #m_sysIdRoutineToApply}.
+     *
+     * @param direction Direction of the SysId Dynamic test
+     * @return Command to run
+     */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutineToApply.dynamic(direction);
+    }
+
+    /* Creates a new auto factory for this drivetrain.
+    *
+    * @return AutoFactory for this drivetrain
+    */
     public AutoFactory createAutoFactory() {
         return createAutoFactory(new AutoBindings());
     }
 
     /**
-     * Creates a new auto factory for this drivetrain with the given
-     * global auto bindings.
-     *
-     * @param autoBindings Global bindings to apply to the factory
-     * @return AutoFactory for this drivetrain
-     */
+    * Creates a new auto factory for this drivetrain with the given
+    * global auto bindings.
+    *
+    * @param autoBindings Global bindings to apply to the factory
+    * @return AutoFactory for this drivetrain
+    */
     public AutoFactory createAutoFactory(AutoBindings autoBindings) {
         return createAutoFactory(autoBindings, (sample, isStart) -> {});
     }
 
     /**
-     * Creates a new auto factory for this drivetrain with the given
-     * global auto bindings and trajectory logger.
-     *
-     * @param autoBindings Global bindings to apply to the factory
-     * @param trajLogger Logger for the trajectory
-     * @return AutoFactory for this drivetrain
-     */
+    * Creates a new auto factory for this drivetrain with the given
+    * global auto bindings and trajectory logger.
+    *
+    * @param autoBindings Global bindings to apply to the factory
+    * @param trajLogger Logger for the trajectory
+    * @return AutoFactory for this drivetrain
+    */
     public AutoFactory createAutoFactory(AutoBindings autoBindings, TrajectoryLogger<SwerveSample> trajLogger) {
         return new AutoFactory(
             () -> getState().Pose,
@@ -234,15 +265,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         );
     }
 
-    /**
-     * Returns a command that applies the specified control request to this swerve drivetrain.
-     *
-     * @param request Function returning the request to apply
-     * @return Command to run
-     */
-    public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        return run(() -> this.setControl(requestSupplier.get()));
-    }
 
     /**
      * Follows the given field-centric path sample with PID.
@@ -270,28 +292,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 .withWheelForceFeedforwardsX(sample.moduleForcesX())
                 .withWheelForceFeedforwardsY(sample.moduleForcesY())
         );
-    }
-
-    /**
-     * Runs the SysId Quasistatic test in the given direction for the routine
-     * specified by {@link #m_sysIdRoutineToApply}.
-     *
-     * @param direction Direction of the SysId Quasistatic test
-     * @return Command to run
-     */
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutineToApply.quasistatic(direction);
-    }
-
-    /**
-     * Runs the SysId Dynamic test in the given direction for the routine
-     * specified by {@link #m_sysIdRoutineToApply}.
-     *
-     * @param direction Direction of the SysId Dynamic test
-     * @return Command to run
-     */
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutineToApply.dynamic(direction);
     }
 
     @Override
