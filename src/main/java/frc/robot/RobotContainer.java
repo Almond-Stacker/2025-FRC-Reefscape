@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants;
+import frc.robot.States.PhotonStates;
 import frc.robot.commands.positionRelativeToAprilTag;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -50,12 +51,17 @@ public class RobotContainer {
     // private final AutoRoutines autoRoutines;
     // private final AutoChooser autoChooser = new AutoChooser();
 
-    private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera1.cameraName, 0, Constants.Photon.camera1.cameraHeightOffGround, 0, Constants.Photon.camera1.cameraPitch, 0.5, 0);
+    private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
 
 
 
     // Initailize commands
-    private final positionRelativeToAprilTag tag7Pos1 = new positionRelativeToAprilTag(camera0, Constants.Photon.tag7.targetID, Constants.Photon.tag7.desiredDistance0, Constants.Photon.tag7.desiredAngle0, Constants.Photon.tag7.tag7HeightOffGround);
+    private final positionRelativeToAprilTag tag7Pos1 = new positionRelativeToAprilTag(camera0, 
+            Constants.Photon.tag4.targetID, 
+            Constants.Photon.tag4.distance0, 
+            Constants.Photon.tag4.angle0, 
+            Constants.Photon.tag4.tagHeight);
+
     private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag7Pos1, 
                                                         drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                                         .withVelocityY(driver0.getLeftY())
@@ -69,7 +75,7 @@ public class RobotContainer {
         // autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
         // SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        // configureDriveBindings();
+        configureDriveBindings();
     }
 
     private void configureDriveBindings() {
