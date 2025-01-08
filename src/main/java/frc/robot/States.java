@@ -20,7 +20,21 @@ public class States {
         }
     }
 
-    public enum elevatorStates{
+    public enum ElevatorStates {
+        // allow for easy changing of elevator states 
+        kBottom(0.0),
+        kMiddle(0.5),
+        kTop(1.0);
+
+        private final double height;
+
+        ElevatorStates(double height) {
+            this.height = height;
+        }
+
+        public double getHeight() {
+            return height;
+        }
 
     }
 }
