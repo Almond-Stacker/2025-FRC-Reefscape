@@ -21,6 +21,7 @@ public class testapriltag extends Command{
         this.camera = camera;
         this.state = state;
         this.strafe = strafe;
+        addRequirements(swerve, camera);
     }
 
     @Override

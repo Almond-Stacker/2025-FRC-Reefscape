@@ -11,6 +11,7 @@ public class positionRelativeToAprilTag extends Command{
     public positionRelativeToAprilTag(PhotonSubsystem camera, PhotonStates state) {
         this.camera = camera;
         this.state = state;
+        addRequirements(camera);
     }
 
     @Override

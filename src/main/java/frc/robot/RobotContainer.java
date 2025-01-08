@@ -47,9 +47,9 @@ public class RobotContainer {
     
     /* Path follower */
     // Choreo set up 
-    // private final AutoFactory autoFactory;
-    // private final AutoRoutines autoRoutines;
-    // private final AutoChooser autoChooser = new AutoChooser();
+    private final AutoFactory autoFactory;
+    private final AutoRoutines autoRoutines;
+    private final AutoChooser autoChooser = new AutoChooser();
 
     private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
 
@@ -65,11 +65,11 @@ public class RobotContainer {
 
 
     public RobotContainer() {
-        // autoFactory = drivetrain.createAutoFactory();
-        // autoRoutines = new AutoRoutines(autoFactory);
+        autoFactory = drivetrain.createAutoFactory();
+        autoRoutines = new AutoRoutines(autoFactory);
 
-        // autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
-        // SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureDriveBindings();
     }
@@ -117,8 +117,8 @@ public class RobotContainer {
         // drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-//     public Command getAutonomousCommand() {
-//         /* Run the routine selected from the auto chooser */
-//         // return autoChooser.selectedCommand();
-//     }
+    public Command getAutonomousCommand() {
+        /* Run the routine selected from the auto chooser */
+        return autoChooser.selectedCommand();
+    }
 }
