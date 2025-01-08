@@ -56,13 +56,9 @@ public class RobotContainer {
 
 
     // Initailize commands
-    private final positionRelativeToAprilTag tag7Pos1 = new positionRelativeToAprilTag(camera0, 
-            Constants.Photon.tag4.targetID, 
-            Constants.Photon.tag4.distance0, 
-            Constants.Photon.tag4.angle0, 
-            Constants.Photon.tag4.tagHeight);
+    private final positionRelativeToAprilTag tag4Pos0 = new positionRelativeToAprilTag(camera0, PhotonStates.driveTag4);
 
-    private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag7Pos1, 
+    private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag4Pos0, 
                                                         drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                                         .withVelocityY(driver0.getLeftY())
                                                         .withRotationalRate(camera0.getTurnOutput())));

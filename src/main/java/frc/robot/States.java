@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.Constants.Photon;
 
 public class States {
+    // allow for easy changing of photon vision targets 
     public enum PhotonStates {
         driveTag4(Photon.tag4.targetID ,Photon.tag4.distance0, Photon.tag4.angle0, Photon.tag4.tagHeight);
 
@@ -20,6 +21,6 @@ public class States {
     }
 
     public enum elevatorStates{
-        
+
     }
 }

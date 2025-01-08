@@ -1,30 +1,21 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.States.PhotonStates;
 import frc.robot.subsystems.PhotonSubsystem;
 
 public class positionRelativeToAprilTag extends Command{
     private PhotonSubsystem camera;
+    private PhotonStates state;
 
-    private double desiredDistance;
-    private double desiredAngle;
-    private double targetHeightOffGround;
-    private int targetID; 
-
-    public positionRelativeToAprilTag(PhotonSubsystem camera, int targetID, double desiredDistance, double desiredAngle, double targetHeightOffGround) {
+    public positionRelativeToAprilTag(PhotonSubsystem camera, PhotonStates state) {
         this.camera = camera;
-        this.desiredAngle = desiredAngle;
-        this.desiredDistance = desiredDistance;
-        this.targetHeightOffGround = targetHeightOffGround;
-        this.targetID = targetID;
+        this.state = state;
     }
 
     @Override
     public void initialize() { 
-        camera.setTargetID(targetID);
-        camera.setDesiredAngle(desiredAngle);
-        camera.setDesiredDistance(desiredDistance);
-        camera.setTargetHeightOffGround(targetHeightOffGround);
+        camera.setState(state);
     }
 
     @Override
