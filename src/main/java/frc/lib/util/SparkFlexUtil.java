@@ -4,11 +4,12 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SignalsConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 /** Sets motor usage for a Spark Max motor controller. */
-public class CANSparkFlexUtil {
+public class SparkFlexUtil {
   public enum Usage {
     kAll,
     kAbsolutePositionOnly,
@@ -32,7 +33,9 @@ public class CANSparkFlexUtil {
    * @param enableFollowing Whether to enable motor following.
    */
   public static void setCANSparkFlexBusUsage(SparkFlex motor, Usage usage, boolean enableFollowing) {
-    CANSparkFlexUtil.sparkConfigurationBase configuration = new CANSparkFlexUtil.sparkConfigurationBase();
+    SparkFlexUtil.sparkConfigurationBase configuration = new SparkFlexUtil.sparkConfigurationBase();
+    SparkFlexConfig motorConfiguration = new SparkFlexConfig();
+
     if(enableFollowing) {
       configuration.setBusVoltageOn();
       configuration.setOutputCurrentOn();
@@ -64,6 +67,9 @@ public class CANSparkFlexUtil {
       case kMinimal:
         break;
     }
+
+    motorConfiguration.apply(configuration.build());
+    motor.configure(motorConfiguration, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
   }
 
   public static void setCANSparkFlexBusUsage(SparkFlex motor, Usage usage) {
