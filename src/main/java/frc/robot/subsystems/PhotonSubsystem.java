@@ -28,6 +28,14 @@ public class PhotonSubsystem extends SubsystemBase{
     private double cameraHeight;
     private double cameraPitch;
 
+    // Kalman filter variables
+    private double estimatedRange;
+    private double estimatedYaw;
+    private double rangeErrorCovariance = 1;
+    private double yawErrorCovariance = 1;
+    private final double processNoise = 1e-4; // Adjusted process noise
+    private final double measurementNoise = 1;
+
 
     public PhotonSubsystem(String cameraName, double cameraHeight, double cameraPitch, PhotonStates state) {
         camera = new PhotonCamera(cameraName);
@@ -67,6 +75,8 @@ public class PhotonSubsystem extends SubsystemBase{
                         state.height, 
                         cameraPitch, 
                         Units.degreesToRadians(target.getPitch()));
+
+                targetRange = applyKalmanFilter(targetRange, estimatedRange, rangeErrorCovariance);
             }
         }
         setSmartdashboardData();
@@ -116,5 +126,24 @@ public class PhotonSubsystem extends SubsystemBase{
         SmartDashboard.putNumber(camera.getName() + " target yaw", targetYaw);
         SmartDashboard.putNumber(camera.getName() + " target range", targetRange);
         SmartDashboard.putBoolean(camera.getName() + " target seen", targetSeen);
+    
     }
+        // Apply Kalman filter to smooth values
+        private double applyKalmanFilter(double measurement, double estimatedValue, double errorCovariance) {
+            // Prediction update
+            double predictedValue = estimatedValue;
+            double predictedErrorCovariance = errorCovariance + processNoise;
+    
+            // Measurement update
+            double kalmanGain = predictedErrorCovariance / (predictedErrorCovariance + measurementNoise);
+            double updatedValue = predictedValue + kalmanGain * (measurement - predictedValue);
+            double updatedErrorCovariance = (1 - kalmanGain) * predictedErrorCovariance;
+    
+            // Update state
+            estimatedValue = updatedValue;
+            errorCovariance = updatedErrorCovariance;
+    
+            return updatedValue;
+        }
+
 }

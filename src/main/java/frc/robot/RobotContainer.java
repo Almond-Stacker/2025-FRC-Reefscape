@@ -60,7 +60,7 @@ public class RobotContainer {
 
     private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag4Pos0, 
                                                         drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
-                                                        .withVelocityY(driver0.getLeftY())
+                                                        .withVelocityY(driver0.getLeftX())
                                                         .withRotationalRate(camera0.getTurnOutput())));
 
 
@@ -92,9 +92,9 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))
         ));
         driver0.y().whileTrue(ramTag7);
-        driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(-driver0.getLeftY() * MaxSpeed)
+        driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                     .withVelocityY(-driver0.getLeftX() * MaxSpeed)
-                                    .withRotationalRate(-driver0.getRightX() * MaxAngularRate)));
+                                    .withRotationalRate(camera0.getTurnOutput())));
                                     
 
         driver0.pov(0).whileTrue(drivetrain.applyRequest(() ->

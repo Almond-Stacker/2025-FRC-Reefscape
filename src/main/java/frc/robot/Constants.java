@@ -36,7 +36,7 @@ public final class Constants {
 
         public static final class tag4 {
             public static final int targetID = 4;
-            public static final double tagHeight = Units.inchesToMeters(22);
+            public static final double tagHeight = Units.inchesToMeters(21);
             public static final double distance0 = 0.3;
             public static final double angle0 = 4; 
         }
