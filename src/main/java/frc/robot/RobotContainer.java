@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.Constants;
 import frc.robot.States.PhotonStates;
+import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.positionRelativeToAprilTag;
+import frc.robot.commands.testapriltag;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.PhotonSubsystem;
@@ -54,10 +56,11 @@ public class RobotContainer {
     private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
 
 
-
     // Initailize commands
-    private final positionRelativeToAprilTag tag4Pos0 = new positionRelativeToAprilTag(camera0, PhotonStates.driveTag4);
+    private final TeleopSwerve teleopSwerve = new TeleopSwerve(drivetrain, driver0::getLeftY, driver0::getLeftX, driver0::getRightX, drive);
 
+    private final positionRelativeToAprilTag tag4Pos0 = new positionRelativeToAprilTag(camera0, PhotonStates.driveTag4);
+    private final testapriltag testapriltag = new testapriltag(drivetrain, camera0, PhotonStates.driveTag4, driver0::getLeftY);
     private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag4Pos0, 
                                                         drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                                         .withVelocityY(driver0.getLeftX())
@@ -78,20 +81,18 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
 
-        drivetrain.setDefaultCommand(
+        drivetrain.setDefaultCommand(teleopSwerve);
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver0.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver0.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver0.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+            // drivetrain.applyRequest(() ->
+            //     drive.withVelocityX(-driver0.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+            //         .withVelocityY(-driver0.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            //         .withRotationalRate(-driver0.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            // 
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        driver0.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))
-        ));
+        driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
         driver0.y().whileTrue(ramTag7);
+        driver0.a().whileTrue(testapriltag);
         driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                     .withVelocityY(-driver0.getLeftX() * MaxSpeed)
                                     .withRotationalRate(camera0.getTurnOutput())));
