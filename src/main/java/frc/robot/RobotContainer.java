@@ -18,12 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.lib.util.AccelerationCurve;
 import frc.robot.Constants;
 import frc.robot.States.PhotonStates;
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.positionRelativeToAprilTag;
-import frc.robot.commands.testapriltag;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.PhotonSubsystem;
@@ -57,10 +55,7 @@ public class RobotContainer {
 
 
     // Initailize commands
-    private final TeleopSwerve teleopSwerve = new TeleopSwerve(drivetrain, driver0::getLeftY, driver0::getLeftX, driver0::getRightX, drive);
-
     private final positionRelativeToAprilTag tag4Pos0 = new positionRelativeToAprilTag(camera0, PhotonStates.driveTag4);
-    private final testapriltag testapriltag = new testapriltag(drivetrain, camera0, PhotonStates.driveTag4, driver0::getLeftY);
     private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag4Pos0, 
                                                         drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                                         .withVelocityY(driver0.getLeftX())
@@ -75,47 +70,38 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureDriveBindings();
+        configureSYSTests();    
     }
 
     private void configureDriveBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
 
-        drivetrain.setDefaultCommand(teleopSwerve);
-            // Drivetrain will execute this command periodically
-            // drivetrain.applyRequest(() ->
-            //     drive.withVelocityX(-driver0.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-            //         .withVelocityY(-driver0.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            //         .withRotationalRate(-driver0.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            // 
+        //Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() ->
+            drive.withVelocityX(AccelerationCurve.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(AccelerationCurve.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(AccelerationCurve.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
+        );
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
         driver0.y().whileTrue(ramTag7);
-        driver0.a().whileTrue(testapriltag);
         driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                     .withVelocityY(-driver0.getLeftX() * MaxSpeed)
                                     .withRotationalRate(camera0.getTurnOutput())));
-                                    
-
-        driver0.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            robotCentricDrive.withVelocityX(0.5).withVelocityY(0))
-        );
-        driver0.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            robotCentricDrive.withVelocityX(-0.5).withVelocityY(0))
-        );
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // driver0.back().and(driver0.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    }
 
-        // drivetrain.registerTelemetry(logger::telemeterize);
+    private void configureSYSTests() {
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        driver0.back().and(driver0.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
     }
 
     public Command getAutonomousCommand() {

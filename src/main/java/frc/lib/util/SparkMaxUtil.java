@@ -1,11 +1,9 @@
 package frc.lib.util;
 
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SignalsConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -34,7 +32,7 @@ public class SparkMaxUtil {
    *     constructed.
    * @param enableFollowing Whether to enable motor following.
    */
-  public static void setCANSparkFlexBusUsage(SparkMax motor, Usage usage, boolean enableFollowing) {
+  public static void setSparkMaxBusUsage(SparkMax motor, SparkMaxUtil.Usage usage, SparkBaseConfig.IdleMode idleMode, boolean enableFollowing, boolean setInverted) {
     SparkMaxUtil.sparkConfigurationBase configuration = new SparkMaxUtil.sparkConfigurationBase();
     SparkMaxConfig motorConfiguration = new SparkMaxConfig();
 
@@ -71,11 +69,9 @@ public class SparkMaxUtil {
     }
 
     motorConfiguration.apply(configuration.build());
+    motorConfiguration.inverted(setInverted); 
+    motorConfiguration.idleMode(idleMode);
     motor.configure(motorConfiguration, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-  }
-
-  public static void setCANSparkFlexBusUsage(SparkFlex motor, Usage usage) {
-
   }
 
   public static class sparkConfigurationBase {

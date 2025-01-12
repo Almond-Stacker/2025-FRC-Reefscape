@@ -32,7 +32,7 @@ public class SparkFlexUtil {
    *     constructed.
    * @param enableFollowing Whether to enable motor following.
    */
-  public static void setCANSparkFlexBusUsage(SparkFlex motor, Usage usage, boolean enableFollowing) {
+  public static void setSparkFlexBusUsage(SparkFlex motor, SparkFlexUtil.Usage usage, SparkBaseConfig.IdleMode idleMode, boolean enableFollowing, boolean setInverted) {
     SparkFlexUtil.sparkConfigurationBase configuration = new SparkFlexUtil.sparkConfigurationBase();
     SparkFlexConfig motorConfiguration = new SparkFlexConfig();
 
@@ -69,11 +69,9 @@ public class SparkFlexUtil {
     }
 
     motorConfiguration.apply(configuration.build());
+    motorConfiguration.inverted(setInverted); 
+    motorConfiguration.idleMode(idleMode);
     motor.configure(motorConfiguration, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-  }
-
-  public static void setCANSparkFlexBusUsage(SparkFlex motor, Usage usage) {
-
   }
 
   public static class sparkConfigurationBase {
