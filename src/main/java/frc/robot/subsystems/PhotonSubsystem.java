@@ -86,15 +86,7 @@ public class PhotonSubsystem extends SubsystemBase{
     public void setState(PhotonStates state) {
         this.state = state;
     }
-
-    public double getRange() {
-        return targetRange;
-    }
-
-    public double getYaw() {
-        return targetYaw;
-    }
-
+    
     // calculate the forward output
     public double getForwardOutput() {
         if(targetSeen) {

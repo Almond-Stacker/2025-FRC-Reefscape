@@ -9,6 +9,10 @@ public final class Constants {
         public static final int beamBreakID = 0;
     }
 
+    public static final class LED {
+        public static final int LED_ID = 0;
+    }
+
     public static final class Elevator {
         public static final int elevatorMotorID = 0; 
         public static final int encoderID = 0;

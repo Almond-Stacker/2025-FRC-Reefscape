@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase{
 
     public void setElevatorState(ElevatorStates state) {
         this.state = state;
-        elevatorPID.setSetpoint(state.getHeight());
+        elevatorPID.setSetpoint(state.height);
     }
 
     private void initalizeMotors() {

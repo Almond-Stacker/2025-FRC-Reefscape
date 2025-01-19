@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
 import frc.lib.util.AccelerationCurve;
-import frc.robot.Constants;
+
+
 import frc.robot.States.PhotonStates;
 import frc.robot.commands.positionRelativeToAprilTag;
 import frc.robot.generated.TunerConstants;
@@ -47,8 +49,8 @@ public class RobotContainer {
     
     /* Path follower */
     // Choreo set up 
-    private final AutoFactory autoFactory;
-    private final AutoRoutines autoRoutines;
+    private final AutoFactory autoFactory = drivetrain.createAutoFactory();
+    private final AutoRoutines autoRoutines = new AutoRoutines(autoFactory);
     private final AutoChooser autoChooser = new AutoChooser();
 
     private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
@@ -63,14 +65,14 @@ public class RobotContainer {
 
 
     public RobotContainer() {
-        autoFactory = drivetrain.createAutoFactory();
-        autoRoutines = new AutoRoutines(autoFactory);
-
-        autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
+        configureAutos();
         configureDriveBindings();
         configureSYSTests();    
+    }
+
+    private void configureAutos() {
+        autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private void configureDriveBindings() {
