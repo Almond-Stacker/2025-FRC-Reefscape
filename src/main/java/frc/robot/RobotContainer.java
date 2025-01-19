@@ -77,12 +77,19 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
 
-        //Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() ->
-            drive.withVelocityX(AccelerationCurve.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                .withVelocityY(AccelerationCurve.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(AccelerationCurve.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
-        );
+        // //Drivetrain will execute this command periodically
+        drivetrain.setDefaultCommand(
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(AccelerationCurve.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(AccelerationCurve.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(AccelerationCurve.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
+        ));
+
+        // drivetrain.setDefaultCommand(
+        //     drivetrain.applyRequest(() ->
+        //         drive.withVelocityX(driver0.getLeftY() * -MaxSpeed) // Drive forward with negative Y (forward)
+        //             .withVelocityY(driver0.getLeftX() * -MaxSpeed) // Drive left with negative X (left)
+        //             .withRotationalRate(driver0.getRightX() * -MaxAngularRate))); // Drive counterclockwise with negative X (left)
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));

@@ -1,5 +1,5 @@
 {
- "name":"2025_FRC_Reefscape_ChoreoConfig",
+ "name":"Reefscape_auto",
  "version":1,
  "type":"Swerve",
  "variables":{
@@ -13,8 +13,8 @@
     "val":0.29209999999999997
    },
    "y":{
-    "exp":"10.4375 in",
-    "val":0.2651125
+    "exp":"10.875 in",
+    "val":0.276225
    }
   },
   "backLeft":{
@@ -23,17 +23,17 @@
     "val":-0.29209999999999997
    },
    "y":{
-    "exp":"10.4375 in",
-    "val":0.2651125
+    "exp":"10.875 in",
+    "val":0.276225
    }
   },
   "mass":{
-   "exp":"50 lbs",
-   "val":22.6796185
+   "exp":"75 lbs",
+   "val":34.01942775
   },
   "inertia":{
-   "exp":"6 kg m ^ 2",
-   "val":6.0
+   "exp":"2 kg m ^ 2",
+   "val":2.0
   },
   "gearing":{
    "exp":"6.75",
@@ -44,12 +44,12 @@
    "val":0.0508
   },
   "vmax":{
-   "exp":"6000 RPM",
-   "val":628.3185307179587
+   "exp":"4000 RPM",
+   "val":418.87902047863906
   },
   "tmax":{
-   "exp":"2 N * m",
-   "val":2.0
+   "exp":"1.5 N * m",
+   "val":1.5
   },
   "cof":{
    "exp":"1.5",
@@ -57,16 +57,16 @@
   },
   "bumper":{
    "front":{
-    "exp":"13 in",
-    "val":0.3302
+    "exp":"15 in",
+    "val":0.381
    },
    "side":{
-    "exp":"14 in",
-    "val":0.35559999999999997
+    "exp":"13.75 in",
+    "val":0.34925
    },
    "back":{
-    "exp":"13 in",
-    "val":0.3302
+    "exp":"15 in",
+    "val":0.381
    }
   },
   "differentialTrackWidth":{

@@ -12,8 +12,8 @@ public class AutoRoutines {
     }
 
     public AutoRoutine simplePathAuto() {
-        final AutoRoutine routine = m_factory.newRoutine("ChoreoTest");
-        final AutoTrajectory simplePath = routine.trajectory("ChoreoTest");
+        final AutoRoutine routine = m_factory.newRoutine("New Path");
+        final AutoTrajectory simplePath = routine.trajectory("New Path");
 
         routine.active().onTrue(
             simplePath.resetOdometry()

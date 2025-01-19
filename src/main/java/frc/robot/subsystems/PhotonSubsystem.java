@@ -128,22 +128,22 @@ public class PhotonSubsystem extends SubsystemBase{
         SmartDashboard.putBoolean(camera.getName() + " target seen", targetSeen);
     
     }
-        // Apply Kalman filter to smooth values
-        private double applyKalmanFilter(double measurement, double estimatedValue, double errorCovariance) {
-            // Prediction update
-            double predictedValue = estimatedValue;
-            double predictedErrorCovariance = errorCovariance + processNoise;
-    
-            // Measurement update
-            double kalmanGain = predictedErrorCovariance / (predictedErrorCovariance + measurementNoise);
-            double updatedValue = predictedValue + kalmanGain * (measurement - predictedValue);
-            double updatedErrorCovariance = (1 - kalmanGain) * predictedErrorCovariance;
-    
-            // Update state
-            estimatedValue = updatedValue;
-            errorCovariance = updatedErrorCovariance;
-    
-            return updatedValue;
-        }
 
+    // Apply Kalman filter to smooth values
+    private double applyKalmanFilter(double measurement, double estimatedValue, double errorCovariance) {
+        // Prediction update
+        double predictedValue = estimatedValue;
+        double predictedErrorCovariance = errorCovariance + processNoise;
+
+        // Measurement update
+        double kalmanGain = predictedErrorCovariance / (predictedErrorCovariance + measurementNoise);
+        double updatedValue = predictedValue + kalmanGain * (measurement - predictedValue);
+        double updatedErrorCovariance = (1 - kalmanGain) * predictedErrorCovariance;
+
+        // Update state
+        estimatedValue = updatedValue;
+        errorCovariance = updatedErrorCovariance;
+
+        return updatedValue;
+    }
 }
