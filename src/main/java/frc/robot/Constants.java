@@ -1,10 +1,22 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.generated.TunerConstants;
 
 // put the algae down 
 // this is for my processor 
 public final class Constants {
+    public static final class Swerve {
+        public static SwerveDriveKinematics driveKinematics = new SwerveDriveKinematics(
+            new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
+            new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
+            new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
+            new Translation2d(TunerConstants.kBackRightXPos, TunerConstants.kBackRightYPos)
+        );
+    }
+
     public static final class BeamBreak {
         public static final int beamBreakID = 0;
     }

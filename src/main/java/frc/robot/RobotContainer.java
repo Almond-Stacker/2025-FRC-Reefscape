@@ -19,9 +19,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
-import frc.lib.util.AccelerationCurve;
-
-
+import frc.lib.util.Utilities;
 import frc.robot.States.PhotonStates;
 import frc.robot.commands.positionRelativeToAprilTag;
 import frc.robot.generated.TunerConstants;
@@ -78,13 +76,12 @@ public class RobotContainer {
     private void configureDriveBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-
         // //Drivetrain will execute this command periodically
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(AccelerationCurve.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(AccelerationCurve.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(AccelerationCurve.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
         // drivetrain.setDefaultCommand(
