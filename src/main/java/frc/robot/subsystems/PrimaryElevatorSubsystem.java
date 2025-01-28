@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
@@ -45,10 +46,18 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
             rightElevatorMotor.set(motorSpeed);
             inBounds = true;    
         }
+        setSmartdashboard();
     }
 
     public void setElevatorState(PrimaryElevatorStates state) {
         this.elevatorPID.setSetpoint(state.height);
         this.state = state;
+    }
+
+    private void setSmartdashboard() {
+        SmartDashboard.putString("Primary elevator state", state.toString());
+        SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
+        SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
+        SmartDashboard.putNumber("Primary elevator posotion ", elevatorPosition);
     }
 }
