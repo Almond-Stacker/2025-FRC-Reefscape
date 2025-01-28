@@ -25,10 +25,32 @@ public final class Constants {
         public static final int LED_ID = 0;
     }
 
-    public static final class Elevator {
-        public static final int elevatorMotorID = 0; 
+    public static final class PrimaryElevator {
+        public static final int leftElevatorMotorID = 0;
+        public static final int rightElevatorMotorID = 1;
         public static final int encoderID = 0;
         public static final double velocitySetPoint = 0; 
+
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double kS = 0;
+        public static final double kG = 0;
+        public static final double kV = 0;
+    }
+
+    public static final class InnerElevator {
+        public static final int ElevatorMotorID = 0;
+
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+    }
+
+    public static final class Arm {
+        public static final int armMotorID = 0;
+        public static final int encoderID = 0;
+        public static final int indexingMotorID = 0; 
 
         public static final double kP = 0;
         public static final double kI = 0;

@@ -1,6 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.Photon;
+import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class States {
     // allow for easy changing of photon vision targets 
@@ -20,18 +22,73 @@ public class States {
         }
     }
 
-    public enum ElevatorStates {
+    public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
-        kBottom(0.0),
-        kMiddle(0.5),
-        kTop(1.0);
+        HOME(),
+        MIN(),
+        MAX();
 
         public final double height;
 
-        ElevatorStates(double height) {
-            this.height = height;
+        PrimaryElevatorStates(double height) {
+            this.height = Units.degreesToRadians(height);
+        }
+
+        PrimaryElevatorStates() {
+            this.height = 0; 
         }
     }
+
+    public enum InnerElevatorStates {
+        // allow for easy changing of elevator states 
+        HOME(),
+        MIN(),
+        MAX();
+
+        public final double height;
+
+        InnerElevatorStates(double height) {
+            this.height = Units.degreesToRadians(height);
+        }
+
+        InnerElevatorStates() {
+            this.height = 0; 
+        }
+    } 
+
+    public enum ArmStates {
+        // allow for easy changing of elevator states 
+        HOME(),
+        MIN(),
+        MAX();
+
+        public final double height;
+
+        ArmStates(double height) {
+            this.height = Units.degreesToRadians(height);
+        }
+
+        ArmStates() {
+            this.height = 0; 
+        }
+    } 
+
+    public enum IndexStates {
+        // allow for easy changing of elevator states 
+        HOME(),
+        MIN(),
+        MAX();
+
+        public final double speed;
+
+        IndexStates(double speed) {
+            this.speed = speed;
+        }
+
+        IndexStates() {
+            this.speed = 0; 
+        }
+    } 
 
     public enum ledStates {
         /*
