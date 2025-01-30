@@ -77,7 +77,7 @@ public class States {
         public final double angle;
 
         ArmStates(double angle) {
-            this.angle = Units.degreesToRadians(angle);
+            this.angle = angle;
         }
 
         ArmStates() {

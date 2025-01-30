@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.lib.util.Utilities;
-
+import frc.robot.CommandFactory.AlgaeIntakeCommandFactory;
+import frc.robot.CommandFactory.InnerElevatorCommandFactory;
+import frc.robot.CommandFactory.IntakeArmCommandFactory;
+import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
 import frc.robot.States.PhotonStates;
 
 import frc.robot.commands.positionRelativeToAprilTag;
@@ -29,6 +32,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
@@ -39,7 +43,8 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.1)
+            .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -48,7 +53,6 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController driver0 = new CommandXboxController(0);
-    private final CommandXboxController driver1 = new CommandXboxController(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     
@@ -58,18 +62,24 @@ public class RobotContainer {
     private final AutoRoutines autoRoutines = new AutoRoutines(autoFactory);
     private final AutoChooser autoChooser = new AutoChooser();
 
-    private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
+    //private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
 
     /** Subsystems **/
     private final PrimaryElevatorSubsystem s_PrimaryElevator = new PrimaryElevatorSubsystem();
-    private final AlgaeIntakeSubsystem s_AlgaeIntake = new AlgaeIntakeSubsystem();
-    //private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
+    private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
+    private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
+    private final AlgaeIntakeSubsystem s_algaeIntake = new AlgaeIntakeSubsystem();
+
+    /* Command Factory */
+    private final PrimaryElevatorCommandFactory f_PrimaryElevator = new CommandFactory.PrimaryElevatorCommandFactory(s_PrimaryElevator);
+    private final InnerElevatorCommandFactory f_InnerElevator = new CommandFactory.InnerElevatorCommandFactory(s_InnerElevator);
+    private final IntakeArmCommandFactory f_intakeArm = new CommandFactory.IntakeArmCommandFactory(s_intakeArm);
+    private final AlgaeIntakeCommandFactory f_AlgaeIntakeCommandFactory = new CommandFactory.AlgaeIntakeCommandFactory(s_algaeIntake);
 
     public RobotContainer() {
         configureAutos();
         configureDriveBindings();
         configureSYSTests();    
-        configureDriver1Bindings();
     }
 
     private void configureAutos() {
@@ -96,10 +106,6 @@ public class RobotContainer {
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
-        //driver0.y().whileTrue(ramTag7);
-        driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
-                                    .withVelocityY(-driver0.getLeftX() * MaxSpeed)
-                                    .withRotationalRate(camera0.getTurnOutput())));
 
         // reset the field-centric heading on left bumper press
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -112,10 +118,6 @@ public class RobotContainer {
         driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-    }
-
-    private void configureDriver1Bindings() {
-        
     }
 
     public Command getAutonomousCommand() {

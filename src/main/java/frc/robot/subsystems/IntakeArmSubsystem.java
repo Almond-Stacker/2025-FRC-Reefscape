@@ -29,8 +29,8 @@ public class IntakeArmSubsystem extends SubsystemBase {
         indexingMotor = new PWMSparkMax(Constants.Arm.indexingMotorID);
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
-        setArmState(armState);
         setIndexState(indexState);
+        setArmState(armState);
     }
 
     @Override
@@ -39,7 +39,8 @@ public class IntakeArmSubsystem extends SubsystemBase {
         if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
             ArmMotor.set(0);
         } else {
-            ArmMotor.set(armPID.calculate(armEncoder.get()));
+            //ArmMotor.set(armPID.calculate(armEncoder.get()));
+            ArmMotor.set(0);
         }
         setSmartdashboard();
     }
