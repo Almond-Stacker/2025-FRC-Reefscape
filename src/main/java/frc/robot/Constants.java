@@ -25,6 +25,13 @@ public final class Constants {
         public static final int LED_ID = 0;
     }
 
+    public static final class AlgaeIntake {
+        public static final int intakeMotorID = 0; 
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+    }
+
     public static final class PrimaryElevator {
         public static final int leftElevatorMotorID = 0;
         public static final int rightElevatorMotorID = 1;

@@ -90,6 +90,23 @@ public class States {
         }
     } 
 
+    public enum AlgaeIntake {
+        // allow for easy changing of elevator states 
+        HOME(),
+        MIN(),
+        MAX();
+
+        public final double angle;
+
+        AlgaeIntake(double angle) {
+            this.angle = angle;
+        }
+
+        AlgaeIntake() {
+            this.angle = 0; 
+        }
+    } 
+
     public enum ledStates {
         /*
         * Fixed Palette Pattern
