@@ -6,7 +6,6 @@ import frc.robot.States.ArmStates;
 import frc.robot.States.IndexStates;
 import frc.robot.States.InnerElevatorStates;
 import frc.robot.States.PrimaryElevatorStates;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
@@ -14,7 +13,7 @@ public class PrimaryElevatorCommand extends Command {
     private final PrimaryElevatorSubsystem elevatorSubsystem;
     private final PrimaryElevatorStates elevatorState;
 
-    public PrimaryElevatorCommand(PrimaryElevatorSubsystem elevatorSubsystem, PrimaryElevatorCommand config) {
+    public PrimaryElevatorCommand(PrimaryElevatorSubsystem elevatorSubsystem, PrimaryElevatorCommandConfiguration config) {
         this.elevatorSubsystem = elevatorSubsystem;
         this.elevatorState = config.elevatorState;
         addRequirements(elevatorSubsystem);
@@ -34,13 +33,13 @@ public class PrimaryElevatorCommand extends Command {
     
 
     public static class PrimaryElevatorCommandConfiguration {
-        private InnerElevatorStates elevatorState;
+        private PrimaryElevatorStates elevatorState;
 
         public PrimaryElevatorCommandConfiguration() {
             this.elevatorState = null;
         }
 
-        public PrimaryElevatorCommandConfiguration withPrimaryElevator(InnerElevatorStates state) {
+        public PrimaryElevatorCommandConfiguration withPrimaryElevator(PrimaryElevatorStates state) {
             this.elevatorState = state;
             return this;
         }

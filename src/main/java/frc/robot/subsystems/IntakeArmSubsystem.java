@@ -14,7 +14,7 @@ import frc.robot.Constants;
 import frc.robot.States.ArmStates;
 import frc.robot.States.IndexStates;
 
-public class ArmSubsystem extends SubsystemBase {   
+public class IntakeArmSubsystem extends SubsystemBase {   
     private final TalonFX ArmMotor;
     private final PWMSparkMax indexingMotor;
     private final DutyCycleEncoder armEncoder; 
@@ -24,7 +24,7 @@ public class ArmSubsystem extends SubsystemBase {
     private ArmStates armState;
     private double armPosition;
 
-    public ArmSubsystem() {
+    public IntakeArmSubsystem() {
         ArmMotor = new TalonFX(Constants.Arm.armMotorID);
         indexingMotor = new PWMSparkMax(Constants.Arm.indexingMotorID);
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
@@ -34,7 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         armPosition = Units.degreesToRadians(armEncoder.get());
-        if(armPosition >= ArmStates.MAX.height || armPosition <= ArmStates.MIN.height) {
+        if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
             ArmMotor.set(0);
         } else {
             ArmMotor.set(armPID.calculate(armEncoder.get()));

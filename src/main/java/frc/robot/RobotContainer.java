@@ -20,11 +20,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.lib.util.Utilities;
+
 import frc.robot.States.PhotonStates;
+
 import frc.robot.commands.positionRelativeToAprilTag;
+
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
+import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class RobotContainer {
     // Initalize Subsytems and subsystem controllers 
@@ -53,14 +59,10 @@ public class RobotContainer {
 
     private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
 
-
-    // Initailize commands
-    private final positionRelativeToAprilTag tag4Pos0 = new positionRelativeToAprilTag(camera0, PhotonStates.driveTag4);
-    private final SequentialCommandGroup ramTag7 = new SequentialCommandGroup(tag4Pos0, 
-                                                        drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
-                                                        .withVelocityY(driver0.getLeftX())
-                                                        .withRotationalRate(camera0.getTurnOutput())));
-
+    /** Subsystems **/
+    private final PrimaryElevatorSubsystem s_PrimaryElevator = new PrimaryElevatorSubsystem();
+    private final AlgaeIntakeSubsystem s_AlgaeIntake = new AlgaeIntakeSubsystem();
+    //private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
 
     public RobotContainer() {
         configureAutos();
@@ -92,7 +94,7 @@ public class RobotContainer {
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
-        driver0.y().whileTrue(ramTag7);
+        //driver0.y().whileTrue(ramTag7);
         driver0.x().toggleOnTrue(drivetrain.applyRequest(() -> robotCentricDrive.withVelocityX(camera0.getForwardOutput())
                                     .withVelocityY(-driver0.getLeftX() * MaxSpeed)
                                     .withRotationalRate(camera0.getTurnOutput())));

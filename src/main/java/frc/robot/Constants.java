@@ -8,14 +8,14 @@ import frc.robot.generated.TunerConstants;
 // put the algae down 
 // this is for my processor 
 public final class Constants {
-    public static final class Swerve {
-        public static SwerveDriveKinematics driveKinematics = new SwerveDriveKinematics(
-            new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
-            new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
-            new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
-            new Translation2d(TunerConstants.kBackRightXPos, TunerConstants.kBackRightYPos)
-        );
-    }
+    // public static final class Swerve {
+    //     public static SwerveDriveKinematics driveKinematics = new SwerveDriveKinematics(
+    //         new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
+    //         new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
+    //         new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
+    //         new Translation2d(TunerConstants.kBackRightXPos, TunerConstants.kBackRightYPos)
+    //     );
+    // }
 
     public static final class BeamBreak {
         public static final int beamBreakID = 0;
@@ -26,16 +26,18 @@ public final class Constants {
     }
 
     public static final class AlgaeIntake {
-        public static final int intakeMotorID = 0; 
+        public static final int intakeMotorID = 20; 
         public static final double kP = 0;
         public static final double kI = 0;
         public static final double kD = 0;
     }
 
     public static final class PrimaryElevator {
-        public static final int leftElevatorMotorID = 0;
-        public static final int rightElevatorMotorID = 1;
-        public static final int encoderID = 0;
+
+        // FINAL 
+        public static final int leftElevatorMotorID = 14;
+        public static final int rightElevatorMotorID = 15;
+        public static final int encoderID = 1;
         public static final double velocitySetPoint = 0; 
 
         public static final double kP = 0;
@@ -47,7 +49,7 @@ public final class Constants {
     }
 
     public static final class InnerElevator {
-        public static final int ElevatorMotorID = 0;
+        public static final int ElevatorMotorID = 22;
 
         public static final double kP = 0;
         public static final double kI = 0;
@@ -55,9 +57,9 @@ public final class Constants {
     }
 
     public static final class Arm {
-        public static final int armMotorID = 0;
+        public static final int armMotorID = 21;
         public static final int encoderID = 0;
-        public static final int indexingMotorID = 0; 
+        public static final int indexingMotorID = 21; 
 
         public static final double kP = 0;
         public static final double kI = 0;

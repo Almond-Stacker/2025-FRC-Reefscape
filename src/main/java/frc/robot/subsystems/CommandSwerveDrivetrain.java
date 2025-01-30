@@ -245,25 +245,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
-    public void setAdavantageScopeSwerveValues(boolean fieldRelative, double forwardDrive, double strafeDrive, double rotationDrive) {
-        if(fieldRelative) {
-            swerveModuleStates = Constants.Swerve.driveKinematics.toSwerveModuleStates(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    forwardDrive, 
-                    strafeDrive, 
-                    rotationDrive, 
-                    new Rotation2d(this.getPigeon2().getYaw().getValueAsDouble())
-                )
-            );
-        } else {
-            swerveModuleStates = Constants.Swerve.driveKinematics.toSwerveModuleStates(
-                new ChassisSpeeds(
-                    forwardDrive, 
-                    strafeDrive, 
-                    rotationDrive
-            ));
-        }
-    }
+    // public void setAdavantageScopeSwerveValues(boolean fieldRelative, double forwardDrive, double strafeDrive, double rotationDrive) {
+    //     if(fieldRelative) {
+    //         swerveModuleStates = Constants.Swerve.driveKinematics.toSwerveModuleStates(
+    //             ChassisSpeeds.fromFieldRelativeSpeeds(
+    //                 forwardDrive, 
+    //                 strafeDrive, 
+    //                 rotationDrive, 
+    //                 new Rotation2d(this.getPigeon2().getYaw().getValueAsDouble())
+    //             )
+    //         );
+    //     } else {
+    //         swerveModuleStates = Constants.Swerve.driveKinematics.toSwerveModuleStates(
+    //             new ChassisSpeeds(
+    //                 forwardDrive, 
+    //                 strafeDrive, 
+    //                 rotationDrive
+    //         ));
+    //     }
+    // }
 
     /**
      * Follows the given field-centric path sample with PID.

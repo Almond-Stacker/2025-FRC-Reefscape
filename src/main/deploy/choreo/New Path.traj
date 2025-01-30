@@ -30,7 +30,8 @@
     {"x":{"exp":"3.930911064147949 m", "val":3.930911064147949}, "y":{"exp":"6.5196757316589355 m", "val":6.5196757316589355}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":20, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"2.5707244873046875 m", "val":2.5707244873046875}, "y":{"exp":"6.952462196350098 m", "val":6.952462196350098}, "heading":{"exp":"-2.051683624180024 rad", "val":-2.051683624180024}, "intervals":25, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"0.48922666907310486 m", "val":0.48922666907310486}, "y":{"exp":"6.41663122177124 m", "val":6.41663122177124}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":20, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"2.9965081214904785 m", "val":2.9965081214904785}, "y":{"exp":"5.688716888427734 m", "val":5.688716888427734}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"2.9965081214904785 m", "val":2.9965081214904785}, "y":{"exp":"5.688716888427734 m", "val":5.688716888427734}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"0.7216169238090515 m", "val":0.7216169238090515}, "y":{"exp":"4.447611331939697 m", "val":4.447611331939697}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -255,5 +256,7 @@
  "events":[
    {"name":"Marker", "from":{"target":8, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"Marker", "from":{"target":3, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
+       {"type":"named", "data":{"name":""}}]}}},
+   {"name":"Marker", "from":{"target":9, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"parallel", "data":{"commands":[
        {"type":"named", "data":{"name":""}}]}}}]
 }

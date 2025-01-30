@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.States.ArmStates;
 import frc.robot.States.IndexStates;
 import frc.robot.States.InnerElevatorStates;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 
 public class InnerElevatorCommand extends Command {

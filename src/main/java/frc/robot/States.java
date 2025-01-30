@@ -25,13 +25,17 @@ public class States {
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
         HOME(),
+        L1(),
+        L2(),
+        L3(),
+        L4(),
         MIN(),
         MAX();
 
         public final double height;
 
         PrimaryElevatorStates(double height) {
-            this.height = Units.degreesToRadians(height);
+            this.height = height;
         }
 
         PrimaryElevatorStates() {
@@ -42,13 +46,17 @@ public class States {
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
         HOME(),
+        L1(),
+        L2(),
+        L3(),
+        L4(),
         MIN(),
         MAX();
 
         public final double height;
 
         InnerElevatorStates(double height) {
-            this.height = Units.degreesToRadians(height);
+            this.height = height;
         }
 
         InnerElevatorStates() {
@@ -59,25 +67,29 @@ public class States {
     public enum ArmStates {
         // allow for easy changing of elevator states 
         HOME(),
+        L1(),
+        L2(),
+        L3(),
+        L4(),
         MIN(),
         MAX();
 
-        public final double height;
+        public final double angle;
 
-        ArmStates(double height) {
-            this.height = Units.degreesToRadians(height);
+        ArmStates(double angle) {
+            this.angle = Units.degreesToRadians(angle);
         }
 
         ArmStates() {
-            this.height = 0; 
+            this.angle = 0; 
         }
     } 
 
     public enum IndexStates {
         // allow for easy changing of elevator states 
-        HOME(),
-        MIN(),
-        MAX();
+        STOP(),
+        INTAKE,
+        FEED_OUT();
 
         public final double speed;
 
@@ -90,20 +102,20 @@ public class States {
         }
     } 
 
-    public enum AlgaeIntake {
+    public enum AlgaeIntakeStates {
         // allow for easy changing of elevator states 
-        HOME(),
-        MIN(),
-        MAX();
+        STOP(),
+        INTAKE(),
+        FEED_OUT();
 
-        public final double angle;
+        public final double speed;
 
-        AlgaeIntake(double angle) {
-            this.angle = angle;
+        AlgaeIntakeStates(double speed) {
+            this.speed = speed;
         }
 
-        AlgaeIntake() {
-            this.angle = 0; 
+        AlgaeIntakeStates() {
+            this.speed = 0; 
         }
     } 
 

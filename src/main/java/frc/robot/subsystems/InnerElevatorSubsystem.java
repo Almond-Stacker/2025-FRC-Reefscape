@@ -37,13 +37,13 @@ public class InnerElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        innerElevatorPosition = Units.degreesToRadians(elevatorEncoder.getPosition());
+        innerElevatorPosition = Units.rotationsToDegrees(elevatorEncoder.getPosition());
         if(innerElevatorPosition >= InnerElevatorStates.MAX.height || innerElevatorPosition <= InnerElevatorStates.MIN.height) {
             elevatorMotor.set(0);
             inBounds = false;
         } else {
-            motorSpeed = elevatorPID.calculate(elevatorEncoder.getPosition());
-            elevatorMotor.set(motorSpeed);
+            motorSpeed = elevatorPID.calculate(innerElevatorPosition);
+            elevatorMotor.set(0);
             inBounds = true; 
         }
         setSmartdashboard();

@@ -4,28 +4,28 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.States.ArmStates;
 import frc.robot.States.IndexStates;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IntakeArmSubsystem;
 
-public class ArmCommand extends Command {
-    private final ArmSubsystem armSubsystem;
+public class IntakeArmCommand extends Command {
+    private final IntakeArmSubsystem IntakeArmSubsystem;
     private final IndexStates indexState;
     private final ArmStates armState;
 
-    public ArmCommand(ArmSubsystem armSubsystem, ArmCommandConfiguration config) {
-        this.armSubsystem = armSubsystem;
+    public IntakeArmCommand(IntakeArmSubsystem IntakeArmSubsystem, IntakeArmCommandConfiguration config) {
+        this.IntakeArmSubsystem = IntakeArmSubsystem;
         this.indexState = config.indexState;
         this.armState = config.armState;
-        addRequirements(armSubsystem);
+        addRequirements(IntakeArmSubsystem);
     }
 
     @Override
     public void initialize() {
         if(indexState != null){
-            armSubsystem.setIndexState(indexState);
+            IntakeArmSubsystem.setIndexState(indexState);
         }
 
         if(armState != null){
-            armSubsystem.setArmState(armState);
+            IntakeArmSubsystem.setArmState(armState);
         }
     }
 
@@ -35,26 +35,26 @@ public class ArmCommand extends Command {
     }
     
 
-    public static class ArmCommandConfiguration {
+    public static class IntakeArmCommandConfiguration {
         private IndexStates indexState;
         private ArmStates armState;
 
-        public ArmCommandConfiguration() {
+        public IntakeArmCommandConfiguration() {
             this.indexState = null;
             this.armState = null;
         }
 
-        public ArmCommandConfiguration withIndexState(IndexStates indexState) {
+        public IntakeArmCommandConfiguration withIndexState(IndexStates indexState) {
             this.indexState = indexState;
             return this;
         }
 
-        public ArmCommandConfiguration withArmState(ArmStates armState) {
+        public IntakeArmCommandConfiguration withArmState(ArmStates armState) {
             this.armState = armState;
             return this;
         }
 
-        public ArmCommandConfiguration build() {
+        public IntakeArmCommandConfiguration build() {
             return this;
         }
     }
