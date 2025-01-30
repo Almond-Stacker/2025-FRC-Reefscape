@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkFlex;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
@@ -20,7 +21,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final PIDController armPID;
 
     private IndexStates indexState;
-    private ArmStates armStates;
+    private ArmStates armState;
     private double armPosition;
 
     public ArmSubsystem() {
@@ -38,14 +39,21 @@ public class ArmSubsystem extends SubsystemBase {
         } else {
             ArmMotor.set(armPID.calculate(armEncoder.get()));
         }
+        setSmartdashboard();
     }
 
     public void setArmState(ArmStates state) {
-        this.armStates = state;
+        this.armState = state;
     }
 
     public void setIndexState(IndexStates state) {
         indexingMotor.set(state.speed);
         this.indexState = state;
+    }
+
+    private void setSmartdashboard() {
+        SmartDashboard.putString("Arm Subsytem index state", indexState.toString());
+        SmartDashboard.putString("Arm Subsystem arm state ", armState.toString());
+        SmartDashboard.putNumber("Arm Subsytem position", armPosition);
     }
 }
