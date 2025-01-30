@@ -29,6 +29,8 @@ public class IntakeArmSubsystem extends SubsystemBase {
         indexingMotor = new PWMSparkMax(Constants.Arm.indexingMotorID);
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
+        setArmState(armState);
+        setIndexState(indexState);
     }
 
     @Override

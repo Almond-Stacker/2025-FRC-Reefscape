@@ -31,8 +31,8 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         elevatorMotor = new SparkFlex(Constants.InnerElevator.ElevatorMotorID, MotorType.kBrushless);
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, null, IdleMode.kBrake, false, false);
         elevatorEncoder = elevatorMotor.getAbsoluteEncoder();
-
         elevatorPID = new PIDController(Constants.InnerElevator.kP, Constants.InnerElevator.kI, Constants.InnerElevator.kD);
+        setInnerElevatorState(state);
     }
 
     @Override

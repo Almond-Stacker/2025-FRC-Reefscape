@@ -48,6 +48,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController driver0 = new CommandXboxController(0);
+    private final CommandXboxController driver1 = new CommandXboxController(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     
@@ -68,6 +69,7 @@ public class RobotContainer {
         configureAutos();
         configureDriveBindings();
         configureSYSTests();    
+        configureDriver1Bindings();
     }
 
     private void configureAutos() {
@@ -110,6 +112,10 @@ public class RobotContainer {
         driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    }
+
+    private void configureDriver1Bindings() {
+        
     }
 
     public Command getAutonomousCommand() {

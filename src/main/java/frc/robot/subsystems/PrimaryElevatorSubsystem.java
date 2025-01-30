@@ -31,6 +31,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor = new TalonFX(Constants.PrimaryElevator.rightElevatorMotorID);  
         encoder = new DutyCycleEncoder(Constants.PrimaryElevator.encoderID);
         elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);
+        setElevatorState(state);
 
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
