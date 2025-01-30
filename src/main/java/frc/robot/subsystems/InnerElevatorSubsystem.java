@@ -59,6 +59,5 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.put
     }
 }
