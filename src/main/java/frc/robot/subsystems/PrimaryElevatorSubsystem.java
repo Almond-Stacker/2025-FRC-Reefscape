@@ -72,7 +72,6 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
-       // SmartDashboard.putNumber("enatshueo", absoluteEncoder.get());
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
     }
 
