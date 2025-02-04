@@ -36,7 +36,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         absoluteEncoder = new DutyCycleEncoder(Constants.PrimaryElevator.encoderID);
         elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);
         setElevatorState(state);
-        //absoluteEncoder.setDutyCycleRange(0, 1750);
+        absoluteEncoder.setDutyCycleRange(0, 1750);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -72,6 +72,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
+       // SmartDashboard.putNumber("enatshueo", absoluteEncoder.get());
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
     }
 

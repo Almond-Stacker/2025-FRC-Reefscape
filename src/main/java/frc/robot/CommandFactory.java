@@ -149,5 +149,10 @@ public class CommandFactory {
             return new SequentialCommandGroup(primaryElevatorFactory.createL1Command(),
                                                 intakeFactory.createL1Command());
         }
+
+        public SequentialCommandGroup createHome() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createHomeCommand(),
+                                                intakeFactory.createHomeCommand());
+        }
     }
 }

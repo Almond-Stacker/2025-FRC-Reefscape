@@ -48,7 +48,7 @@ public class States {
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.01),
-        L1(),
+        L1(2),
         L2(),
         L3(4.8),
         MIN(0),
@@ -69,7 +69,7 @@ public class States {
         // allow for easy changing of elevator states 
         HOME(60),
         STARTING_POSITION(240),
-        L1(150),
+        L1(197),
         L2(150),
         L3(150),
         FEED_OUT(207),

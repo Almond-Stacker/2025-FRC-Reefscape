@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.ModuleLayer.Controller;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -27,7 +29,7 @@ import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
 import frc.robot.States.PhotonStates;
-
+import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.positionRelativeToAprilTag;
 
 import frc.robot.generated.TunerConstants;
@@ -80,6 +82,13 @@ public class RobotContainer {
     private final AlgaeIntakeCommandFactory f_algaeIntake = new CommandFactory.AlgaeIntakeCommandFactory(s_algaeIntake);
     private final CombinationCommandFactory f_combination = new CommandFactory.CombinationCommandFactory(f_intakeArm, f_algaeIntake, f_PrimaryElevator, f_InnerElevator);
 
+    /* Commands */
+    private final IntakeArmCommand c_coralIntake = f_intakeArm.createIntakeCommand();
+    private final IntakeArmCommand c_coralFeedOut = f_intakeArm.createFeedOutCommand();
+    private final IntakeArmCommand c_armStop = f_intakeArm.createStopCommand();
+
+    private final SequentialCommandGroup c_scoreL1 = f_combination.createScoreL1();
+
     public RobotContainer() {
         configureAutos();
         configureDriveBindings();
@@ -126,7 +135,13 @@ public class RobotContainer {
     }
 
     private void configureDriver1Commands() {
+        driver1.rightTrigger().onTrue(c_coralIntake);
+        driver1.rightTrigger().onFalse(c_armStop);
 
+        driver1.leftTrigger().onTrue(c_coralFeedOut);
+        driver1.leftTrigger().onFalse(c_armStop);
+
+        driver1.a().onTrue(c_scoreL1);
     }
 
     public Command getAutonomousCommand() {
