@@ -74,6 +74,16 @@ public class CommandFactory {
             return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
                 .withPrimaryElevator(PrimaryElevatorStates.L3).build());
         }
+
+        public PrimaryElevatorCommand createPreIntakeCommand() {
+            return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
+               .withPrimaryElevator(PrimaryElevatorStates.PRE_INTAKE).build());
+        }
+
+        public PrimaryElevatorCommand createIntakeCommand() {
+            return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
+                .withPrimaryElevator(PrimaryElevatorStates.INTAKE).build());
+        }
     }
 
     public static class AlgaeIntakeCommandFactory {
@@ -126,9 +136,29 @@ public class CommandFactory {
                 .withIndexState(IndexStates.FEED_OUT).build());
         }
 
+        public IntakeArmCommand createIntakePositionCommand() {
+            return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
+                .withArmState(ArmStates.INTAKE));
+        }
+
         public IntakeArmCommand createL1Command() {
             return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
                 .withArmState(ArmStates.L1));
+        }
+
+        public IntakeArmCommand createL2Command() {
+            return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
+                .withArmState(ArmStates.L2));
+        }
+
+        public IntakeArmCommand createL3Command() {
+            return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
+                .withArmState(ArmStates.L3));
+        }
+
+        public IntakeArmCommand createStartingPositionCommand() {
+            return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
+                .withArmState(ArmStates.STARTING_POSITION));       
         }
     }
 
@@ -145,14 +175,30 @@ public class CommandFactory {
             innerElevatorFactory = innerElevator;
         }
 
-        public SequentialCommandGroup createScoreL1() {
+        public SequentialCommandGroup createScoreL1Command() {
             return new SequentialCommandGroup(primaryElevatorFactory.createL1Command(),
                                                 intakeFactory.createL1Command());
         }
 
-        public SequentialCommandGroup createHome() {
+        public SequentialCommandGroup createScoreL2Command() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createL2Command(),
+                                                intakeFactory.createL2Command());
+        }
+
+        
+        public SequentialCommandGroup createScoreL3Command() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createL3Command(),
+                                                intakeFactory.createL3Command());
+        }
+
+        public SequentialCommandGroup createPreIntakeCommand() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createPreIntakeCommand(),
+                                                intakeFactory.createIntakePositionCommand());
+        }
+
+        public SequentialCommandGroup createHomeCommand() {
             return new SequentialCommandGroup(primaryElevatorFactory.createHomeCommand(),
-                                                intakeFactory.createHomeCommand());
+                                                intakeFactory.createStartingPositionCommand());
         }
     }
 }

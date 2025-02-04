@@ -32,9 +32,9 @@ public final class Constants {
         public static final double kD = 0;
     }
 
+    // FINISHED 
     public static final class PrimaryElevator {
 
-        // FINAL 
         public static final int leftElevatorMotorID = 14;
         public static final int rightElevatorMotorID = 15;
         public static final int encoderID = 1;
@@ -56,6 +56,7 @@ public final class Constants {
         public static final double kD = 0;
     }
 
+    // FINISHED 
     public static final class Arm {
         public static final int armMotorID = 17;
         public static final int encoderID = 0;

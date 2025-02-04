@@ -68,6 +68,7 @@ public class States {
     public enum ArmStates {
         // allow for easy changing of elevator states 
         HOME(60),
+        INTAKE(60),
         STARTING_POSITION(240),
         L1(197),
         L2(150),

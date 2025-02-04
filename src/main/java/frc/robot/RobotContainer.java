@@ -87,7 +87,11 @@ public class RobotContainer {
     private final IntakeArmCommand c_coralFeedOut = f_intakeArm.createFeedOutCommand();
     private final IntakeArmCommand c_armStop = f_intakeArm.createStopCommand();
 
-    private final SequentialCommandGroup c_scoreL1 = f_combination.createScoreL1();
+    private final SequentialCommandGroup c_scoreL1 = f_combination.createScoreL1Command();
+    private final SequentialCommandGroup c_scoreL2 = f_combination.createScoreL2Command();
+    private final SequentialCommandGroup c_scoreL3 = f_combination.createScoreL3Command();
+    private final SequentialCommandGroup c_home = f_combination.createHomeCommand();
+    private final SequentialCommandGroup c_preIntake = f_combination.createPreIntakeCommand();
 
     public RobotContainer() {
         configureAutos();
@@ -102,21 +106,12 @@ public class RobotContainer {
     }
 
     private void configureDriveBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        // //Drivetrain will execute this command periodically
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
-
-        // drivetrain.setDefaultCommand(
-        //     drivetrain.applyRequest(() ->
-        //         drive.withVelocityX(driver0.getLeftY() * -MaxSpeed) // Drive forward with negative Y (forward)
-        //             .withVelocityY(driver0.getLeftX() * -MaxSpeed) // Drive left with negative X (left)
-        //             .withRotationalRate(driver0.getRightX() * -MaxAngularRate))); // Drive counterclockwise with negative X (left)
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
@@ -141,7 +136,11 @@ public class RobotContainer {
         driver1.leftTrigger().onTrue(c_coralFeedOut);
         driver1.leftTrigger().onFalse(c_armStop);
 
-        driver1.a().onTrue(c_scoreL1);
+        driver1.pov(-1).toggleOnTrue(c_preIntake);
+        driver1.pov(90).toggleOnTrue(c_scoreL1);
+        driver1.pov(180).toggleOnTrue(c_scoreL2);
+        driver1.pov(270).toggleOnTrue(c_scoreL3);
+        driver1.pov(0).toggleOnTrue(c_home);
     }
 
     public Command getAutonomousCommand() {

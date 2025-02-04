@@ -34,8 +34,10 @@ public class IntakeArmSubsystem extends SubsystemBase {
         ArmMotor = new TalonFX(Constants.Arm.armMotorID);
         indexingMotor = new SparkMax(Constants.Arm.indexingMotorID, MotorType.kBrushless);
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
+
         armFeedforward = new ArmFeedforward(Constants.Arm.kS, Constants.Arm.kG, Constants.Arm.kV);
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
+
         armState  = ArmStates.STARTING_POSITION;
         indexState = IndexStates.STOP;
         setIndexState(indexState);
@@ -46,11 +48,11 @@ public class IntakeArmSubsystem extends SubsystemBase {
     public void periodic() {
         armPosition = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
         motorSpeed = armPID.calculate(armPosition) + armFeedforward.calculate(Units.degreesToRadians(armPosition), ArmMotor.getVelocity().getValueAsDouble());
+
         if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
             // posotive is up
-            ArmMotor.set(motorSpeed);
+            ArmMotor.set(0);
         } else {
-            //ArmMotor.set(armPID.calculate(armEncoder.get()));
             ArmMotor.set(motorSpeed);
         }
         setSmartdashboard();

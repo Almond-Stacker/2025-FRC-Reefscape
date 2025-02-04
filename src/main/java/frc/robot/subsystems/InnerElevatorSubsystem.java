@@ -52,7 +52,6 @@ public class InnerElevatorSubsystem extends SubsystemBase {
             elevatorMotor.set(0.0);
             inBounds = false;
         } else {
-            //motorSpeed = elevatorPID.calculate(innerElevatorPosition);
             elevatorMotor.set(0);
             inBounds = true; 
         }
@@ -73,5 +72,6 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
         SmartDashboard.putNumber("Inner elevator speed", motorSpeed);
         SmartDashboard.putNumber("Inner elevator posotion ", innerElevatorPosition);
+        SmartDashboard.putNumber("Inner elevator goal position", state.height);
     }
 }
