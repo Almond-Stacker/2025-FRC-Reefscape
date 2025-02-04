@@ -40,7 +40,7 @@ public final class Constants {
         public static final int encoderID = 1;
         public static final double velocitySetPoint = 0; 
 
-        public static final double kP = 0;
+        public static final double kP = 0.02;
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double kS = 0;
@@ -57,15 +57,15 @@ public final class Constants {
     }
 
     public static final class Arm {
-        public static final int armMotorID = 21;
+        public static final int armMotorID = 17;
         public static final int encoderID = 0;
         public static final int indexingMotorID = 21; 
 
-        public static final double kP = 0;
+        public static final double kP = 0.01;
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double kS = 0;
-        public static final double kG = 0;
+        public static final double kG = 0.003;
         public static final double kV = 0;
     }
 
@@ -73,7 +73,7 @@ public final class Constants {
     // all angles must be in radians
     public static final class Photon {
         public static final double driveConstant = 1;
-        public static final double angleConstant = 0.04;
+        public static final double angleConstant = 0.06;
 
         public static final class camera0 {
             public static final String cameraName = "front_photon_camera";

@@ -15,6 +15,7 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -53,6 +54,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController driver0 = new CommandXboxController(0);
+    private final CommandXboxController driver1 = new CommandXboxController(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     
@@ -79,7 +81,8 @@ public class RobotContainer {
     public RobotContainer() {
         configureAutos();
         configureDriveBindings();
-        configureSYSTests();    
+        configureSYSTests();  
+        configureDriver1Commands();  
     }
 
     private void configureAutos() {
@@ -118,6 +121,29 @@ public class RobotContainer {
         driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    }
+
+    private void configureDriver1Commands() {
+        driver1.b().onFalse(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0)));
+        driver1.a().onFalse(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0)));
+
+        driver1.a().onTrue(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0.05)));
+
+        driver1.b().onTrue(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(-0.05)));
+
+
+        driver1.y().onTrue(new InstantCommand(() -> s_intakeArm.setIndexSpeed(1)));
+        driver1.y().onFalse(new InstantCommand(() -> s_intakeArm.setIndexSpeed(0)));
+
+        driver1.x().onTrue(new InstantCommand(() -> s_intakeArm.setIndexSpeed(-1)));
+        driver1.x().onFalse(new InstantCommand(() -> s_intakeArm.setIndexSpeed(0)));
+
+        driver1.rightBumper().onTrue(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0.1)));
+        driver1.rightBumper().onFalse(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0)));
+
+        driver1.leftBumper().onTrue(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(-0.1)));
+        driver1.leftBumper().onFalse(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0)));
+
     }
 
     public Command getAutonomousCommand() {

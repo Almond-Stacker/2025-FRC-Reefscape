@@ -21,7 +21,7 @@ public class IntakeArmCommand extends Command {
     @Override
     public void initialize() {
         if(indexState != null){
-            IntakeArmSubsystem.setIndexState(indexState);
+           // IntakeArmSubsystem.setIndexState(indexState);
         }
 
         if(armState != null){

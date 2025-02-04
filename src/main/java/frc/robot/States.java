@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.Photon;
+import frc.robot.commands.IntakeArmCommand;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class States {
@@ -24,13 +25,15 @@ public class States {
 
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
-        HOME(),
-        L1(),
-        L2(),
-        L3(),
-        L4(),
-        MIN(),
-        MAX();
+        HOME(0.57),
+        L1(37),
+        L2(99.5),
+        L3(99.5),
+        L4(60),
+        PRE_INTAKE(65),
+        INTAKE(52),
+        MIN(0),
+        MAX(101);
 
         public final double height;
 
@@ -45,13 +48,13 @@ public class States {
 
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
-        HOME(),
+        HOME(0.01),
         L1(),
         L2(),
         L3(),
-        L4(),
-        MIN(),
-        MAX();
+        L4(4.8),
+        MIN(0),
+        MAX(5);
 
         public final double height;
 
@@ -66,11 +69,13 @@ public class States {
 
     public enum ArmStates {
         // allow for easy changing of elevator states 
-        HOME(),
+        HOME(60),
+        STARTING_POSITION(240),
         L1(),
-        L2(),
         L3(),
-        L4(),
+        L4(),    
+        L2(150),
+        FEED_OUT(207),
         MIN(),
         MAX();
 

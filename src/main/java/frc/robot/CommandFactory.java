@@ -2,6 +2,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Horsepower;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.States.AlgaeIntakeStates;
 import frc.robot.States.ArmStates;
 import frc.robot.States.InnerElevatorStates;
@@ -80,10 +82,10 @@ public class CommandFactory {
                 .withPrimaryElevator(PrimaryElevatorStates.L3).build());
         }
 
-        public PrimaryElevatorCommand createL4Command() {
-            return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
-                .withPrimaryElevator(PrimaryElevatorStates.L4).build());
-        }
+        // public PrimaryElevatorCommand createL4Command() {
+        //     return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
+        //         .withPrimaryElevator(PrimaryElevatorStates.L4).build());
+        // }
     }
 
     public static class AlgaeIntakeCommandFactory {
@@ -134,6 +136,24 @@ public class CommandFactory {
         public IntakeArmCommand createFeedOutCommand() {
             return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
                 .withIndexState(IndexStates.FEED_OUT).build());
+        }
+    }
+
+    public static class CombinationCommandFactory {
+        private final IntakeArmCommandFactory intakeFactory;
+        private final AlgaeIntakeCommandFactory algaeFactory;
+        private final PrimaryElevatorCommandFactory primaryElevatorFactory;
+        private final InnerElevatorCommandFactory innerElevatorFactory; 
+
+        public CombinationCommandFactory(IntakeArmCommandFactory intake, AlgaeIntakeCommandFactory algae, PrimaryElevatorCommandFactory elevator, InnerElevatorCommandFactory innerElevator) {
+            intakeFactory = intake;
+            algaeFactory = algae;
+            primaryElevatorFactory = elevator;
+            innerElevatorFactory = innerElevator;
+        }
+
+        public SequentialCommandGroup createScoreL1() {
+            
         }
     }
 }
