@@ -36,10 +36,9 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
         armFeedforward = new ArmFeedforward(Constants.Arm.kS, Constants.Arm.kG, Constants.Arm.kV);
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
-        armState  = ArmStates.L2;
+        armState  = ArmStates.STARTING_POSITION;
         indexState = IndexStates.STOP;
-       // armEncoder.
-        //setIndexState(indexState);
+        setIndexState(indexState);
         setArmState(armState);
     }
 
@@ -62,15 +61,11 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armPID.setSetpoint(armState.angle);
     }
 
-    // public void setIndexState(IndexStates state) {
-    //     indexingMotor.set(0);
-    //     this.indexState = state;
-    // }
-
-    public void setIndexSpeed(double speed) {
-        indexingMotor.set(speed);
+    public void setIndexState(IndexStates state) {
+        indexingMotor.set(state.speed);
+        this.indexState = state;
     }
-
+    
     private void setSmartdashboard() {
         SmartDashboard.putString("Arm Subsytem index state", indexState.toString());
         SmartDashboard.putString("Arm Subsystem arm state ", armState.toString());

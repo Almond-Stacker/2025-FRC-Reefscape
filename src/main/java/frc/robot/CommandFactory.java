@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Horsepower;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.States.AlgaeIntakeStates;
@@ -48,11 +46,6 @@ public class CommandFactory {
             return new InnerElevatorCommand(elevator, new InnerElevatorCommand.InnerElevatorCommandConfiguration()
                 .withInnerElevator(InnerElevatorStates.L3).build());
         } 
-
-        public InnerElevatorCommand createL4Command() {
-            return new InnerElevatorCommand(elevator, new InnerElevatorCommand.InnerElevatorCommandConfiguration()
-                .withInnerElevator(InnerElevatorStates.L4).build());
-        } 
     }
 
     public static class PrimaryElevatorCommandFactory {
@@ -81,11 +74,6 @@ public class CommandFactory {
             return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
                 .withPrimaryElevator(PrimaryElevatorStates.L3).build());
         }
-
-        // public PrimaryElevatorCommand createL4Command() {
-        //     return new PrimaryElevatorCommand(elevator, new PrimaryElevatorCommand.PrimaryElevatorCommandConfiguration()
-        //         .withPrimaryElevator(PrimaryElevatorStates.L4).build());
-        // }
     }
 
     public static class AlgaeIntakeCommandFactory {
@@ -137,6 +125,11 @@ public class CommandFactory {
             return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
                 .withIndexState(IndexStates.FEED_OUT).build());
         }
+
+        public IntakeArmCommand createL1Command() {
+            return new IntakeArmCommand(intake, new IntakeArmCommand.IntakeArmCommandConfiguration()
+                .withArmState(ArmStates.L1));
+        }
     }
 
     public static class CombinationCommandFactory {
@@ -153,7 +146,8 @@ public class CommandFactory {
         }
 
         public SequentialCommandGroup createScoreL1() {
-            
+            return new SequentialCommandGroup(primaryElevatorFactory.createL1Command(),
+                                                intakeFactory.createL1Command());
         }
     }
 }

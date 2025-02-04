@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.lib.util.Utilities;
 import frc.robot.CommandFactory.AlgaeIntakeCommandFactory;
+import frc.robot.CommandFactory.CombinationCommandFactory;
 import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
@@ -76,7 +77,8 @@ public class RobotContainer {
     private final PrimaryElevatorCommandFactory f_PrimaryElevator = new CommandFactory.PrimaryElevatorCommandFactory(s_PrimaryElevator);
     private final InnerElevatorCommandFactory f_InnerElevator = new CommandFactory.InnerElevatorCommandFactory(s_InnerElevator);
     private final IntakeArmCommandFactory f_intakeArm = new CommandFactory.IntakeArmCommandFactory(s_intakeArm);
-    private final AlgaeIntakeCommandFactory f_AlgaeIntakeCommandFactory = new CommandFactory.AlgaeIntakeCommandFactory(s_algaeIntake);
+    private final AlgaeIntakeCommandFactory f_algaeIntake = new CommandFactory.AlgaeIntakeCommandFactory(s_algaeIntake);
+    private final CombinationCommandFactory f_combination = new CommandFactory.CombinationCommandFactory(f_intakeArm, f_algaeIntake, f_PrimaryElevator, f_InnerElevator);
 
     public RobotContainer() {
         configureAutos();
@@ -124,25 +126,6 @@ public class RobotContainer {
     }
 
     private void configureDriver1Commands() {
-        driver1.b().onFalse(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0)));
-        driver1.a().onFalse(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0)));
-
-        driver1.a().onTrue(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0.05)));
-
-        driver1.b().onTrue(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(-0.05)));
-
-
-        driver1.y().onTrue(new InstantCommand(() -> s_intakeArm.setIndexSpeed(1)));
-        driver1.y().onFalse(new InstantCommand(() -> s_intakeArm.setIndexSpeed(0)));
-
-        driver1.x().onTrue(new InstantCommand(() -> s_intakeArm.setIndexSpeed(-1)));
-        driver1.x().onFalse(new InstantCommand(() -> s_intakeArm.setIndexSpeed(0)));
-
-        driver1.rightBumper().onTrue(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0.1)));
-        driver1.rightBumper().onFalse(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0)));
-
-        driver1.leftBumper().onTrue(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(-0.1)));
-        driver1.leftBumper().onFalse(new InstantCommand(() -> s_InnerElevator.setInnerElevatorSpeed(0)));
 
     }
 
