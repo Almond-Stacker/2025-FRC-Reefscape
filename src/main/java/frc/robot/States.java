@@ -72,10 +72,10 @@ public class States {
         STARTING_POSITION(240),
         L1(197),
         L2(150),
-        L3(150),
+        L3(210),
         FEED_OUT(207),
-        MIN(),
-        MAX();
+        MIN(0),
+        MAX(360);
 
         public final double angle;
 

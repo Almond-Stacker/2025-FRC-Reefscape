@@ -188,6 +188,7 @@ public class CommandFactory {
         
         public SequentialCommandGroup createScoreL3Command() {
             return new SequentialCommandGroup(primaryElevatorFactory.createL3Command(),
+                                                innerElevatorFactory.createL3Command(),
                                                 intakeFactory.createL3Command());
         }
 
@@ -198,6 +199,7 @@ public class CommandFactory {
 
         public SequentialCommandGroup createHomeCommand() {
             return new SequentialCommandGroup(primaryElevatorFactory.createHomeCommand(),
+                                                innerElevatorFactory.createHomeCommand(),
                                                 intakeFactory.createStartingPositionCommand());
         }
     }

@@ -34,7 +34,7 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     private boolean inBounds;
 
     public InnerElevatorSubsystem() {
-        this.state = InnerElevatorStates.L1;
+        this.state = InnerElevatorStates.HOME;
         elevatorMotor = new SparkFlex(Constants.InnerElevator.ElevatorMotorID, MotorType.kBrushless);
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
         //elevatorEncoder = elevatorMotor.getAbsoluteEncoder();
@@ -47,14 +47,14 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         innerElevatorPosition = elevatorEncoder.getPosition() + 0.01;
-        motorSpeed = elevatorPID.calculate(innerElevatorPosition) + elevatorFeedforward.calculate(elevatorMotor.getEncoder().getVelocity());// + 0.05;
+        motorSpeed = elevatorPID.calculate(innerElevatorPosition); //+ elevatorFeedforward.calculate(elevatorMotor.getEncoder().getVelocity());// + 0.05;
         //motorSpeed = elevator
         if(innerElevatorPosition >= InnerElevatorStates.MAX.height || innerElevatorPosition <= InnerElevatorStates.MIN.height) {
             // positive goes up 
             elevatorMotor.set(0.0);
             inBounds = false;
         } else {
-            elevatorMotor.set(0);
+            elevatorMotor.set(motorSpeed);
             inBounds = true; 
         }
         setSmartdashboard();

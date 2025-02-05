@@ -136,7 +136,7 @@ public class RobotContainer {
         driver1.leftTrigger().onTrue(c_coralFeedOut);
         driver1.leftTrigger().onFalse(c_armStop);
 
-        driver1.pov(-1).toggleOnTrue(c_preIntake);
+        //driver1.pov(-1).toggleOnTrue(c_preIntake);
         driver1.pov(90).toggleOnTrue(c_scoreL1);
         driver1.pov(180).toggleOnTrue(c_scoreL2);
         driver1.pov(270).toggleOnTrue(c_scoreL3);

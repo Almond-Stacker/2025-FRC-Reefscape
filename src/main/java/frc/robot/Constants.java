@@ -48,12 +48,13 @@ public final class Constants {
         public static final double kV = 0;
     }
 
+    // final 
     public static final class InnerElevator {
         public static final int ElevatorMotorID = 22;
 
-        public static final double kP = 0.08;
+        public static final double kP = 0.38;
         public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double kD = 0.03;
         public static final double kS = 0;
         public static final double kG = 0.03;
         public static final double kV = 0;

@@ -55,10 +55,10 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         } else {
             motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
             // positive goes up 
-            // leftElevatorMotor.set(motorSpeed);
-            // rightElevatorMotor.set(motorSpeed);
-            leftElevatorMotor.set(0);
-            rightElevatorMotor.set(0);
+            leftElevatorMotor.set(motorSpeed);
+            rightElevatorMotor.set(motorSpeed);
+            // leftElevatorMotor.set(0);
+            // rightElevatorMotor.set(0);
             inBounds = true;    
         }
         setSmartdashboard();
