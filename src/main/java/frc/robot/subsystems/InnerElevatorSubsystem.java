@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -24,7 +25,7 @@ import frc.robot.States.InnerElevatorStates;
 public class InnerElevatorSubsystem extends SubsystemBase {
     private final SparkFlex elevatorMotor;
     private final PIDController elevatorPID;
-   // private final ArmFeedforward armFeedforward;
+    private final ElevatorFeedforward elevatorFeedforward;
     //private final SparkAbsoluteEncoder elevatorEncoder;
     private final RelativeEncoder elevatorEncoder;
     private InnerElevatorStates state;
@@ -37,6 +38,7 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         elevatorMotor = new SparkFlex(Constants.InnerElevator.ElevatorMotorID, MotorType.kBrushless);
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
         //elevatorEncoder = elevatorMotor.getAbsoluteEncoder();
+        elevatorFeedforward = new ElevatorFeedforward(Constants.InnerElevator.kS, Constants.InnerElevator.kG, Constants.InnerElevator.kV);
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorPID = new PIDController(Constants.InnerElevator.kP, Constants.InnerElevator.kI, Constants.InnerElevator.kD);
         setInnerElevatorState(state);
@@ -45,7 +47,7 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         innerElevatorPosition = elevatorEncoder.getPosition() + 0.01;
-        motorSpeed = elevatorPID.calculate(innerElevatorPosition) + 0.05;
+        motorSpeed = elevatorPID.calculate(innerElevatorPosition) + elevatorFeedforward.calculate(elevatorMotor.getEncoder().getVelocity());// + 0.05;
         //motorSpeed = elevator
         if(innerElevatorPosition >= InnerElevatorStates.MAX.height || innerElevatorPosition <= InnerElevatorStates.MIN.height) {
             // positive goes up 

@@ -55,8 +55,10 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         } else {
             motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
             // positive goes up 
-            leftElevatorMotor.set(motorSpeed);
-            rightElevatorMotor.set(motorSpeed);
+            // leftElevatorMotor.set(motorSpeed);
+            // rightElevatorMotor.set(motorSpeed);
+            leftElevatorMotor.set(0);
+            rightElevatorMotor.set(0);
             inBounds = true;    
         }
         setSmartdashboard();
@@ -72,6 +74,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
+       // SmartDashboard.putNumber("enatshueo", absoluteEncoder.get());
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
     }
 
