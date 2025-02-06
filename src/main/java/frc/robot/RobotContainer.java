@@ -7,6 +7,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.lang.ModuleLayer.Controller;
+import java.lang.Thread.State;
+
+import org.photonvision.proto.Photon;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -74,6 +77,7 @@ public class RobotContainer {
     private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
     private final AlgaeIntakeSubsystem s_algaeIntake = new AlgaeIntakeSubsystem();
+    private final PhotonSubsystem s_photonCamera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName, Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, States.PhotonStates.tag1);
 
     /* Command Factory */
     private final PrimaryElevatorCommandFactory f_PrimaryElevator = new CommandFactory.PrimaryElevatorCommandFactory(s_PrimaryElevator);

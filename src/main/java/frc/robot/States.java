@@ -8,7 +8,8 @@ import frc.robot.subsystems.PrimaryElevatorSubsystem;
 public class States {
     // allow for easy changing of photon vision targets 
     public enum PhotonStates {
-        driveTag4(Photon.tag4.targetID ,Photon.tag4.distance0, Photon.tag4.angle0, Photon.tag4.tagHeight);
+        driveTag4(Photon.tag4.targetID ,Photon.tag4.distance0, Photon.tag4.angle0, Photon.tag4.tagHeight),
+        tag1(Photon.tag1.targetID, Photon.tag1.desiredDistance1, Photon.tag1.desiredAngle1, Photon.tag1.tagHeight);
 
         public final int id;
         public final double distance;
