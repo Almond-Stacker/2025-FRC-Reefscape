@@ -176,20 +176,23 @@ public class CommandFactory {
         }
 
         public SequentialCommandGroup createScoreL1Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL1Command(),
-                                                intakeFactory.createL1Command());
+            return new SequentialCommandGroup(intakeFactory.createL1Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL1Command());
         }
 
         public SequentialCommandGroup createScoreL2Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL2Command(),
-                                                intakeFactory.createL2Command());
+            return new SequentialCommandGroup(intakeFactory.createL2Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL2Command());
         }
 
         
         public SequentialCommandGroup createScoreL3Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL3Command(),
-                                                innerElevatorFactory.createL3Command(),
-                                                intakeFactory.createL3Command());
+            return new SequentialCommandGroup(intakeFactory.createL3Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL3Command(),
+                                                innerElevatorFactory.createL3Command());
         }
 
         public SequentialCommandGroup createPreIntakeCommand() {
