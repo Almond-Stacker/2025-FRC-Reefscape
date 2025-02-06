@@ -52,9 +52,10 @@ public class IntakeArmSubsystem extends SubsystemBase {
         inBounds = false;
         if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
             // posotive is up
-            ArmMotor.set(motorSpeed);
+            ArmMotor.set(0);
         } else {
-            ArmMotor.set(motorSpeed);
+            //ArmMotor.set(motorSpeed);
+            ArmMotor.set(0);
             inBounds = true;
         }
         setSmartdashboard();

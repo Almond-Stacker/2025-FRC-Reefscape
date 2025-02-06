@@ -82,7 +82,7 @@ public final class Constants {
 
         public static final class camera0 {
             public static final String cameraName = "front_photon_camera";
-            public static final double cameraHeight = Units.inchesToMeters(23);
+            public static final double cameraHeight = Units.inchesToMeters(11);
             public static final double cameraPitch = Units.degreesToRadians(0);
         }
 
@@ -91,6 +91,14 @@ public final class Constants {
             public static final double tagHeight = Units.inchesToMeters(21);
             public static final double distance0 = 0.3;
             public static final double angle0 = 4; 
+        }
+
+        public static final class tag1 {
+            public static final int targetID = 1;
+            public static final double tagHeight = Units.inchesToMeters(8.2);
+            public static final double desiredDistance1 = 0.5;
+            public static final double desiredAngle1 = 0;
+    
         }
     }
 }

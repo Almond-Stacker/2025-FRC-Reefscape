@@ -102,6 +102,7 @@ public class RobotContainer {
 
     private void configureAutos() {
         autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        autoChooser.addRoutine("SimplePath1", autoRoutines::simplePathAuto1);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 

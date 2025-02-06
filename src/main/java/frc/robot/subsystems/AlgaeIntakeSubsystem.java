@@ -29,7 +29,8 @@ public class AlgaeIntakeSubsystem extends SubsystemBase {
 
     public void setAlgaeIntakeState(AlgaeIntakeStates state) {
         this.state = state;
-        intakeMotor.set(state.speed);
+    //  intakeMotor.set(state.speed);
+        intakeMotor.set(0);
     }
 
     private void setSmartdashboard() {

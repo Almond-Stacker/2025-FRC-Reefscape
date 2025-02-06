@@ -21,4 +21,15 @@ public class AutoRoutines {
         );
         return routine;
     }
+
+    public AutoRoutine simplePathAuto1() {
+        final AutoRoutine routine = m_factory.newRoutine("New Path (2)");
+        final AutoTrajectory simplePath = routine.trajectory("New Path (2)");
+
+        routine.active().onTrue(
+            simplePath.resetOdometry()
+                .andThen(simplePath.cmd())
+        );
+        return routine;
+    }
 }
