@@ -6,11 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.ModuleLayer.Controller;
-import java.lang.Thread.State;
-
-import org.photonvision.proto.Photon;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -31,9 +26,7 @@ import frc.robot.CommandFactory.CombinationCommandFactory;
 import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
-import frc.robot.States.PhotonStates;
 import frc.robot.commands.IntakeArmCommand;
-import frc.robot.commands.positionRelativeToAprilTag;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
