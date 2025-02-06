@@ -202,5 +202,11 @@ public class CommandFactory {
                                                 innerElevatorFactory.createHomeCommand(),
                                                 intakeFactory.createStartingPositionCommand());
         }
+
+        public SequentialCommandGroup createIntakeCommand() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createIntakeCommand(),
+                                                //innerElevatorFactory.createIntakeCommand(),
+                                                intakeFactory.createIntakeCommand());
+        }
     }
 }

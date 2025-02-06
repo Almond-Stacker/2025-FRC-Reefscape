@@ -96,6 +96,8 @@ public class RobotContainer {
     private final SequentialCommandGroup c_scoreL3 = f_combination.createScoreL3Command();
     private final SequentialCommandGroup c_home = f_combination.createHomeCommand();
     private final SequentialCommandGroup c_preIntake = f_combination.createPreIntakeCommand();
+    private final SequentialCommandGroup c_intake = f_combination.createIntakeCommand();
+
 
     public RobotContainer() {
         configureAutos();
@@ -141,7 +143,8 @@ public class RobotContainer {
         driver1.leftTrigger().onTrue(c_coralFeedOut);
         driver1.leftTrigger().onFalse(c_armStop);
 
-        //driver1.pov(-1).toggleOnTrue(c_preIntake);
+        driver1.a().toggleOnTrue(c_preIntake);
+        driver1.x().toggleOnTrue(c_intake);
         driver1.pov(90).toggleOnTrue(c_scoreL1);
         driver1.pov(180).toggleOnTrue(c_scoreL2);
         driver1.pov(270).toggleOnTrue(c_scoreL3);
