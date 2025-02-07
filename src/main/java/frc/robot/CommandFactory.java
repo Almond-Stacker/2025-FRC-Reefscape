@@ -2,12 +2,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.States.AlgaeIntakeStates;
 import frc.robot.States.ArmStates;
 import frc.robot.States.InnerElevatorStates;
 import frc.robot.States.PrimaryElevatorStates;
 import frc.robot.States.IndexStates;
-import frc.robot.States.AlgaeIntakeStates;
 
 import frc.robot.commands.AlgaeIntakeCommand;
 import frc.robot.commands.InnerElevatorCommand;
@@ -21,7 +21,7 @@ import frc.robot.subsystems.AlgaeIntakeSubsystem;
 
 public class CommandFactory {
     public static class InnerElevatorCommandFactory {
-        private final InnerElevatorSubsystem elevator;
+        public final InnerElevatorSubsystem elevator;
 
         public InnerElevatorCommandFactory(InnerElevatorSubsystem elevator) {
             this.elevator = elevator;
@@ -49,7 +49,7 @@ public class CommandFactory {
     }
 
     public static class PrimaryElevatorCommandFactory {
-        private final PrimaryElevatorSubsystem elevator;
+        public final PrimaryElevatorSubsystem elevator;
 
         public PrimaryElevatorCommandFactory(PrimaryElevatorSubsystem elevator) {
             this.elevator = elevator;
@@ -87,7 +87,7 @@ public class CommandFactory {
     }
 
     public static class AlgaeIntakeCommandFactory {
-        private final AlgaeIntakeSubsystem intake;
+        public final AlgaeIntakeSubsystem intake;
 
         public AlgaeIntakeCommandFactory(AlgaeIntakeSubsystem intake) {
             this.intake = intake;
@@ -110,7 +110,7 @@ public class CommandFactory {
     }
 
     public static class IntakeArmCommandFactory {
-        private final IntakeArmSubsystem intake;
+        public final IntakeArmSubsystem intake;
 
         public IntakeArmCommandFactory(IntakeArmSubsystem intake) {
             this.intake = intake;
@@ -176,20 +176,23 @@ public class CommandFactory {
         }
 
         public SequentialCommandGroup createScoreL1Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL1Command(),
-                                                intakeFactory.createL1Command());
+            return new SequentialCommandGroup(intakeFactory.createL1Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL1Command());
         }
 
         public SequentialCommandGroup createScoreL2Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL2Command(),
-                                                intakeFactory.createL2Command());
+            return new SequentialCommandGroup(intakeFactory.createL2Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL2Command());
         }
 
         
         public SequentialCommandGroup createScoreL3Command() {
-            return new SequentialCommandGroup(primaryElevatorFactory.createL3Command(),
-                                                innerElevatorFactory.createL3Command(),
-                                                intakeFactory.createL3Command());
+            return new SequentialCommandGroup(intakeFactory.createL3Command(),
+                                                new WaitCommand(0.3),
+                                                primaryElevatorFactory.createL3Command(),
+                                                innerElevatorFactory.createL3Command());
         }
 
         public SequentialCommandGroup createPreIntakeCommand() {
@@ -201,6 +204,21 @@ public class CommandFactory {
             return new SequentialCommandGroup(primaryElevatorFactory.createHomeCommand(),
                                                 innerElevatorFactory.createHomeCommand(),
                                                 intakeFactory.createStartingPositionCommand());
+        }
+
+        public SequentialCommandGroup createFeedOutScoreCommand() {
+            return new SequentialCommandGroup(new InstantCommand( () -> intakeFactory.intake.setArmSpeed(0, true)),
+                                                intakeFactory.createFeedOutCommand(), 
+                                                new WaitCommand(0.2),
+                                                intakeFactory.createStopCommand(),
+                                                new InstantCommand(() -> intakeFactory.intake.setArmSpeed(0, false)));
+
+        }
+
+        public SequentialCommandGroup createIntakeCommand() {
+            return new SequentialCommandGroup(primaryElevatorFactory.createIntakeCommand(),
+                                                //innerElevatorFactory.createIntakeCommand(),
+                                                intakeFactory.createIntakeCommand());
         }
     }
 }

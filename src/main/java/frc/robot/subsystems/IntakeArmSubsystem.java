@@ -21,7 +21,7 @@ import frc.robot.States.ArmStates;
 import frc.robot.States.IndexStates;
 
 public class IntakeArmSubsystem extends SubsystemBase {   
-    private final TalonFX ArmMotor;
+    private final TalonFX armMotor;
     private final SparkMax indexingMotor;
     private final DutyCycleEncoder armEncoder; 
     private final ArmFeedforward armFeedforward;
@@ -99,10 +99,10 @@ public class IntakeArmSubsystem extends SubsystemBase {
     private ArmStates armState;
     private double armPosition;
     private double motorSpeed; 
-    private boolean inBounds; 
+    private boolean override;
 
     public IntakeArmSubsystem() {
-        ArmMotor = new TalonFX(Constants.Arm.armMotorID);
+        armMotor = new TalonFX(Constants.Arm.armMotorID);
         indexingMotor = new SparkMax(Constants.Arm.indexingMotorID, MotorType.kBrushless);
         armEncoder = new DutyCycleEncoder(Constants.Arm.encoderID);
 
@@ -111,6 +111,7 @@ public class IntakeArmSubsystem extends SubsystemBase {
 
         armState  = ArmStates.STARTING_POSITION;
         indexState = IndexStates.STOP;
+        override = false;
         setIndexState(indexState);
         setArmState(armState);
     }
@@ -118,16 +119,24 @@ public class IntakeArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         armPosition = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
-        motorSpeed = armPID.calculate(armPosition) + armFeedforward.calculate(Units.degreesToRadians(armPosition), ArmMotor.getVelocity().getValueAsDouble());
-        inBounds = false;
-        if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
-            // posotive is up
-            ArmMotor.set(motorSpeed);
-        } else {
-            ArmMotor.set(motorSpeed);
-            inBounds = true;
+
+        // position motor speed moves up 
+        if(override) {
+            armMotor.set(motorSpeed);
         }
+        else if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
+            armMotor.set(0);
+        } else {
+            motorSpeed = armPID.calculate(armPosition) + armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getVelocity().getValueAsDouble());
+            armMotor.set(motorSpeed);
+        }
+
         setSmartdashboard();
+    }
+
+    public void setArmSpeed(double speed, boolean activate) {
+        this.override = activate;
+        this.motorSpeed = speed;
     }
 
     //calculate total desired height by 
@@ -149,7 +158,6 @@ public class IntakeArmSubsystem extends SubsystemBase {
         SmartDashboard.putString("Arm Subsystem arm state ", armState.toString());
         SmartDashboard.putNumber("Arm Subsystem position", armPosition);
         SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
-        SmartDashboard.putBoolean("Arm Subsystem inbounds", inBounds);
         SmartDashboard.putNumber("Arm Subsystem arm position goal", armState.angle);
     }
         */

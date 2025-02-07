@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.ModuleLayer.Controller;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -28,9 +26,7 @@ import frc.robot.CommandFactory.CombinationCommandFactory;
 import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
-import frc.robot.States.PhotonStates;
 import frc.robot.commands.IntakeArmCommand;
-import frc.robot.commands.positionRelativeToAprilTag;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -74,6 +70,7 @@ public class RobotContainer {
     private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
     private final AlgaeIntakeSubsystem s_algaeIntake = new AlgaeIntakeSubsystem();
+    private final PhotonSubsystem s_photonCamera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName, Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, States.PhotonStates.tag1);
 
     /* Command Factory */
     private final PrimaryElevatorCommandFactory f_PrimaryElevator = new CommandFactory.PrimaryElevatorCommandFactory(s_PrimaryElevator);
@@ -92,6 +89,8 @@ public class RobotContainer {
     private final SequentialCommandGroup c_scoreL3 = f_combination.createScoreL3Command();
     private final SequentialCommandGroup c_home = f_combination.createHomeCommand();
     private final SequentialCommandGroup c_preIntake = f_combination.createPreIntakeCommand();
+    private final SequentialCommandGroup c_intake = f_combination.createIntakeCommand();
+
 
     public RobotContainer() {
         configureAutos();
@@ -102,6 +101,7 @@ public class RobotContainer {
 
     private void configureAutos() {
         autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        autoChooser.addRoutine("SimplePath1", autoRoutines::simplePathAuto1);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -136,7 +136,8 @@ public class RobotContainer {
         driver1.leftTrigger().onTrue(c_coralFeedOut);
         driver1.leftTrigger().onFalse(c_armStop);
 
-        //driver1.pov(-1).toggleOnTrue(c_preIntake);
+        driver1.a().toggleOnTrue(c_preIntake);
+        driver1.x().toggleOnTrue(c_intake);
         driver1.pov(90).toggleOnTrue(c_scoreL1);
         driver1.pov(180).toggleOnTrue(c_scoreL2);
         driver1.pov(270).toggleOnTrue(c_scoreL3);

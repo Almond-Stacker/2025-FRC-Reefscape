@@ -46,19 +46,17 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
        // elevatorPosition = Units.degreesToRadians(leftElevatorMotor.getPosition().getValueAsDouble());
        //elevatorPosition = Units.rotationsToDegrees(encoder.get());
        relativeElevatorPosition = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
-       motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
+       //motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
 
+       // positive goes up 
         if(relativeElevatorPosition >= PrimaryElevatorStates.MAX.height || relativeElevatorPosition <= PrimaryElevatorStates.MIN.height) {
             leftElevatorMotor.set(0);
             rightElevatorMotor.set(0);
             inBounds = false;
         } else {
             motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
-            // positive goes up 
             leftElevatorMotor.set(motorSpeed);
             rightElevatorMotor.set(motorSpeed);
-            // leftElevatorMotor.set(0);
-            // rightElevatorMotor.set(0);
             inBounds = true;    
         }
         setSmartdashboard();
@@ -74,7 +72,6 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
-       // SmartDashboard.putNumber("enatshueo", absoluteEncoder.get());
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
     }
 
