@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
 
@@ -69,6 +70,7 @@ public final class Constants {
         public static final double kP = 0.01;
         public static final double kI = 0;
         public static final double kD = 0;
+        public static final TrapezoidProfile.Constraints ANGLE_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 1);
         public static final double kS = 0;
         public static final double kG = 0.003;
         public static final double kV = 0;
