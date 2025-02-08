@@ -1,57 +1,30 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-import frc.robot.generated.TunerConstants;
 
-// put the algae down 
-// this is for my processor 
-public final class Constants {
-    // public static final class Swerve {
-    //     public static SwerveDriveKinematics driveKinematics = new SwerveDriveKinematics(
-    //         new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
-    //         new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
-    //         new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
-    //         new Translation2d(TunerConstants.kBackRightXPos, TunerConstants.kBackRightYPos)
-    //     );
-    // }
-
-    public static final class BeamBreak {
-        public static final int beamBreakID = 0;
-    }
-
-    public static final class LED {
-        public static final int LED_ID = 0;
-    }
-
-    public static final class AlgaeIntake {
-        public static final int intakeMotorID = 20; 
-        public static final double kP = 0;
-        public static final double kI = 0;
-        public static final double kD = 0;
-    }
-
-    // FINISHED 
-    public static final class PrimaryElevator {
-
+//if want to import with .* to avoid typing exact class dependances
+//consider seperate constants files
+public class Constants {
+    
+    public static final class PrimaryElevatorConsts {
         public static final int leftElevatorMotorID = 14;
         public static final int rightElevatorMotorID = 15;
         public static final int encoderID = 1;
-        public static final double velocitySetPoint = 0; 
 
+        //temopory estamate, although resonable value?
+        //smaller the better, however don't want occelations 
+        public static final double PID_TOLERANCE = 10;
         public static final double kP = 0.02;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double kS = 0;
-        public static final double kG = 0;
-        public static final double kV = 0;
+        
+        //tune this as well too, could be very off ##note it's reading height
+        public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(2, 4);
+        
     }
 
-    // final 
-    public static final class InnerElevator {
-        public static final int ElevatorMotorID = 22;
+    public static final class InnerElevatorConsts {
+        public static final int elevatorMotorID = 22;
 
         public static final double kP = 0.38;
         public static final double kI = 0;
@@ -62,13 +35,14 @@ public final class Constants {
         public static final double kV = 0;
 
         public static final double gravityNegationConstant = 0.7;
+        public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(2, 4);
     }
 
-    // FINISHED 
-    public static final class Arm {
+    public static final class IntakeArmConsts {
         public static final int armMotorID = 17;
         public static final int encoderID = 0;
-        public static final int indexingMotorID = 21; 
+        public static final int suckMotorID = 21;
+        public static final double OUT_TIMEOUT = 1;//one second 
 
         public static final double kP = 0.01;
         public static final double kI = 0;
@@ -79,31 +53,8 @@ public final class Constants {
         public static final double kV = 0;
     }
 
-    // all distances must be in meters 
-    // all angles must be in radians
-    public static final class Photon {
-        public static final double driveConstant = 1;
-        public static final double angleConstant = 0.06;
-
-        public static final class camera0 {
-            public static final String cameraName = "front_photon_camera";
-            public static final double cameraHeight = Units.inchesToMeters(11);
-            public static final double cameraPitch = Units.degreesToRadians(0);
-        }
-
-        public static final class tag4 {
-            public static final int targetID = 4;
-            public static final double tagHeight = Units.inchesToMeters(21);
-            public static final double distance0 = 0.3;
-            public static final double angle0 = 4; 
-        }
-
-        public static final class tag1 {
-            public static final int targetID = 1;
-            public static final double tagHeight = Units.inchesToMeters(8.2);
-            public static final double desiredDistance1 = 0.5;
-            public static final double desiredAngle1 = 0;
-    
-        }
+    public static final class PhotonConsts {
+        
     }
+
 }
