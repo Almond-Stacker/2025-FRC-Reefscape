@@ -13,12 +13,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 import frc.robot.States.InnerElevatorStates;
+import frc.robot.States.IntakeArmStates;
 import frc.robot.States.PrimaryElevatorStates;
+import frc.robot.States.SuckStates;
 import frc.robot.commands.InnerElevatorCommand;
+import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.PrimaryElevatorCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 //overall structure of the robot here, no real robot logic
@@ -53,6 +57,9 @@ public class RobotContainer {
     private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
     private final InnerElevatorCommand innerElevatorCommand = innerElevatorSubsystem.getCommands();
 
+    private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
+    private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
+
     public RobotContainer() {
         configureDriveBindings();
         configureDriver1Commands();
@@ -82,6 +89,9 @@ public class RobotContainer {
     }
     
     private void configureDriver1Commands() {
+        driver1.a().onTrue(intakeArmCommand.setSuck(SuckStates.INTAKE));
+        driver1.b().onTrue(intakeArmCommand.setSuck(SuckStates.FEED_OUT));
+
         driver1.pov(90).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L1));
         driver1.pov(90).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L1));
 

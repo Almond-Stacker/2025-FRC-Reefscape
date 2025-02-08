@@ -9,9 +9,11 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeArmConsts;
 import frc.robot.States.IntakeArmStates;
+import frc.robot.States.SuckStates;
 import frc.robot.commands.IntakeArmCommand;
 
 public class IntakeArmSubsystem extends SubsystemBase{
@@ -41,7 +43,7 @@ public class IntakeArmSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        double armAngle = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
+        double armAngle = getAngle();
 
         if(armAngle >= IntakeArmStates.MAX.angle
                 || armAngle <= IntakeArmStates.MIN.angle) {
@@ -56,23 +58,37 @@ public class IntakeArmSubsystem extends SubsystemBase{
     }
 
     public void setAngle(double angle) {
-
+        armPID.setGoal(angle);
     }
 
-    public void reset() {
+    public void setSuck(double speed) {
+        //could set variable instead then update motor in periodic
+        //if restrictions are needed and such
+        suckMotor.set(speed);
+    }
 
+    public void resetArm() {
+        armPID.setGoal(getAngle());
+        armPID.reset(getAngle());
+    }
+
+    public void resetSuck() {
+        setSuck(SuckStates.STOP.speed);
     }
 
     public boolean atAngle() {
-
+        return armPID.atGoal();
     }
 
     public double getAngle() {
-
+        return Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
     }
 
     private void setSmartdashboard() {
-
+        SmartDashboard.putNumber("Arm Subsystem position", getAngle());
+        SmartDashboard.putNumber("Arm Subsystem motor speed", motorOutput);
+        SmartDashboard.putBoolean("Arm Subsystem inbounds", inBounds);
+        SmartDashboard.putNumber("Arm Subsystem arm position goal", armPID.getGoal().position);
     }
 
     public IntakeArmCommand getCommands() {
