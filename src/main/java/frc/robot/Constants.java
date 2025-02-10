@@ -54,7 +54,8 @@ public class Constants {
     }
 
     public static final class PhotonConsts {
-        
+        public static final String CAM0_NAME = "front_photon_camera";
+        public static final String CAM1_NAME = "";//set constants 2/9
     }
 
 }
