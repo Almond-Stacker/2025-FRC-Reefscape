@@ -1,6 +1,16 @@
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
+import java.util.List;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 //if want to import with .* to avoid typing exact class dependances
 //consider seperate constants files
@@ -56,6 +66,19 @@ public class Constants {
     public static final class PhotonConsts {
         public static final String CAM0_NAME = "front_photon_camera";
         public static final String CAM1_NAME = "";//set constants 2/9
+
+        public static final double TIMEOUT = 0.1;
+        public static final double MIN_AMBIGUITY = 0.2;//tune
+
+        //no reading consideration
+        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(4, 4, 8);
+        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
+        public static final PhotonPipelineResult NO_RESULT = new PhotonPipelineResult();
+        public static final Pose3d NO_APRILTAG = new Pose3d();
+        public static final EstimatedRobotPose NO_APRILTAG_ESTIMATE =
+                new EstimatedRobotPose(NO_APRILTAG, 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
+
+        
     }
 
 }
