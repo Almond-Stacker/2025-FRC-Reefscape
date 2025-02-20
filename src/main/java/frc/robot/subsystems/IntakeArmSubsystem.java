@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
@@ -34,11 +35,14 @@ public class IntakeArmSubsystem extends SubsystemBase{
 
     public IntakeArmSubsystem() {
         armMotor = new TalonFX(IntakeArmConsts.armMotorID);
+        armMotor.setNeutralMode(NeutralModeValue.Brake);
         suckMotor = new SparkMax(IntakeArmConsts.suckMotorID, MotorType.kBrushless);
         armEncoder = new DutyCycleEncoder(IntakeArmConsts.encoderID);
 
         armFeedforward = new ArmFeedforward(IntakeArmConsts.kS, IntakeArmConsts.kG, IntakeArmConsts.kV);
         armPID = new ProfiledPIDController(IntakeArmConsts.kP, IntakeArmConsts.kI, IntakeArmConsts.kD, IntakeArmConsts.ANGLE_CONSTRAINTS);
+
+        commands = new IntakeArmCommand(this);
     }
 
     @Override
@@ -47,24 +51,28 @@ public class IntakeArmSubsystem extends SubsystemBase{
 
         if(armAngle >= IntakeArmStates.MAX.angle
                 || armAngle <= IntakeArmStates.MIN.angle) {
-                    armMotor.set(0);
+                    motorOutput = 0;
                     inBounds = false;
-        } else {
-            motorOutput = armPID.calculate(getAngle()) + armFeedforward.calculate(armPID.getSetpoint().velocity, (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
+        } else {armFeedforward.calculate(armPID.getSetpoint().velocity, (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
+            motorOutput = armPID.calculate(getAngle()); //+ armFeedforward.calculate(getAngle() - 153, (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
+
         }
         
+        //armMotor.set(motorOutput);
         lastSpeed = armPID.getSetpoint().velocity;
         timeStamp = Timer.getFPGATimestamp();
+
+        setSmartdashboard();
     }
 
     public void setAngle(double angle) {
         armPID.setGoal(angle);
     }
 
-    public void setSuck(double speed) {
+    public void setSuckState(SuckStates state) {
         //could set variable instead then update motor in periodic
         //if restrictions are needed and such
-        suckMotor.set(speed);
+        //suckMotor.set(speed);
     }
 
     public void resetArm() {
@@ -73,7 +81,7 @@ public class IntakeArmSubsystem extends SubsystemBase{
     }
 
     public void resetSuck() {
-        setSuck(SuckStates.STOP.speed);
+        setSuckState(SuckStates.STOP);
     }
 
     public boolean atAngle() {

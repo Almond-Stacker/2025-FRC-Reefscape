@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -33,6 +34,11 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         elevatorPID.setTolerance(PrimaryElevatorConsts.PID_TOLERANCE);
         motorOutput = 0;
 
+        //config
+        absoluteEncoder.setDutyCycleRange(0, 1750);
+        leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+        rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+
         commands = new PrimaryElevatorCommand(this);
     }
     
@@ -42,15 +48,15 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
 
         if(relativeElevatorPosition >= PrimaryElevatorStates.MAX.height 
                 || relativeElevatorPosition <= PrimaryElevatorStates.MIN.height) {
-            leftElevatorMotor.set(0);
-            rightElevatorMotor.set(0);
+            //leftElevatorMotor.set(0);
+            //rightElevatorMotor.set(0);
             inBounds = false;
         } else {
             inBounds = true;
             //goal points are set in command
             motorOutput = elevatorPID.calculate(getHeight());
-            leftElevatorMotor.set(motorOutput);
-            rightElevatorMotor.set(motorOutput);
+            //leftElevatorMotor.set(motorOutput);
+            //rightElevatorMotor.set(motorOutput);
         }
 
         setSmartdashboard();

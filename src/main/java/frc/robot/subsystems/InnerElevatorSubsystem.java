@@ -46,16 +46,18 @@ public class InnerElevatorSubsystem extends SubsystemBase{
 
         if(relativeElevatorPosition >= InnerElevatorStates.MAX.height
                 || relativeElevatorPosition <= InnerElevatorStates.MIN.height) {
-            elevatorMotor.set(0);
+            //elevatorMotor.set(0);
             inBounds = false;
         } else {
             motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedforward.calculate(elevatorPID.getSetpoint().velocity, (elevatorPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
-            elevatorMotor.set(motorOutput);
+            //elevatorMotor.set(motorOutput);
             inBounds = true;
         }
 
         lastSpeed = elevatorPID.getSetpoint().velocity;
         timeStamp = Timer.getFPGATimestamp();
+
+        setSmartdashboard();
     }
 
     public void setHeight(double height) {

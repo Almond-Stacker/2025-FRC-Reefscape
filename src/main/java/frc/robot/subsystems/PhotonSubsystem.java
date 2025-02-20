@@ -28,6 +28,7 @@ import frc.robot.commands.PhotonCommand;
 //built for multiple cameras, finds average pose of every reading then 
 public class PhotonSubsystem extends SubsystemBase {
     private PhotonCommand commands;
+    private CommandSwerveDrivetrain drivetrain;
 
     private Matrix<N3, N1> curStdDevs = PhotonConsts.SINGLE_STD_DEVS; // dynamic standard deviation
 
@@ -36,15 +37,18 @@ public class PhotonSubsystem extends SubsystemBase {
     private final PhotonPoseEstimator estimator;
     private Optional<EstimatedRobotPose> collectiveEstimatedPose = Optional.empty();
 
-    private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-
     private double lastUpdateTime = 0;
+
+    private boolean targetExist = false;//testing
     
-        public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms) {
+        public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
+            this.drivetrain = drivetrain;
+            commands = new PhotonCommand(this, drivetrain);
+
             this.cameraToRobotTransforms = cameraToRobotTransforms;//was throwin error
             this.cameras = cameraNames.stream().map(PhotonCamera::new).toList();
             this.estimator = new PhotonPoseEstimator(
-                aprilTagFieldLayout, //figure custom April Tag feld creation
+                PhotonConsts.aprilTagFieldLayout, //figure custom April Tag feld creation
                 PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 cameraToRobotTransforms.get(0) // Using first cameras transform as refrence
             );
@@ -86,12 +90,26 @@ public class PhotonSubsystem extends SubsystemBase {
                     if(!filteredTargets.isEmpty()) {
                         Optional<EstimatedRobotPose> pose = estimator.update(result);
                         //check if pose was resonable
+                        targetExist = true;
                         if(pose.isPresent()) {
                             //transforms here to utalize index, consider creating a higher level pose handler
+                            
                             Pose3d transformedPose = pose.get().estimatedPose.transformBy(cameraToRobotTransforms.get(index).inverse());
+                            addedPose = new Pose3d(
+                                    transformedPose.getX() + addedPose.getX(),
+                                    transformedPose.getY() + addedPose.getY(),
+                                    transformedPose.getZ() + addedPose.getZ(),
+                                    new Rotation3d(
+                                        transformedPose.getRotation().getX() + addedPose.getRotation().getX(),
+                                        transformedPose.getRotation().getY() + addedPose.getRotation().getY(),
+                                        transformedPose.getRotation().getZ() + addedPose.getRotation().getZ()
+                                    )
+                                );
                             avgDist += transformedPose.toPose2d().getTranslation().getNorm();
                             validPoseCount++;
                         }
+                    } else {
+                        targetExist = false;
                     }
     
                 }
@@ -109,14 +127,19 @@ public class PhotonSubsystem extends SubsystemBase {
                         addedPose.getRotation().getZ() / validPoseCount
                     )
                 ));
+
+                //targetExist = true;
                 updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
                 lastUpdateTime = currentTime;
+
+                
             collectiveEstimatedPose = Optional.of(new EstimatedRobotPose(averagedPose, 0, List.of(), PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR));
         } else if (currentTime - lastUpdateTime > PhotonConsts.TIMEOUT) {
             collectiveEstimatedPose = Optional.of(PhotonConsts.NO_APRILTAG_ESTIMATE); //clear result if too great of time difference
             //no change to swerve pose
         }
 
+        setSmartDashboard();
     }
 
     public Optional<EstimatedRobotPose> getCollectiveEstimatedPose() {
@@ -125,7 +148,15 @@ public class PhotonSubsystem extends SubsystemBase {
 
     //distance and angle to specific tag
     public void setSmartDashboard() {
-        
+        if(collectiveEstimatedPose.isPresent()) {
+            Pose3d pose = collectiveEstimatedPose.get().estimatedPose;
+            SmartDashboard.putNumber("Pose X", pose.getX());
+            SmartDashboard.putNumber("Pose Y", pose.getY());
+            SmartDashboard.putNumber("Pose theata", pose.getRotation().getZ());
+        } else {
+            SmartDashboard.putString("Robot Pose", "No pose available");
+        }
+        SmartDashboard.putBoolean("There is Target", targetExist);
     }
 
     public PhotonCommand getCommands() {

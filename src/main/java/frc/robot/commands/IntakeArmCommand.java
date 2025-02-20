@@ -13,6 +13,8 @@ public class IntakeArmCommand {
 
     public IntakeArmCommand(IntakeArmSubsystem arm) {
         this.arm = arm;
+        this.arm.resetArm();
+        setArm(IntakeArmStates.HOME).initialize();
     }
 
     public Command setArm(IntakeArmStates state) {
@@ -25,15 +27,15 @@ public class IntakeArmCommand {
 
     public Command setSuck(SuckStates state) {
         SmartDashboard.putString("Suck state", state.toString());
-        Command command = arm.run(() -> arm.setSuck(state.speed)); //set timeout??
+        Command command = arm.run(() -> arm.setSuckState(state)); //set timeout??
 
         if(state.equals(SuckStates.FEED_OUT)) {
             return command
                 .withTimeout(IntakeArmConsts.OUT_TIMEOUT)//seconds on
-                .finallyDo(() -> arm.setSuck(SuckStates.STOP.speed));
+                .finallyDo(() -> arm.setSuckState(SuckStates.STOP));
         }
 
-        return command.finallyDo(() -> arm.setSuck(SuckStates.STOP.speed));
+        return command.finallyDo(() -> arm.setSuckState(SuckStates.STOP));
     }
 
     public IntakeArmSubsystem getIntakeArmSubsystem() {
