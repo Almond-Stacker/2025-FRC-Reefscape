@@ -80,11 +80,11 @@ public final class Constants {
     // all distances must be in meters 
     // all angles must be in radians
     public static final class Photon {
-        public static final double driveConstant = 1;
+        public static final double driveConstant = 0.5;//;
         public static final double angleConstant = 0.06;
 
         public static final class camera0 {
-            public static final String cameraName = "front_photon_camera";
+            public static final String cameraName = "left_photon_camera";
             public static final double cameraHeight = Units.inchesToMeters(11);
             public static final double cameraPitch = Units.degreesToRadians(0);
         }
@@ -100,8 +100,12 @@ public final class Constants {
             public static final int targetID = 1;
             public static final double tagHeight = Units.inchesToMeters(8.2);
             public static final double desiredDistance1 = 0.5;
-            public static final double desiredAngle1 = 0;
+            public static final double desiredAngle1 = 0 ;
     
         }
+    }
+
+    public static final class ClimbConstants {
+        public static final int climbMotorID = 16; //find
     }
 }

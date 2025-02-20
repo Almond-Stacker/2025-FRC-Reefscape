@@ -79,7 +79,7 @@ public class PhotonSubsystem extends SubsystemBase{
     // calculate the forward output
     public double getForwardOutput() {
         if(targetSeen) {
-            return -(state.distance - targetRange) * Constants.Photon.driveConstant * TunerConstants.kSpeedAt12Volts.magnitude() * Constants.Photon.driveConstant;
+            return -(state.distance - targetRange) * Constants.Photon.driveConstant * TunerConstants.kSpeedAt12Volts.magnitude();// * Constants.Photon.driveConstant;
         }
         return 0;
     }

@@ -47,9 +47,7 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         innerElevatorPosition = elevatorEncoder.getPosition() + 0.01;
         inBounds = false;
-        if(motorSpeed < -0.1){
-            motorSpeed *= Constants.InnerElevator.gravityNegationConstant;
-        }
+
 
         // positive speed goes up 
         if(override) {
@@ -60,8 +58,13 @@ public class InnerElevatorSubsystem extends SubsystemBase {
             elevatorMotor.set(0.0);
             inBounds = false;
         } else {
-            //elevatorMotor.set(motorSpeed);
-            elevatorMotor.set(0);
+            motorSpeed = elevatorPID.calculate(innerElevatorPosition) + elevatorFeedforward.calculate(innerElevatorPosition);
+            if(motorSpeed < -0.1){
+                motorSpeed *= 0.2;
+            }
+
+            elevatorMotor.set(motorSpeed);
+            //elevatorMotor.set(0);
             inBounds = true; 
         }
         setSmartdashboard();

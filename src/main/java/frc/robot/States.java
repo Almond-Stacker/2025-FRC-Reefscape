@@ -27,10 +27,10 @@ public class States {
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.57),
-        L1(37),
+        L1(26),
         L2(99.5),
         L3(99.5),
-        PRE_INTAKE(65),
+        PRE_INTAKE(80),
         INTAKE(52),
         MIN(0),
         MAX(101);
@@ -49,7 +49,7 @@ public class States {
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.01),
-        L1(2),
+        L1(),
         L2(),
         L3(4.8),
         MIN(0),
@@ -122,6 +122,22 @@ public class States {
             this.speed = 0; 
         }
     } 
+
+    public enum ClimbStates {
+        STOP(0),
+        CLIMB(0.5),
+        DROP(-0.5);
+
+        public final double speed;
+
+        ClimbStates(double speed) {
+            this.speed = speed;
+        }
+
+        ClimbStates() {
+            this.speed = 0;
+        }
+    }
 
     public enum ledStates {
         /*

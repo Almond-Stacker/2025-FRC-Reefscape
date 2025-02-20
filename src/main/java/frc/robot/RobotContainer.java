@@ -27,7 +27,7 @@ import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
 import frc.robot.commands.IntakeArmCommand;
-
+import frc.robot.commands.sigma;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -54,8 +54,8 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController driver0 = new CommandXboxController(0);
     private final CommandXboxController driver1 = new CommandXboxController(1);
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+    public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final sigma i = new sigma(drivetrain);
     
     /* Path follower */
     // Choreo set up 
@@ -90,6 +90,7 @@ public class RobotContainer {
     private final SequentialCommandGroup c_home = f_combination.createHomeCommand();
     private final SequentialCommandGroup c_preIntake = f_combination.createPreIntakeCommand();
     private final SequentialCommandGroup c_intake = f_combination.createIntakeCommand();
+    private final SequentialCommandGroup c_feedOutScore = f_combination.createFeedOutScoreCommand(i);
 
 
     public RobotContainer() {
@@ -113,12 +114,16 @@ public class RobotContainer {
                     .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
-        driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
+         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
 
-        // reset the field-centric heading on left bumper press
-        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // // reset the field-centric heading on left bumper press
+         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        driver0.y().onTrue(i);
     }
+    
 
     private void configureSYSTests() {
         // Run SysId routines when holding back/start and X/Y.
@@ -138,6 +143,7 @@ public class RobotContainer {
 
         driver1.a().toggleOnTrue(c_preIntake);
         driver1.x().toggleOnTrue(c_intake);
+        driver1.y().toggleOnTrue(c_feedOutScore);
         driver1.pov(90).toggleOnTrue(c_scoreL1);
         driver1.pov(180).toggleOnTrue(c_scoreL2);
         driver1.pov(270).toggleOnTrue(c_scoreL3);

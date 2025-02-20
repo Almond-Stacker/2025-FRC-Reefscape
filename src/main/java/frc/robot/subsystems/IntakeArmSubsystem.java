@@ -83,5 +83,6 @@ public class IntakeArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm Subsystem position", armPosition);
         SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
         SmartDashboard.putNumber("Arm Subsystem arm position goal", armState.angle);
+        SmartDashboard.putNumber("arm Subsytem velocity", indexingMotor.getEncoder().getVelocity());
     }
 }
