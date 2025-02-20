@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
 
@@ -35,11 +34,10 @@ public final class Constants {
 
     // FINISHED 
     public static final class PrimaryElevator {
+
         public static final int leftElevatorMotorID = 14;
         public static final int rightElevatorMotorID = 15;
         public static final int encoderID = 1;
-        public static final TrapezoidProfile.Constraints TRAPEZOID_PROFILE = new TrapezoidProfile.Constraints(leftElevatorMotorID, encoderID);
-        
         public static final double velocitySetPoint = 0; 
 
         public static final double kP = 0.02;
