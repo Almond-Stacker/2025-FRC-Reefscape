@@ -1,61 +1,36 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import frc.robot.States.ArmStates;
-import frc.robot.States.IndexStates;
+import frc.robot.States.IntakeStates;
 import frc.robot.subsystems.IntakeArmSubsystem;
 
-public class IntakeArmCommand extends Command {
-    private final IntakeArmSubsystem IntakeArmSubsystem;
-    private final IndexStates indexState;
-    private final ArmStates armState;
+public class IntakeArmCommand {
+    private final IntakeArmSubsystem intakeArm;
+    private Command command;
 
-    public IntakeArmCommand(IntakeArmSubsystem IntakeArmSubsystem, IntakeArmCommandConfiguration config) {
-        this.IntakeArmSubsystem = IntakeArmSubsystem;
-        this.indexState = config.indexState;
-        this.armState = config.armState;
-        addRequirements(IntakeArmSubsystem);
+    public IntakeArmCommand(IntakeArmSubsystem intakeArm) {
+        this.intakeArm = intakeArm;
+        setArmAngle(ArmStates.HOME);
+        setIntakeSpeed(IntakeStates.STOP);
     }
 
-    @Override
-    public void initialize() {
-        if(indexState != null){
-           IntakeArmSubsystem.setIndexState(indexState);
-        }
+    public Command setArmAngle(ArmStates state) {
+        SmartDashboard.putString("Intake Arm State", state.toString());
+        SmartDashboard.putNumber("Intake Arm Goal Angle", state.angle);
+        
+        command = intakeArm.run(() -> intakeArm.setArmAngle(state.angle));
 
-        if(armState != null){
-            IntakeArmSubsystem.setArmState(armState);
-        }
+        return command;
     }
 
-    @Override
-    public boolean isFinished() {
-        return true;
-    }
-    
+    public Command setIntakeSpeed(IntakeStates state) {
+        SmartDashboard.putString("Intake Arm State", state.toString());
+        SmartDashboard.putNumber("Intake Arm Goal Angle", state.speed);
+        
+        command = intakeArm.run(() -> intakeArm.setArmAngle(state.speed));
 
-    public static class IntakeArmCommandConfiguration {
-        private IndexStates indexState;
-        private ArmStates armState;
-
-        public IntakeArmCommandConfiguration() {
-            this.indexState = null;
-            this.armState = null;
-        }
-
-        public IntakeArmCommandConfiguration withIndexState(IndexStates indexState) {
-            this.indexState = indexState;
-            return this;
-        }
-
-        public IntakeArmCommandConfiguration withArmState(ArmStates armState) {
-            this.armState = armState;
-            return this;
-        }
-
-        public IntakeArmCommandConfiguration build() {
-            return this;
-        }
+        return command;
     }
 }

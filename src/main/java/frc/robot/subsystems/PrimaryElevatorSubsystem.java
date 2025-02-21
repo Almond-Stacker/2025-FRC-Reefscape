@@ -6,6 +6,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycle;
@@ -20,23 +21,20 @@ import frc.robot.States.PrimaryElevatorStates;
 public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftElevatorMotor;
     private final TalonFX rightElevatorMotor;
-    private final DutyCycleEncoder absoluteEncoder; 
+    //private final DutyCycleEncoder absoluteEncoder; 
     private final PIDController elevatorPID;
+    //private final ProfiledPIDController elevatorProfiledPID;
 
-    private PrimaryElevatorStates state;
     private double relativeElevatorPosition; 
-    private double absoluteElevatorPosition; 
     private double motorSpeed;
     private boolean inBounds;
 
     public PrimaryElevatorSubsystem() {
-        this.state = PrimaryElevatorStates.HOME;
         leftElevatorMotor = new TalonFX(Constants.PrimaryElevator.leftElevatorMotorID);
         rightElevatorMotor = new TalonFX(Constants.PrimaryElevator.rightElevatorMotorID);  
-        absoluteEncoder = new DutyCycleEncoder(Constants.PrimaryElevator.encoderID);
         elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);
-        setElevatorState(state);
-        absoluteEncoder.setDutyCycleRange(0, 1750);
+       // elevatorProfiledPID = new ProfiledPIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD, Constants.);
+
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -62,14 +60,11 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         setSmartdashboard();
     }
 
-    public void setElevatorState(PrimaryElevatorStates state) {
-        this.elevatorPID.setSetpoint(state.height);
-        this.state = state;
+    public void setElevatorHeight(double height) {
+        this.elevatorPID.setSetpoint(height);
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.putString("Primary elevator state", state.toString());
-        SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);

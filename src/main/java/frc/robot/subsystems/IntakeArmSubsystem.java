@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
 import frc.robot.States.ArmStates;
-import frc.robot.States.IndexStates;
 
 public class IntakeArmSubsystem extends SubsystemBase {   
     private final TalonFX armMotor;
@@ -22,8 +21,6 @@ public class IntakeArmSubsystem extends SubsystemBase {
     private final DutyCycleEncoder armEncoder; 
     private final ArmFeedforward armFeedforward;
     private final PIDController armPID;
-
-    private IndexStates indexState;
     private ArmStates armState;
     private double armPosition;
     private double motorSpeed; 
@@ -38,10 +35,7 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
 
         armState  = ArmStates.STARTING_POSITION;
-        indexState = IndexStates.STOP;
         override = false;
-        setIndexState(indexState);
-        setArmState(armState);
     }
 
     @Override
@@ -67,18 +61,15 @@ public class IntakeArmSubsystem extends SubsystemBase {
         this.motorSpeed = speed;
     }
 
-    public void setArmState(ArmStates state) {
-        this.armState = state;
-        armPID.setSetpoint(armState.angle);
+    public void setArmAngle(double angle) {
+        armPID.setSetpoint(angle);
     }
 
-    public void setIndexState(IndexStates state) {
-        indexingMotor.set(state.speed);
-        this.indexState = state;
+    public void setIntakeSpeed(double speed) {
+        indexingMotor.set(speed);
     }
     
     private void setSmartdashboard() {
-        SmartDashboard.putString("Arm Subsytem index state", indexState.toString());
         SmartDashboard.putString("Arm Subsystem arm state ", armState.toString());
         SmartDashboard.putNumber("Arm Subsystem position", armPosition);
         SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
