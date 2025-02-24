@@ -6,12 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,27 +14,31 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+
 import frc.lib.util.Utilities;
-import frc.robot.CommandFactory.AlgaeIntakeCommandFactory;
-import frc.robot.CommandFactory.CombinationCommandFactory;
-import frc.robot.CommandFactory.InnerElevatorCommandFactory;
-import frc.robot.CommandFactory.IntakeArmCommandFactory;
-import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
+
 import frc.robot.Constants.PrimaryElevator;
+import frc.robot.generated.TunerConstants;
+import frc.robot.States.ClimbStates;
 import frc.robot.States.InnerElevatorStates;
 import frc.robot.States.IntakeArmStates;
 import frc.robot.States.IntakeStates;
 import frc.robot.States.PrimaryElevatorStates;
+
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.InnerElevatorCommand;
 import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.PrimaryElevatorCommand;
-import frc.robot.commands.sigma;
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.AlgaeIntakeSubsystem;
+
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.IntakeArmSubsystem;
-import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class RobotContainer {
@@ -75,16 +73,22 @@ public class RobotContainer {
     private final PrimaryElevatorSubsystem s_PrimaryElevator = new PrimaryElevatorSubsystem();
     private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
+    private final ClimbSubsystem s_climb = new ClimbSubsystem();
 
     /** Commands **/
     private final PrimaryElevatorCommand ch_primaryElevator = s_PrimaryElevator.getCommand();
     private final InnerElevatorCommand ch_innerElevator = s_InnerElevator.getCommand();
     private final IntakeArmCommand ch_intakeArm = s_intakeArm.getCommand();
+    private final ClimbCommand ch_climb = s_climb.getCommand();
+
+    private final Command c_startClimb = ch_climb.setClimb(ClimbStates.CLIMB);
+    private final Command c_dropClimb = ch_climb.setClimb(ClimbStates.DROP);
+    private final Command c_stopClimb = ch_climb.setClimb(ClimbStates.STOP);
 
     private final SequentialCommandGroup c_home = new SequentialCommandGroup(
-        ch_primaryElevator.set(PrimaryElevatorStates.HOME),
-        ch_innerElevator.set(InnerElevatorStates.HOME),
-        ch_intakeArm.setAngle(IntakeArmStates.HOME),
+        ch_primaryElevator.set(PrimaryElevatorStates.STARTING_POSITION),
+        ch_innerElevator.set(InnerElevatorStates.STARTING_POSITION),
+        ch_intakeArm.setAngle(IntakeArmStates.STARTING_POSITION),
         ch_intakeArm.setIntakeSpeed(IntakeStates.STOP)
     );
 

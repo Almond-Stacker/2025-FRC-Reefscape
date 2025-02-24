@@ -64,6 +64,10 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         return command;
     }
 
+    public double getPosition() {
+        return position;
+    }
+
     private void setSmartdashboard() {
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);

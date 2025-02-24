@@ -62,6 +62,10 @@ public class IntakeArmSubsystem extends SubsystemBase {
     public IntakeArmCommand getCommand() {
         return command;
     }
+
+    public double getMotorSpeed() {
+        return motorSpeed;
+    }
     
     private void setSmartdashboard() {
         SmartDashboard.putNumber("Arm subsystem current angle;", armPosition);

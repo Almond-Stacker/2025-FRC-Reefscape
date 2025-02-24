@@ -1,23 +1,20 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.Photon;
-import frc.robot.commands.IntakeArmCommand;
-import frc.robot.subsystems.PrimaryElevatorSubsystem;
-
+// use states to easily change subsystem positions
+// also to get more information about what the subsystem is doing
 public class States {
     public enum PrimaryElevatorStates {
-        // allow for easy changing of elevator states 
-        HOME(0.57),
+        STARTING_POSITION(0.57),
         L1(26),
         L2(99.5),
         L3(99.5),
         PRE_INTAKE(80),
         INTAKE(52),
+        STOP(STARTING_POSITION.height),
         MIN(0),
         MAX(101);
-
-        public final double height;
+        
+        public double height;
 
         PrimaryElevatorStates(double height) {
             this.height = height;
@@ -26,11 +23,15 @@ public class States {
         PrimaryElevatorStates() {
             this.height = 0; 
         }
+        
+        public void setStateValue(double height) {
+            this.height = height;
+        }
     }
 
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
-        HOME(0.01),
+        STARTING_POSITION(0.01),
         L1(),
         L2(),
         L3(4.8),
@@ -50,7 +51,6 @@ public class States {
 
     public enum IntakeArmStates {
         // allow for easy changing of elevator states 
-        HOME(60),
         INTAKE(60),
         STARTING_POSITION(240),
         L1(210),
@@ -72,7 +72,6 @@ public class States {
     } 
 
     public enum IntakeStates {
-        // allow for easy changing of elevator states 
         STOP(0),
         INTAKE(1),
         FEED_OUT(-1);
