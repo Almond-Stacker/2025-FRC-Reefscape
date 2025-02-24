@@ -60,6 +60,10 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         this.elevatorPID.setSetpoint(height);
     }
 
+    public PrimaryElevatorCommand getCommand() {
+        return command;
+    }
+
     private void setSmartdashboard() {
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);

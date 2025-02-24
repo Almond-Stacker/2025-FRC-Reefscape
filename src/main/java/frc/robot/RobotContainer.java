@@ -26,7 +26,14 @@ import frc.robot.CommandFactory.CombinationCommandFactory;
 import frc.robot.CommandFactory.InnerElevatorCommandFactory;
 import frc.robot.CommandFactory.IntakeArmCommandFactory;
 import frc.robot.CommandFactory.PrimaryElevatorCommandFactory;
+import frc.robot.Constants.PrimaryElevator;
+import frc.robot.States.InnerElevatorStates;
+import frc.robot.States.IntakeArmStates;
+import frc.robot.States.IntakeStates;
+import frc.robot.States.PrimaryElevatorStates;
+import frc.robot.commands.InnerElevatorCommand;
 import frc.robot.commands.IntakeArmCommand;
+import frc.robot.commands.PrimaryElevatorCommand;
 import frc.robot.commands.sigma;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
@@ -54,8 +61,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
     private final CommandXboxController driver0 = new CommandXboxController(0);
     private final CommandXboxController driver1 = new CommandXboxController(1);
-    public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    private final sigma i = new sigma(drivetrain);
+    public final  CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
     /* Path follower */
     // Choreo set up 
@@ -69,29 +75,18 @@ public class RobotContainer {
     private final PrimaryElevatorSubsystem s_PrimaryElevator = new PrimaryElevatorSubsystem();
     private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
-    private final AlgaeIntakeSubsystem s_algaeIntake = new AlgaeIntakeSubsystem();
-    private final PhotonSubsystem s_photonCamera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName, Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, States.PhotonStates.tag1);
 
-    /* Command Factory */
-    private final PrimaryElevatorCommandFactory f_PrimaryElevator = new CommandFactory.PrimaryElevatorCommandFactory(s_PrimaryElevator);
-    private final InnerElevatorCommandFactory f_InnerElevator = new CommandFactory.InnerElevatorCommandFactory(s_InnerElevator);
-    private final IntakeArmCommandFactory f_intakeArm = new CommandFactory.IntakeArmCommandFactory(s_intakeArm);
-    private final AlgaeIntakeCommandFactory f_algaeIntake = new CommandFactory.AlgaeIntakeCommandFactory(s_algaeIntake);
-    private final CombinationCommandFactory f_combination = new CommandFactory.CombinationCommandFactory(f_intakeArm, f_algaeIntake, f_PrimaryElevator, f_InnerElevator);
+    /** Commands **/
+    private final PrimaryElevatorCommand ch_primaryElevator = s_PrimaryElevator.getCommand();
+    private final InnerElevatorCommand ch_innerElevator = s_InnerElevator.getCommand();
+    private final IntakeArmCommand ch_intakeArm = s_intakeArm.getCommand();
 
-    /* Commands */
-    private final IntakeArmCommand c_coralIntake = f_intakeArm.createIntakeCommand();
-    private final IntakeArmCommand c_coralFeedOut = f_intakeArm.createFeedOutCommand();
-    private final IntakeArmCommand c_armStop = f_intakeArm.createStopCommand();
-
-    private final SequentialCommandGroup c_scoreL1 = f_combination.createScoreL1Command();
-    private final SequentialCommandGroup c_scoreL2 = f_combination.createScoreL2Command();
-    private final SequentialCommandGroup c_scoreL3 = f_combination.createScoreL3Command();
-    private final SequentialCommandGroup c_home = f_combination.createHomeCommand();
-    private final SequentialCommandGroup c_preIntake = f_combination.createPreIntakeCommand();
-    private final SequentialCommandGroup c_intake = f_combination.createIntakeCommand();
-    private final SequentialCommandGroup c_feedOutScore = f_combination.createFeedOutScoreCommand(i);
-
+    private final SequentialCommandGroup c_home = new SequentialCommandGroup(
+        ch_primaryElevator.set(PrimaryElevatorStates.HOME),
+        ch_innerElevator.set(InnerElevatorStates.HOME),
+        ch_intakeArm.setAngle(IntakeArmStates.HOME),
+        ch_intakeArm.setIntakeSpeed(IntakeStates.STOP)
+    );
 
     public RobotContainer() {
         configureAutos();

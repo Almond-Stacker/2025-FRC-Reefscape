@@ -74,6 +74,10 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         this.elevatorPID.setSetpoint(height);
     }
 
+    public InnerElevatorCommand getCommand() {
+        return command;
+    }
+
     private void setSmartdashboard() {
         SmartDashboard.putNumber("Inner elevator current height", position);
         SmartDashboard.putNumber("Inner elevator motor speed", motorSpeed);
