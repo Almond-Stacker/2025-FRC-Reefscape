@@ -6,24 +6,6 @@ import frc.robot.commands.IntakeArmCommand;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class States {
-    // allow for easy changing of photon vision targets 
-    public enum PhotonStates {
-        driveTag4(Photon.tag4.targetID ,Photon.tag4.distance0, Photon.tag4.angle0, Photon.tag4.tagHeight),
-        tag1(Photon.tag1.targetID, Photon.tag1.desiredDistance1, Photon.tag1.desiredAngle1, Photon.tag1.tagHeight);
-
-        public final int id;
-        public final double distance;
-        public final double angle; 
-        public final double height;
-
-        PhotonStates(int id, double distance, double angle, double height) {
-            this.id = id;
-            this.distance = distance;
-            this.angle = angle;
-            this.height = height;
-        }
-    }
-
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.57),
@@ -66,7 +48,7 @@ public class States {
         }
     } 
 
-    public enum ArmStates {
+    public enum IntakeArmStates {
         // allow for easy changing of elevator states 
         HOME(60),
         INTAKE(60),
@@ -80,16 +62,16 @@ public class States {
 
         public final double angle;
 
-        ArmStates(double angle) {
+        IntakeArmStates(double angle) {
             this.angle = angle;
         }
 
-        ArmStates() {
+        IntakeArmStates() {
             this.angle = 0; 
         }
     } 
 
-    public enum IndexStates {
+    public enum IntakeStates {
         // allow for easy changing of elevator states 
         STOP(0),
         INTAKE(1),
@@ -97,28 +79,11 @@ public class States {
 
         public final double speed;
 
-        IndexStates(double speed) {
+        IntakeStates(double speed) {
             this.speed = speed;
         }
 
-        IndexStates() {
-            this.speed = 0; 
-        }
-    } 
-
-    public enum AlgaeIntakeStates {
-        // allow for easy changing of elevator states 
-        STOP(),
-        INTAKE(),
-        FEED_OUT();
-
-        public final double speed;
-
-        AlgaeIntakeStates(double speed) {
-            this.speed = speed;
-        }
-
-        AlgaeIntakeStates() {
+        IntakeStates() {
             this.speed = 0; 
         }
     } 

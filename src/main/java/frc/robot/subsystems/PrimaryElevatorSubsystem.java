@@ -16,67 +16,56 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
 import frc.robot.States.PrimaryElevatorStates;
+import frc.robot.commands.PrimaryElevatorCommand;
 
 public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftElevatorMotor;
     private final TalonFX rightElevatorMotor;
-    private final DutyCycleEncoder absoluteEncoder; 
     private final PIDController elevatorPID;
+    private final PrimaryElevatorCommand command;
 
-    private PrimaryElevatorStates state;
-    private double relativeElevatorPosition; 
-    private double absoluteElevatorPosition; 
+    private double position; 
     private double motorSpeed;
     private boolean inBounds;
 
     public PrimaryElevatorSubsystem() {
-        this.state = PrimaryElevatorStates.HOME;
         leftElevatorMotor = new TalonFX(Constants.PrimaryElevator.leftElevatorMotorID);
         rightElevatorMotor = new TalonFX(Constants.PrimaryElevator.rightElevatorMotorID);  
-        absoluteEncoder = new DutyCycleEncoder(Constants.PrimaryElevator.encoderID);
-        elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);
-        setElevatorState(state);
-        
+        elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);        
+        command = new PrimaryElevatorCommand(this);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     @Override
     public void periodic() {
-       // elevatorPosition = Units.degreesToRadians(leftElevatorMotor.getPosition().getValueAsDouble());
-       //elevatorPosition = Units.rotationsToDegrees(encoder.get());
-       relativeElevatorPosition = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
-       //motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
+       position = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
+       inBounds = false;
 
        // positive goes up 
-        if(relativeElevatorPosition >= PrimaryElevatorStates.MAX.height || relativeElevatorPosition <= PrimaryElevatorStates.MIN.height) {
+        if(position >= PrimaryElevatorStates.MAX.height || position <= PrimaryElevatorStates.MIN.height) {
             leftElevatorMotor.set(0);
             rightElevatorMotor.set(0);
-            inBounds = false;
-        } else {
-            motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
-            leftElevatorMotor.set(motorSpeed);
-            rightElevatorMotor.set(motorSpeed);
-            inBounds = true;    
+            return;
         }
+        
+        motorSpeed = elevatorPID.calculate(position);
+        leftElevatorMotor.set(motorSpeed);
+        rightElevatorMotor.set(motorSpeed);
+        inBounds = true;    
         setSmartdashboard();
     }
 
-    public void setElevatorState(PrimaryElevatorStates state) {
-        this.elevatorPID.setSetpoint(state.height);
-        this.state = state;
+    public void setHeight(double height) {
+        this.elevatorPID.setSetpoint(height);
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.putString("Primary elevator state", state.toString());
-        SmartDashboard.putNumber("Primary elevator goal position", state.height);
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
-        SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
-    }
+        SmartDashboard.putNumber("Primary elevator current height", position);
 
-    public void setElevatorSpeed(double motor) {
-        leftElevatorMotor.set(motor);
-        rightElevatorMotor.set(motor);
+        SmartDashboard.putNumber("Primary elevator goal height", command.getState().height);
+        SmartDashboard.putString("Primary elevator state", command.getState().toString());
     }
 }

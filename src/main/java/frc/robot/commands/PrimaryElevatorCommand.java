@@ -6,23 +6,25 @@ import frc.robot.States.PrimaryElevatorStates;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class PrimaryElevatorCommand {
-    
-    private PrimaryElevatorSubsystem elevatorPrimary;
+    private final PrimaryElevatorSubsystem elevatorPrimary;
+    private Command command;
+    private PrimaryElevatorStates state;
 
     public PrimaryElevatorCommand(PrimaryElevatorSubsystem elevatorPrimary) {
         this.elevatorPrimary = elevatorPrimary;
     }
 
     public Command set(PrimaryElevatorStates state) {
-        SmartDashboard.putString("Primary elevator state", state.toString());
-        return elevatorPrimary
-            .runOnce(() -> elevatorPrimary.setHeight(state.height))
-            .until(elevatorPrimary::atHeight)
-            .handleInterrupt(elevatorPrimary::reset);
+        this.state = state;
+        command = elevatorPrimary.runOnce(() -> elevatorPrimary.setHeight(state.height));
+        return command;
+    }
+
+    public PrimaryElevatorStates getState() {
+        return state;
     }
 
     public PrimaryElevatorSubsystem getPrimaryElevator() {
         return elevatorPrimary;
     }
-
 }

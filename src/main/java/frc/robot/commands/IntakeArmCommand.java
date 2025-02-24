@@ -1,61 +1,39 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-
-import frc.robot.States.ArmStates;
-import frc.robot.States.IndexStates;
+import frc.robot.States.IntakeArmStates;
+import frc.robot.States.IntakeStates;
 import frc.robot.subsystems.IntakeArmSubsystem;
 
-public class IntakeArmCommand extends Command {
-    private final IntakeArmSubsystem IntakeArmSubsystem;
-    private final IndexStates indexState;
-    private final ArmStates armState;
+public class IntakeArmCommand {
+    private final IntakeArmSubsystem intakeArm;
+    private IntakeArmStates intakeArmState;
+    private IntakeStates intakeState;
+    private Command command;
 
-    public IntakeArmCommand(IntakeArmSubsystem IntakeArmSubsystem, IntakeArmCommandConfiguration config) {
-        this.IntakeArmSubsystem = IntakeArmSubsystem;
-        this.indexState = config.indexState;
-        this.armState = config.armState;
-        addRequirements(IntakeArmSubsystem);
+    public IntakeArmCommand(IntakeArmSubsystem intakeArm) {
+        this.intakeArm = intakeArm;
     }
 
-    @Override
-    public void initialize() {
-        if(indexState != null){
-           IntakeArmSubsystem.setIndexState(indexState);
-        }
-
-        if(armState != null){
-            IntakeArmSubsystem.setArmState(armState);
-        }
+    public Command setAngle(IntakeArmStates state) {
+        command = intakeArm.run(() -> intakeArm.setArmAngle(state.angle));
+        return command;
     }
 
-    @Override
-    public boolean isFinished() {
-        return true;
+    public Command setIntakeSpeed(IntakeStates state) {
+        command = intakeArm.run(() -> intakeArm.setIntakeSpeed(state.speed));
+        return command;
     }
-    
 
-    public static class IntakeArmCommandConfiguration {
-        private IndexStates indexState;
-        private ArmStates armState;
+    public IntakeArmStates getIntakeArmState() {
+        return intakeArmState;
+    }
 
-        public IntakeArmCommandConfiguration() {
-            this.indexState = null;
-            this.armState = null;
-        }
+    public IntakeStates getIntakeState() {
+        return intakeState;
+    }
 
-        public IntakeArmCommandConfiguration withIndexState(IndexStates indexState) {
-            this.indexState = indexState;
-            return this;
-        }
-
-        public IntakeArmCommandConfiguration withArmState(ArmStates armState) {
-            this.armState = armState;
-            return this;
-        }
-
-        public IntakeArmCommandConfiguration build() {
-            return this;
-        }
+    public IntakeArmSubsystem getIntakeArmSubsystem() {
+        return intakeArm;
     }
 }
