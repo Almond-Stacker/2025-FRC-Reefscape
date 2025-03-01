@@ -21,9 +21,12 @@ import frc.robot.Constants;
 import frc.robot.Constants.InnerElevator;
 import frc.robot.States.InnerElevatorStates;
 import frc.robot.commands.InnerElevatorCommand;
+import frc.robot.commands.InnerElevatorCommand;
 
 public class InnerElevatorSubsystem extends SubsystemBase {
     private final SparkFlex elevatorMotor;
+    private final RelativeEncoder encoder;
+    
     private final PIDController elevatorPID;
     private final ElevatorFeedforward elevatorFeedforward;
     private final RelativeEncoder elevatorEncoder;
@@ -31,13 +34,13 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     private double innerElevatorPosition; 
     private double motorSpeed;
     private boolean inBounds;
-    private boolean override;
+
 
     public InnerElevatorSubsystem() {
         elevatorMotor = new SparkFlex(Constants.InnerElevator.ElevatorMotorID, MotorType.kBrushless);
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
         elevatorFeedforward = new ElevatorFeedforward(Constants.InnerElevator.kS, Constants.InnerElevator.kG, Constants.InnerElevator.kV);
-        elevatorEncoder = elevatorMotor.getEncoder();
+        encoder = elevatorMotor.getEncoder();
         elevatorPID = new PIDController(Constants.InnerElevator.kP, Constants.InnerElevator.kI, Constants.InnerElevator.kD);
         elevatorCommand = new InnerElevatorCommand(this);
         override = false;

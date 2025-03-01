@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.States.PrimaryElevatorStates;
 import frc.robot.commands.PrimaryElevatorCommand;
+import frc.robot.commands.PrimaryElevatorCommand;
 
 public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftElevatorMotor;

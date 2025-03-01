@@ -2,17 +2,17 @@ package frc.robot;
 
 public class States {
     public enum PrimaryElevatorStates {
-        // allow for easy changing of elevator states 
-        HOME(0.57),
+        STARTING_POSITION(0.57),
         L1(26),
         L2(99.5),
         L3(99.5),
         PRE_INTAKE(80),
         INTAKE(52),
+        STOP(STARTING_POSITION.height),
         MIN(0),
         MAX(101);
-
-        public final double height;
+        
+        public double height;
 
         PrimaryElevatorStates(double height) {
             this.height = height;
@@ -20,6 +20,10 @@ public class States {
 
         PrimaryElevatorStates() {
             this.height = 0; 
+        }
+        
+        public void setStateValue(double height) {
+            this.height = height;
         }
     }
 
@@ -45,9 +49,8 @@ public class States {
         }
     } 
 
-    public enum ArmStates {
+    public enum IntakeArmStates {
         // allow for easy changing of elevator states 
-        HOME(60),
         INTAKE(60),
         STARTING_POSITION(240),
         L1(210),
@@ -59,11 +62,11 @@ public class States {
 
         public final double angle;
 
-        ArmStates(double angle) {
+        IntakeArmStates(double angle) {
             this.angle = angle;
         }
 
-        ArmStates() {
+        IntakeArmStates() {
             this.angle = 0; 
         }
     } 

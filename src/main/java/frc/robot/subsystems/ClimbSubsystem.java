@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.commands.ClimbCommand;
@@ -33,7 +34,7 @@ public class ClimbSubsystem extends SubsystemBase{
     }
 
     public void setSmartdashboard() {
-
+        SmartDashboard.putNumber("Climb motor speed", commands.getState().speed);
     }
 
     public ClimbCommand getCommand() {

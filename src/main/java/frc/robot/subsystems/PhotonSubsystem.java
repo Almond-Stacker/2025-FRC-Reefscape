@@ -1,8 +1,17 @@
 // package frc.robot.subsystems;
+// package frc.robot.subsystems;
 
 // import java.util.List;
 // import java.util.Optional;
+// import java.util.List;
+// import java.util.Optional;
 
+// import org.photonvision.EstimatedRobotPose;
+// import org.photonvision.PhotonCamera;
+// import org.photonvision.PhotonPoseEstimator;
+// import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+// import org.photonvision.targeting.PhotonPipelineResult;
+// import org.photonvision.targeting.PhotonTrackedTarget;
 // import org.photonvision.EstimatedRobotPose;
 // import org.photonvision.PhotonCamera;
 // import org.photonvision.PhotonPoseEstimator;
@@ -29,6 +38,10 @@
 // public class PhotonSubsystem extends SubsystemBase {
 //     private PhotonCommand commands;
 //     private CommandSwerveDrivetrain drivetrain;
+// //built for multiple cameras, finds average pose of every reading then 
+// public class PhotonSubsystem extends SubsystemBase {
+//     private PhotonCommand commands;
+//     private CommandSwerveDrivetrain drivetrain;
 
 //     private Matrix<N3, N1> curStdDevs = PhotonConstants.SINGLE_STD_DEVS; // dynamic standard deviation
 
@@ -36,11 +49,20 @@
 //     private List<Transform3d> cameraToRobotTransforms;
 //     private final PhotonPoseEstimator estimator;
 //     private Optional<EstimatedRobotPose> collectiveEstimatedPose = Optional.empty();
+//     private List<PhotonCamera> cameras; // pain transforms and cameras later
+//     private List<Transform3d> cameraToRobotTransforms;
+//     private final PhotonPoseEstimator estimator;
+//     private Optional<EstimatedRobotPose> collectiveEstimatedPose = Optional.empty();
 
+//     private double lastUpdateTime = 0;
 //     private double lastUpdateTime = 0;
 
 //     private boolean targetExist = false;//testing
+//     private boolean targetExist = false;//testing
     
+//         public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
+//             this.drivetrain = drivetrain;
+//             commands = new PhotonCommand(this, drivetrain);
 //         public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
 //             this.drivetrain = drivetrain;
 //             commands = new PhotonCommand(this, drivetrain);
@@ -64,7 +86,20 @@
 //                 curStdDevs = curStdDevs.times(1 + (avgDist * avgDist / 30));
 //             }
 //         }
+//         //for swerve drive estimator type stuff
+//         private void updateEstimationStdDevs(int numTags, double avgDist) {
+//                 //if 1 and far then standard deviation is larger, else smaller
+//             curStdDevs = numTags > 1 ? VecBuilder.fill(0.5, 0.5, 1) : VecBuilder.fill(4, 4, 8);
+//             if(numTags == 1 && avgDist > 4) {//dist in meters
+//                 curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+//             } else {
+//                 curStdDevs = curStdDevs.times(1 + (avgDist * avgDist / 30));
+//             }
+//         }
     
+//         public Matrix<N3, N1> getEstimationStdDevs() {
+//             return curStdDevs;
+//         }
 //         public Matrix<N3, N1> getEstimationStdDevs() {
 //             return curStdDevs;
 //         }
@@ -75,9 +110,19 @@
 //             double avgDist = 0;//for standard deviation
 //             int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
 //             int index = 0;//which cam for pose transforms
+//         @Override
+//         public void periodic() {
+//             Pose3d addedPose = new Pose3d(); // find average pose, couldn't figure a List or array list for some reason
+//             double avgDist = 0;//for standard deviation
+//             int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
+//             int index = 0;//which cam for pose transforms
     
 //             double currentTime = Timer.getFPGATimestamp();
+//             double currentTime = Timer.getFPGATimestamp();
     
+//             for(PhotonCamera cam : cameras) {
+//                 List<PhotonPipelineResult> results = cam.getAllUnreadResults();
+//                 for(PhotonPipelineResult result : results) {
 //             for(PhotonCamera cam : cameras) {
 //                 List<PhotonPipelineResult> results = cam.getAllUnreadResults();
 //                 for(PhotonPipelineResult result : results) {
@@ -111,7 +156,27 @@
 //                     } else {
 //                         targetExist = false;
 //                     }
+//                             Pose3d transformedPose = pose.get().estimatedPose.transformBy(cameraToRobotTransforms.get(index).inverse());
+//                             addedPose = new Pose3d(
+//                                     transformedPose.getX() + addedPose.getX(),
+//                                     transformedPose.getY() + addedPose.getY(),
+//                                     transformedPose.getZ() + addedPose.getZ(),
+//                                     new Rotation3d(
+//                                         transformedPose.getRotation().getX() + addedPose.getRotation().getX(),
+//                                         transformedPose.getRotation().getY() + addedPose.getRotation().getY(),
+//                                         transformedPose.getRotation().getZ() + addedPose.getRotation().getZ()
+//                                     )
+//                                 );
+//                             avgDist += transformedPose.toPose2d().getTranslation().getNorm();
+//                             validPoseCount++;
+//                         }
+//                     } else {
+//                         targetExist = false;
+//                     }
     
+//                 }
+//                 index++;
+//             }
 //                 }
 //                 index++;
 //             }
@@ -127,7 +192,21 @@
 //                         addedPose.getRotation().getZ() / validPoseCount
 //                     )
 //                 ));
+//             if(validPoseCount > 0) {
+//                 Pose3d averagedPose = addedPose.transformBy(new Transform3d(
+//                     addedPose.getX() / validPoseCount,
+//                     addedPose.getY() / validPoseCount,
+//                     addedPose.getZ() / validPoseCount,
+//                     new Rotation3d(
+//                         addedPose.getRotation().getX() / validPoseCount,
+//                         addedPose.getRotation().getY() / validPoseCount,
+//                         addedPose.getRotation().getZ() / validPoseCount
+//                     )
+//                 ));
 
+//                 //targetExist = true;
+//                 updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
+//                 lastUpdateTime = currentTime;
 //                 //targetExist = true;
 //                 updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
 //                 lastUpdateTime = currentTime;
@@ -141,7 +220,12 @@
 
 //         setSmartDashboard();
 //     }
+//         setSmartDashboard();
+//     }
 
+//     public Optional<EstimatedRobotPose> getCollectiveEstimatedPose() {
+//         return collectiveEstimatedPose;
+//     }
 //     public Optional<EstimatedRobotPose> getCollectiveEstimatedPose() {
 //         return collectiveEstimatedPose;
 //     }
@@ -158,7 +242,23 @@
 //         }
 //         SmartDashboard.putBoolean("There is Target", targetExist);
 //     }
+//     //distance and angle to specific tag
+//     public void setSmartDashboard() {
+//         if(collectiveEstimatedPose.isPresent()) {
+//             Pose3d pose = collectiveEstimatedPose.get().estimatedPose;
+//             SmartDashboard.putNumber("Pose X", pose.getX());
+//             SmartDashboard.putNumber("Pose Y", pose.getY());
+//             SmartDashboard.putNumber("Pose theata", pose.getRotation().getZ());
+//         } else {
+//             SmartDashboard.putString("Robot Pose", "No pose available");
+//         }
+//         SmartDashboard.putBoolean("There is Target", targetExist);
+//     }
 
+//     public PhotonCommand getCommands() {
+//         return commands;
+//     }
+// }
 //     public PhotonCommand getCommands() {
 //         return commands;
 //     }

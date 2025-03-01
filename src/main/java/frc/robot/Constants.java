@@ -56,6 +56,10 @@ public final class Constants {
         public static final int rightElevatorMotorID = 15;
         public static final int encoderID = 1;        
 
+        public static final double CRITICAL_POSITION_MIN = 0;
+        public static final double CRITICAL_POSITION_MAX = 0;
+
+
         public static final double kP = 0.02;
         public static final double kI = 0;
         public static final double kD = 0;
@@ -93,7 +97,10 @@ public final class Constants {
         public static final double kD = 0;
         public static final double kS = 0;
         public static final double kG = 0.003;
-        public static final double kV = 0;
+        public static final double kV = 0;  
+
+        public static final double CRITICAL_POSITION_MIN = 0;
+        public static final double CRITICAL_POSITION_MAX = 0;
     }
 
     // all distances must be in meters 
