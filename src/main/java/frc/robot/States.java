@@ -1,18 +1,63 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class States {
+
+    public enum ElevatorStates {
+        //tune
+        HOME_ABS(0.57, 0.1, 210),
+        MAX_ABS(101, 0.8, 255),
+        MIN_ABS(0, -2.7, 70),
+        HOME_REL(0.5, 210),
+        L2_REL(1, 210),
+        L3_REL(1, 210),
+        L4_REL(1, 210);
+
+        public final double primaryHeight;
+        public final double innerHeight;
+        public final double relTotalHeight;
+        public final double angle;
+
+        ElevatorStates(double primaryHeight, double innerHeight, double angle) {
+            this.primaryHeight = primaryHeight;
+            this.innerHeight = innerHeight;
+            this.angle = angle;
+
+            this.relTotalHeight = 0;
+            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
+
+        }
+
+        ElevatorStates(double relTotalHeight, double angle) {
+            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
+
+            this.relTotalHeight = relTotalHeight;
+            this.angle = angle;
+
+            this.primaryHeight = 0;
+            this.innerHeight = 0;
+        }
+        
+        ElevatorStates() {
+            //refrence HOME instead somehow
+            this(0.57, 0.01, 210);
+        }
+    }
+
+    /*
     public enum PrimaryElevatorStates {
-        STARTING_POSITION(0.57),
-        L1(26),
+        // allow for easy changing of elevator states 
+        HOME(0.57),
+        L1(37),
         L2(99.5),
         L3(99.5),
-        PRE_INTAKE(80),
+        PRE_INTAKE(65),
         INTAKE(52),
-        STOP(STARTING_POSITION.height),
         MIN(0),
         MAX(101);
-        
-        public double height;
+
+        public final double height;
 
         PrimaryElevatorStates(double height) {
             this.height = height;
@@ -21,22 +66,16 @@ public class States {
         PrimaryElevatorStates() {
             this.height = 0; 
         }
-        
-        public void setStateValue(double height) {
-            this.height = height;
-        }
     }
 
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
-        STARTING_POSITION(3.93),
-        PRE_INTAKE(3.79),
-        INTAKE(3.9),
-        L1(0.25),
+        HOME(0.01),
+        L1(2),
         L2(),
         L3(4.8),
-        MIN(0.18),
-        MAX(4.9);
+        MIN(0),
+        MAX(5);
 
         public final double height;
 
@@ -47,10 +86,11 @@ public class States {
         InnerElevatorStates() {
             this.height = 0; 
         }
-    } 
+    }
 
     public enum IntakeArmStates {
         // allow for easy changing of elevator states 
+        HOME(210),
         INTAKE(60),
         STARTING_POSITION(240),
         L1(210),
@@ -69,9 +109,10 @@ public class States {
         IntakeArmStates() {
             this.angle = 0; 
         }
-    } 
+    }
+    */
 
-    public enum IntakeStates {
+    public enum SuckStates {
         // allow for easy changing of elevator states 
         STOP(0),
         INTAKE(1),
@@ -79,19 +120,19 @@ public class States {
 
         public final double speed;
 
-        IntakeStates(double speed) {
+        SuckStates(double speed) {
             this.speed = speed;
         }
 
-        IntakeStates() {
+        SuckStates() {
             this.speed = 0; 
         }
-    } 
+    }
 
     public enum ClimbStates {
         STOP(0),
-        CLIMB(0.5),
-        DROP(-0.5);
+        CLIMB(0.06),
+        DROP(-0.06);
 
         public final double speed;
 
@@ -101,131 +142,6 @@ public class States {
 
         ClimbStates() {
             this.speed = 0;
-        }
-    }
-
-    public enum ledStates {
-        /*
-        * Fixed Palette Pattern
-        */
-        RAINBOW_RAINBOW_PALETTE(-0.99),
-        RAINBOW_PARTY_PALETTE(-0.97),
-        RAINBOW_OCEAN_PALETTE(-0.95),
-        RAINBOW_LAVA_PALETTE(-0.93),
-        RAINBOW_FOREST_PALETTE(-0.91),
-        RAINBOW_WITH_GLITTER(-0.89),
-        CONFETTI(-0.87),
-        SHOT_RED(-0.85),
-        SHOT_BLUE(-0.83),
-        SHOT_WHITE(-0.81),
-        SINELON_RAINBOW_PALETTE(-0.79),
-        SINELON_PARTY_PALETTE(-0.77),
-        SINELON_OCEAN_PALETTE(-0.75),
-        SINELON_LAVA_PALETTE(-0.73),
-        SINELON_FOREST_PALETTE(-0.71),
-        BEATS_PER_MINUTE_RAINBOW_PALETTE(-0.69),
-        BEATS_PER_MINUTE_PARTY_PALETTE(-0.67),
-        BEATS_PER_MINUTE_OCEAN_PALETTE(-0.65),
-        BEATS_PER_MINUTE_LAVA_PALETTE(-0.63),
-        BEATS_PER_MINUTE_FOREST_PALETTE(-0.61),
-        FIRE_MEDIUM(-0.59),
-        FIRE_LARGE(-0.57),
-        TWINKLES_RAINBOW_PALETTE(-0.55),
-        TWINKLES_PARTY_PALETTE(-0.53),
-        TWINKLES_OCEAN_PALETTE(-0.51),
-        TWINKLES_LAVA_PALETTE(-0.49),
-        TWINKLES_FOREST_PALETTE(-0.47),
-        COLOR_WAVES_RAINBOW_PALETTE(-0.45),
-        COLOR_WAVES_PARTY_PALETTE(-0.43),
-        COLOR_WAVES_OCEAN_PALETTE(-0.41),
-        COLOR_WAVES_LAVA_PALETTE(-0.39),
-        COLOR_WAVES_FOREST_PALETTE(-0.37),
-        LARSON_SCANNER_RED(-0.35),
-        LARSON_SCANNER_GRAY(-0.33),
-        LIGHT_CHASE_RED(-0.31),
-        LIGHT_CHASE_BLUE(-0.29),
-        LIGHT_CHASE_GRAY(-0.27),
-        HEARTBEAT_RED(-0.25),
-        HEARTBEAT_BLUE(-0.23),
-        HEARTBEAT_WHITE(-0.21),
-        HEARTBEAT_GRAY(-0.19),
-        BREATH_RED(-0.17),
-        BREATH_BLUE(-0.15),
-        BREATH_GRAY(-0.13),
-        STROBE_RED(-0.11),
-        STROBE_BLUE(-0.09),
-        STROBE_GOLD(-0.07),
-        STROBE_WHITE(-0.05),
-        /*
-        * CP1: Color 1 Pattern
-        */
-        CP1_END_TO_END_BLEND_TO_BLACK(-0.03),
-        CP1_LARSON_SCANNER(-0.01),
-        CP1_LIGHT_CHASE(+0.01),
-        CP1_HEARTBEAT_SLOW(+0.03),
-        CP1_HEARTBEAT_MEDIUM(+0.05),
-        CP1_HEARTBEAT_FAST(+0.07),
-        CP1_BREATH_SLOW(+0.09),
-        CP1_BREATH_FAST(+0.11),
-        CP1_SHOT(+0.13),
-        CP1_STROBE(+0.15),
-        /*
-        * CP2: Color 2 Pattern
-        */
-        CP2_END_TO_END_BLEND_TO_BLACK(+0.17),
-        CP2_LARSON_SCANNER(+0.19),
-        CP2_LIGHT_CHASE(+0.21),
-        CP2_HEARTBEAT_SLOW(+0.23),
-        CP2_HEARTBEAT_MEDIUM(+0.25),
-        CP2_HEARTBEAT_FAST(+0.27),
-        CP2_BREATH_SLOW(+0.29),
-        CP2_BREATH_FAST(+0.31),
-        CP2_SHOT(+0.33),
-        CP2_STROBE(+0.35),
-        /*
-        * CP1_2: Color 1 and 2 Pattern
-        */
-        CP1_2_SPARKLE_1_ON_2(+0.37),
-        CP1_2_SPARKLE_2_ON_1(+0.39),
-        CP1_2_COLOR_GRADIENT(+0.41),
-        CP1_2_BEATS_PER_MINUTE(+0.43),
-        CP1_2_END_TO_END_BLEND_1_TO_2(+0.45),
-        CP1_2_END_TO_END_BLEND(+0.47),
-        CP1_2_NO_BLENDING(+0.49),
-        CP1_2_TWINKLES(+0.51),
-        CP1_2_COLOR_WAVES(+0.53),
-        CP1_2_SINELON(+0.55),
-        /*
-        * Solid color
-        */
-        HOT_PINK(+0.57),
-        DARK_RED(+0.59),
-        RED(+0.61),
-        RED_ORANGE(+0.63),
-        ORANGE(+0.65),
-        GOLD(+0.67),
-        YELLOW(+0.69),
-        LAWN_GREEN(+0.71),
-        LIME(+0.73),
-        DARK_GREEN(+0.75),
-        GREEN(+0.77),
-        BLUE_GREEN(+0.79),
-        AQUA(+0.81),
-        SKY_BLUE(+0.83),
-        DARK_BLUE(+0.85),
-        BLUE(+0.87),
-        BLUE_VIOLET(+0.89),
-        VIOLET(+0.91),
-        WHITE(+0.93),
-        GRAY(+0.95),
-        DARK_GRAY(+0.97),
-        BLACK(+0.99),
-        OFF(0);
-
-        public final double value;
-
-        private ledStates(double value) {
-        this.value = value;
         }
     }
 }

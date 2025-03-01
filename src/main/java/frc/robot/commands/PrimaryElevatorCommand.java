@@ -1,35 +1,29 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
-import frc.robot.States.IntakeArmStates;
-import frc.robot.States.PrimaryElevatorStates;
-import frc.robot.subsystems.IntakeArmSubsystem;
+import frc.robot.States.ElevatorStates;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class PrimaryElevatorCommand {
-    private final PrimaryElevatorSubsystem elevatorPrimary;
-    private final IntakeArmSubsystem intakeArm;
-    private Command command;
-    private PrimaryElevatorStates state;
+    
+    private PrimaryElevatorSubsystem elevatorPrimary;
 
-    public PrimaryElevatorCommand(PrimaryElevatorSubsystem elevatorPrimary, IntakeArmSubsystem intakeArm) {
+    public PrimaryElevatorCommand(PrimaryElevatorSubsystem elevatorPrimary) {
         this.elevatorPrimary = elevatorPrimary;
-        this.intakeArm = intakeArm;
+        this.elevatorPrimary.reset();
     }
 
-    public Command set(PrimaryElevatorStates state) {
-        this.state = state;
-        command = elevatorPrimary.runOnce(() -> elevatorPrimary.setHeight(state.height));
-        return command;
-    }
-
-    public PrimaryElevatorStates getState() {
-        return state;
+    public Command set(double primaryHeight) {
+        SmartDashboard.putNumber("goal Primary Height", primaryHeight);
+        return elevatorPrimary
+            .runOnce(() -> elevatorPrimary.setHeight(primaryHeight))
+            .until(elevatorPrimary::atHeight)
+            .handleInterrupt(elevatorPrimary::reset);
     }
 
     public PrimaryElevatorSubsystem getPrimaryElevator() {
         return elevatorPrimary;
     }
+
 }
