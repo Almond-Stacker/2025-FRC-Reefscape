@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.States.ArmStates;
-import frc.robot.States.IndexStates;
 import frc.robot.States.InnerElevatorStates;
 import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;

@@ -12,7 +12,7 @@ public class IntakeArmCommand {
 
     public IntakeArmCommand(IntakeArmSubsystem intakeArm) {
         this.intakeArm = intakeArm;
-        setArmAngle(ArmStates.HOME);
+        setArmAngle(ArmStates.STARTING_POSITION);
         setIntakeSpeed(IntakeStates.STOP);
     }
 

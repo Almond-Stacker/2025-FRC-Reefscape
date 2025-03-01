@@ -3,9 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.States.InnerElevatorStates;
-import frc.robot.States.PrimaryElevatorStates;
 import frc.robot.subsystems.InnerElevatorSubsystem;
-import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class InnerElevatorCommand {
     private final InnerElevatorSubsystem elevator;
@@ -13,7 +11,7 @@ public class InnerElevatorCommand {
 
     public InnerElevatorCommand(InnerElevatorSubsystem elevator) {
         this.elevator = elevator;
-        setElevator(InnerElevatorStates.HOME);
+        setElevator(InnerElevatorStates.STARTING_POSITION);
     }
 
     public Command setElevator(InnerElevatorStates state) {

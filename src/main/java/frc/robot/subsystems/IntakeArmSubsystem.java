@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
 import frc.robot.States.ArmStates;
+import frc.robot.commands.IntakeArmCommand;
 
 public class IntakeArmSubsystem extends SubsystemBase {   
     private final TalonFX armMotor;
@@ -21,10 +22,10 @@ public class IntakeArmSubsystem extends SubsystemBase {
     private final DutyCycleEncoder armEncoder; 
     private final ArmFeedforward armFeedforward;
     private final PIDController armPID;
-    private ArmStates armState;
+    private final IntakeArmCommand intakeArmCommand;
     private double armPosition;
     private double motorSpeed; 
-    private boolean override;
+    //private boolean override;
 
     public IntakeArmSubsystem() {
         armMotor = new TalonFX(Constants.Arm.armMotorID);
@@ -34,8 +35,9 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armFeedforward = new ArmFeedforward(Constants.Arm.kS, Constants.Arm.kG, Constants.Arm.kV);
         armPID = new PIDController(Constants.Arm.kP, Constants.Arm.kI, Constants.Arm.kD);
 
-        armState  = ArmStates.STARTING_POSITION;
-        override = false;
+        intakeArmCommand = new IntakeArmCommand(this);
+        armMotor.disable();
+        //override = false;
     }
 
     @Override
@@ -43,23 +45,24 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armPosition = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
 
         // position motor speed moves up 
-        if(override) {
-            armMotor.set(motorSpeed);
-        }
-        else if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
+        // if(override) {
+        //     armMotor.set(motorSpeed);
+        // }
+        //else 
+        if(armPosition >= ArmStates.MAX.angle || armPosition <= ArmStates.MIN.angle) {
             armMotor.set(0);
         } else {
             motorSpeed = armPID.calculate(armPosition) + armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getVelocity().getValueAsDouble());
             armMotor.set(motorSpeed);
         }
-
+        armMotor.set(0);
         setSmartdashboard();
     }
 
-    public void setArmSpeed(double speed, boolean activate) {
-        this.override = activate;
-        this.motorSpeed = speed;
-    }
+    // public void setArmSpeed(double speed, boolean activate) {
+    //     this.override = activate;
+    //     this.motorSpeed = speed;
+    // }
 
     public void setArmAngle(double angle) {
         armPID.setSetpoint(angle);
@@ -70,10 +73,7 @@ public class IntakeArmSubsystem extends SubsystemBase {
     }
     
     private void setSmartdashboard() {
-        SmartDashboard.putString("Arm Subsystem arm state ", armState.toString());
         SmartDashboard.putNumber("Arm Subsystem position", armPosition);
         SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
-        SmartDashboard.putNumber("Arm Subsystem arm position goal", armState.angle);
-        SmartDashboard.putNumber("arm Subsytem velocity", indexingMotor.getEncoder().getVelocity());
     }
 }

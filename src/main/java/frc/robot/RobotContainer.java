@@ -24,6 +24,7 @@ import frc.lib.util.Utilities;
 import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.sigma;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.IntakeArmSubsystem;
@@ -62,6 +63,7 @@ public class RobotContainer {
     private final PrimaryElevatorSubsystem s_PrimaryElevator = new PrimaryElevatorSubsystem();
     private final InnerElevatorSubsystem s_InnerElevator = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArm  = new IntakeArmSubsystem();
+    private final ClimbSubsystem s_climb = new ClimbSubsystem();
    // private final PhotonSubsystem s_photonCamera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName, Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, States.PhotonStates.tag1);
 
     public RobotContainer() {
@@ -69,10 +71,24 @@ public class RobotContainer {
         configureDriveBindings();
         configureSYSTests();  
         configureDriver1Commands();  
+        //driver1.a().whileTrue(new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0.05)));
+       // driver1.a().whileFalse  (new InstantCommand(() -> s_PrimaryElevator.setElevatorSpeed(0)));
+        driver1.b().onTrue(new InstantCommand(() -> s_climb.setClimb(0.06)));
+        driver1.b().onFalse(new InstantCommand(() -> s_climb.setClimb(0)));
+        driver1.y().onTrue(new InstantCommand(() -> s_climb.setClimb(-0.06)));
+        driver1.y().onFalse(new InstantCommand(() -> s_climb.setClimb(0)));
+        driver1.x().onTrue(new InstantCommand(() -> s_climb.setClimb(-1)));
+        driver1.x().onFalse(new InstantCommand(() -> s_climb.setClimb(0)));
     }
 
     private void configureAutos() {
-        autoChooser.addRoutine("SimplePath", autoRoutines::simplePathAuto);
+        autoChooser.addRoutine("SimplePath2", autoRoutines::simplePathAuto2);
+
+        autoChooser.addRoutine("SimplePath13", autoRoutines::simplePathAuto3);
+
+        autoChooser.addRoutine("SimplePath14", autoRoutines::simplePathAuto4);
+
+
         autoChooser.addRoutine("SimplePath1", autoRoutines::simplePathAuto1);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
@@ -85,14 +101,14 @@ public class RobotContainer {
                     .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
-         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        //  driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         
-        driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
+        // driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
 
-        // // reset the field-centric heading on left bumper press
-         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // // // reset the field-centric heading on left bumper press
+      driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        driver0.y().onTrue(i);
+        // driver0.y().onTrue(i);
     }
     
 

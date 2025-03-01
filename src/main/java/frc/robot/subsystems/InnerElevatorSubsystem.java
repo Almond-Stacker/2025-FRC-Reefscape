@@ -18,32 +18,34 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.lib.util.SparkFlexUtil;
 import frc.robot.Constants;
+import frc.robot.Constants.InnerElevator;
 import frc.robot.States.InnerElevatorStates;
+import frc.robot.commands.InnerElevatorCommand;
 
 public class InnerElevatorSubsystem extends SubsystemBase {
     private final SparkFlex elevatorMotor;
     private final PIDController elevatorPID;
     private final ElevatorFeedforward elevatorFeedforward;
     private final RelativeEncoder elevatorEncoder;
-    private InnerElevatorStates state;
+    private final InnerElevatorCommand elevatorCommand;
     private double innerElevatorPosition; 
     private double motorSpeed;
     private boolean inBounds;
     private boolean override;
 
     public InnerElevatorSubsystem() {
-        this.state = InnerElevatorStates.HOME;
         elevatorMotor = new SparkFlex(Constants.InnerElevator.ElevatorMotorID, MotorType.kBrushless);
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
         elevatorFeedforward = new ElevatorFeedforward(Constants.InnerElevator.kS, Constants.InnerElevator.kG, Constants.InnerElevator.kV);
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorPID = new PIDController(Constants.InnerElevator.kP, Constants.InnerElevator.kI, Constants.InnerElevator.kD);
+        elevatorCommand = new InnerElevatorCommand(this);
         override = false;
     }
 
     @Override
     public void periodic() {
-        innerElevatorPosition = elevatorEncoder.getPosition() + 0.01;
+        innerElevatorPosition = elevatorEncoder.getPosition() + 0.1;
         inBounds = false;
 
         // positive speed goes up 
@@ -56,12 +58,13 @@ public class InnerElevatorSubsystem extends SubsystemBase {
             inBounds = false;
         } else {
             motorSpeed = elevatorPID.calculate(innerElevatorPosition) + elevatorFeedforward.calculate(innerElevatorPosition);
+
             if(motorSpeed < -0.1){
                 motorSpeed *= 0.2;
             }
 
-            elevatorMotor.set(motorSpeed);
-            //elevatorMotor.set(0);
+            //elevatorMotor.set(motorSpeed);
+            elevatorMotor.set(0);
             inBounds = true; 
         }
         setSmartdashboard();
@@ -75,11 +78,13 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         elevatorMotor.set(speed);
     }
 
+    public InnerElevatorCommand getCommand() {
+        return elevatorCommand;
+    }
+
     private void setSmartdashboard() {
-        SmartDashboard.putString("Inner elevator state", state.toString());
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
         SmartDashboard.putNumber("Inner elevator speed", motorSpeed);
         SmartDashboard.putNumber("Inner elevator posotion ", innerElevatorPosition);
-        SmartDashboard.putNumber("Inner elevator goal position", state.height);
     }
 }

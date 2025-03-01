@@ -1,29 +1,6 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.Photon;
-import frc.robot.commands.IntakeArmCommand;
-import frc.robot.subsystems.PrimaryElevatorSubsystem;
-
 public class States {
-    // allow for easy changing of photon vision targets 
-    public enum PhotonStates {
-        driveTag4(Photon.tag4.targetID ,Photon.tag4.distance0, Photon.tag4.angle0, Photon.tag4.tagHeight),
-        tag1(Photon.tag1.targetID, Photon.tag1.desiredDistance1, Photon.tag1.desiredAngle1, Photon.tag1.tagHeight);
-
-        public final int id;
-        public final double distance;
-        public final double angle; 
-        public final double height;
-
-        PhotonStates(int id, double distance, double angle, double height) {
-            this.id = id;
-            this.distance = distance;
-            this.angle = angle;
-            this.height = height;
-        }
-    }
-
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.57),
@@ -48,12 +25,14 @@ public class States {
 
     public enum InnerElevatorStates {
         // allow for easy changing of elevator states 
-        HOME(0.01),
-        L1(),
+        STARTING_POSITION(3.93),
+        PRE_INTAKE(3.79),
+        INTAKE(3.9),
+        L1(0.25),
         L2(),
         L3(4.8),
-        MIN(0),
-        MAX(5);
+        MIN(0.18),
+        MAX(4.9);
 
         public final double height;
 

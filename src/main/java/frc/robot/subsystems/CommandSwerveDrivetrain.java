@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,8 +53,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during field-centric path following */
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
-    private final PIDController m_pathXController = new PIDController(10, 0, 0);
-    private final PIDController m_pathYController = new PIDController(10, 0, 0);
+    private final PIDController m_pathXController = new PIDController(1.5, 0.01, 0.5);
+    private final PIDController m_pathYController = new PIDController(1.5, 0.01, 0.5);
     private final PIDController m_pathThetaController = new PIDController(10, 0, 0);
 
     /* Swerve requests to apply during SysId characterization */
@@ -285,6 +286,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
             pose.getRotation().getRadians(), sample.heading
         );
+            SmartDashboard.putNumber("sigma foward", targetSpeeds.vxMetersPerSecond);
+            SmartDashboard.putNumber("sigma back", targetSpeeds.vyMetersPerSecond);
+
+            SmartDashboard.putNumber("sigma turn", targetSpeeds.omegaRadiansPerSecond);
+
 
         setControl(
             m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds)

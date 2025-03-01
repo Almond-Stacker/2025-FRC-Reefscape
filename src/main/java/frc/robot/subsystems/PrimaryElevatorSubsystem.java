@@ -17,46 +17,45 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
 import frc.robot.States.PrimaryElevatorStates;
+import frc.robot.commands.PrimaryElevatorCommand;
 
 public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftElevatorMotor;
     private final TalonFX rightElevatorMotor;
-    //private final DutyCycleEncoder absoluteEncoder; 
     private final PIDController elevatorPID;
-    //private final ProfiledPIDController elevatorProfiledPID;
+    private final PrimaryElevatorCommand elevatorCommand;
 
     private double relativeElevatorPosition; 
     private double motorSpeed;
     private boolean inBounds;
+    private double sigma = 0; 
 
     public PrimaryElevatorSubsystem() {
         leftElevatorMotor = new TalonFX(Constants.PrimaryElevator.leftElevatorMotorID);
         rightElevatorMotor = new TalonFX(Constants.PrimaryElevator.rightElevatorMotorID);  
         elevatorPID = new PIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD);
-       // elevatorProfiledPID = new ProfiledPIDController(Constants.PrimaryElevator.kP, Constants.PrimaryElevator.kI, Constants.PrimaryElevator.kD, Constants.);
-
+        elevatorCommand = new PrimaryElevatorCommand(this);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     @Override
     public void periodic() {
-       // elevatorPosition = Units.degreesToRadians(leftElevatorMotor.getPosition().getValueAsDouble());
-       //elevatorPosition = Units.rotationsToDegrees(encoder.get());
        relativeElevatorPosition = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
-       //motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
 
-       // positive goes up 
-        if(relativeElevatorPosition >= PrimaryElevatorStates.MAX.height || relativeElevatorPosition <= PrimaryElevatorStates.MIN.height) {
-            leftElevatorMotor.set(0);
-            rightElevatorMotor.set(0);
-            inBounds = false;
-        } else {
-            motorSpeed = elevatorPID.calculate(relativeElevatorPosition);//leftElevatorMotor.getPosition().getValueAsDouble());
-            leftElevatorMotor.set(motorSpeed);
-            rightElevatorMotor.set(motorSpeed);
-            inBounds = true;    
-        }
+    //    // positive goes up 
+    //     if(relativeElevatorPosition >= PrimaryElevatorStates.MAX.height || relativeElevatorPosition <= PrimaryElevatorStates.MIN.height) {
+    //         leftElevatorMotor.set(0);
+    //         rightElevatorMotor.set(0);
+    //         inBounds = false;
+    //     } else {
+    //         motorSpeed = elevatorPID.calculate(relativeElevatorPosition);
+    //         leftElevatorMotor.set(motorSpeed);
+    //         rightElevatorMotor.set(motorSpeed);
+    //         inBounds = true;    
+    //     }
+        leftElevatorMotor.set(sigma);
+        rightElevatorMotor.set(sigma);
         setSmartdashboard();
     }
 
@@ -66,12 +65,15 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
 
     private void setSmartdashboard() {
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
-        SmartDashboard.putNumber("Primary elevator speed", motorSpeed);
+        SmartDashboard.putNumber("Primary elevator speed", sigma);
         SmartDashboard.putNumber("Primary elevator position ", relativeElevatorPosition);
     }
 
     public void setElevatorSpeed(double motor) {
-        leftElevatorMotor.set(motor);
-        rightElevatorMotor.set(motor);
+        sigma = motor;
+    }
+
+    public PrimaryElevatorCommand getCommand() {
+        return elevatorCommand;
     }
 }

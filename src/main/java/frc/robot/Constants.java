@@ -6,9 +6,9 @@ import java.util.List;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -125,31 +125,31 @@ public final class Constants {
     // }
 
         public static final class PhotonConstants {
-        public static final List<String> CAM_NAMES = Arrays.asList("front_photon_camera");
+            public static final List<String> CAM_NAMES = Arrays.asList("front_photon_camera");
 
-        public static final Transform3d front_cam_transform = new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, 0, 0)
-                );
-        public static final List<Transform3d> CAM_TO_ROBOT_TRANSFORMS = List.of(front_cam_transform);
-      //  public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            public static final Transform3d front_cam_transform = new Transform3d(
+                        new Translation3d(0, 0, 0),
+                        new Rotation3d(0, 0, 0)
+                    );
+            public static final List<Transform3d> CAM_TO_ROBOT_TRANSFORMS = List.of(front_cam_transform);
+           // public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-       // public static final String CAM0_NAME = "front_photon_camera";
-        //public static final String CAM1_NAME = "";//set constants 2/9
+            // public static final String CAM0_NAME = "front_photon_camera";
+            //public static final String CAM1_NAME = "";//set constants 2/9
 
-        public static final double TIMEOUT = 0.3;
-        public static final double MIN_AMBIGUITY = 0.2;//tune
+            public static final double TIMEOUT = 0.3;
+            public static final double MIN_AMBIGUITY = 0.2;//tune
 
-        //no reading consideration
-        public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(4, 4, 8);
-        public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
-        public static final PhotonPipelineResult NO_RESULT = new PhotonPipelineResult();
-        public static final Pose3d NO_APRILTAG = new Pose3d();
-        public static final EstimatedRobotPose NO_APRILTAG_ESTIMATE =
-                new EstimatedRobotPose(NO_APRILTAG, 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
+            //no reading consideration
+            public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(4, 4, 8);
+            public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
+            public static final PhotonPipelineResult NO_RESULT = new PhotonPipelineResult();
+            public static final Pose3d NO_APRILTAG = new Pose3d();
+            public static final EstimatedRobotPose NO_APRILTAG_ESTIMATE =
+                    new EstimatedRobotPose(NO_APRILTAG, 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
 
-        public static final TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(2.0, 1.0);
-        public static final TrapezoidProfile.Constraints rotationConstraints = new TrapezoidProfile.Constraints(Math.PI, Math.PI / 2);
+            public static final TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(2.0, 1.0);
+            public static final TrapezoidProfile.Constraints rotationConstraints = new TrapezoidProfile.Constraints(Math.PI, Math.PI / 2);
     }
 
     public static final class ClimbConstants {

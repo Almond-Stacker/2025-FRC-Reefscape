@@ -100,7 +100,7 @@
 //         SmartDashboard.putNumber("ySpeed", targetPose.getY());
 //         SmartDashboard.putNumber("rSpeed", targetPose.getRotation().getRadians());
 
-//         }, drivetrain).finallyDo(() -> drivetrain.stop());
+//         }, drivetrain);//.finallyDo(() -> drivetrain.stop());
 //     }
 
 //     public void setTarget(int targetAprilTagID) {
