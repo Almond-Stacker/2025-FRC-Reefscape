@@ -34,106 +34,104 @@ public class PhotonSubsystem extends SubsystemBase {
 
     private List<PhotonCamera> cameras; // pain transforms and cameras later
     private List<Transform3d> cameraToRobotTransforms;
-    private final PhotonPoseEstimator estimator;
     private Optional<EstimatedRobotPose> collectiveEstimatedPose = Optional.empty();
 
     private double lastUpdateTime = 0;
 
     private boolean targetExist = false;//testing
     
-        public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
-            this.drivetrain = drivetrain;
-            commands = new PhotonCommand(this, drivetrain);
+    public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
+        this.drivetrain = drivetrain;
+        commands = new PhotonCommand(this, drivetrain);
 
-            this.cameraToRobotTransforms = cameraToRobotTransforms;//was throwin error
-            this.cameras = cameraNames.stream().map(PhotonCamera::new).toList();
-            this.estimator = new PhotonPoseEstimator(
-                PhotonConsts.aprilTagFieldLayout, //figure custom April Tag feld creation
-                PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                cameraToRobotTransforms.get(0) // Using first cameras transform as refrence
-            );
+        this.cameraToRobotTransforms = cameraToRobotTransforms;//was throwin error
+        this.cameras = cameraNames.stream().map(PhotonCamera::new).toList();
+    }
+
+    //for swerve drive estimator type stuff
+    private void updateEstimationStdDevs(int numTags, double avgDist) {
+            //if 1 and far then standard deviation is larger, else smaller
+        curStdDevs = numTags > 1 ? VecBuilder.fill(0.5, 0.5, 1) : VecBuilder.fill(4, 4, 8);
+        if(numTags == 1 && avgDist > 4) {//dist in meters
+            curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        } else {
+            curStdDevs = curStdDevs.times(1 + (avgDist * avgDist / 30));
         }
-    
-        //for swerve drive estimator type stuff
-        private void updateEstimationStdDevs(int numTags, double avgDist) {
-                //if 1 and far then standard deviation is larger, else smaller
-            curStdDevs = numTags > 1 ? VecBuilder.fill(0.5, 0.5, 1) : VecBuilder.fill(4, 4, 8);
-            if(numTags == 1 && avgDist > 4) {//dist in meters
-                curStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-            } else {
-                curStdDevs = curStdDevs.times(1 + (avgDist * avgDist / 30));
-            }
-        }
-    
-        public Matrix<N3, N1> getEstimationStdDevs() {
-            return curStdDevs;
-        }
-    
-        @Override
-        public void periodic() {
-            Pose3d addedPose = new Pose3d(); // find average pose, couldn't figure a List or array list for some reason
-            double avgDist = 0;//for standard deviation
-            int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
-            int index = 0;//which cam for pose transforms
-    
-            double currentTime = Timer.getFPGATimestamp();
-    
-            for(PhotonCamera cam : cameras) {
-                List<PhotonPipelineResult> results = cam.getAllUnreadResults();
-                for(PhotonPipelineResult result : results) {
-    
-                    //check if targets are resonable
-                    List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
-                        .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
-                        .toList();
-    
-                    if(!filteredTargets.isEmpty()) {
-                        Optional<EstimatedRobotPose> pose = estimator.update(result);
-                        //check if pose was resonable
-                        targetExist = true;
-                        if(pose.isPresent()) {
-                            //transforms here to utalize index, consider creating a higher level pose handler
-                            
-                            Pose3d transformedPose = pose.get().estimatedPose.transformBy(cameraToRobotTransforms.get(index).inverse());
-                            addedPose = new Pose3d(
-                                    transformedPose.getX() + addedPose.getX(),
-                                    transformedPose.getY() + addedPose.getY(),
-                                    transformedPose.getZ() + addedPose.getZ(),
-                                    new Rotation3d(
-                                        transformedPose.getRotation().getX() + addedPose.getRotation().getX(),
-                                        transformedPose.getRotation().getY() + addedPose.getRotation().getY(),
-                                        transformedPose.getRotation().getZ() + addedPose.getRotation().getZ()
-                                    )
-                                );
-                            avgDist += transformedPose.toPose2d().getTranslation().getNorm();
-                            validPoseCount++;
-                        }
-                    } else {
-                        targetExist = false;
+    }
+
+    public Matrix<N3, N1> getEstimationStdDevs() {
+        return curStdDevs;
+    }
+
+    @Override
+    public void periodic() {
+        Pose3d addedPose = new Pose3d(); // find average pose, couldn't figure a List or array list for some reason
+        double avgDist = 0;//for standard deviation
+        int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
+        int index = 0;//which cam for pose transforms
+
+        double currentTime = Timer.getFPGATimestamp();
+
+        for(PhotonCamera cam : cameras) {
+            List<PhotonPipelineResult> results = cam.getAllUnreadResults();
+            for(PhotonPipelineResult result : results) {
+                targetExist = false;
+                //check if targets are resonable
+                List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
+                    .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
+                    .toList();
+
+                SmartDashboard.putNumber("amt Targets", filteredTargets.size());
+
+                for(PhotonTrackedTarget target : filteredTargets) {
+                    targetExist = true;
+                    Optional<Pose3d> tagPoseOpt = PhotonConsts.aprilTagFieldLayout.getTagPose(target.getFiducialId());
+                    //check if pose was resonable
+                    if(tagPoseOpt.isPresent()) {
+                        SmartDashboard.putBoolean("SIGMA", true);
+                        //transforms here to utalize index, consider creating a higher level pose handler
+                        Pose3d tagPose = tagPoseOpt.get();
+                        Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget().inverse());
+                        Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index).inverse());
+
+                        avgDist += transformedPose.getTranslation().getNorm();
+                        addedPose = new Pose3d(
+                            addedPose.getX() + transformedPose.getX(),
+                            addedPose.getY() + transformedPose.getY(),
+                            addedPose.getZ() + transformedPose.getZ(),
+                            new Rotation3d(
+                                addedPose.getRotation().getX() + transformedPose.getRotation().getX(),
+                                addedPose.getRotation().getY() + transformedPose.getRotation().getY(),
+                                addedPose.getRotation().getZ() + transformedPose.getRotation().getZ()
+                            )
+                        );
+
+                        validPoseCount++;
                     }
-    
                 }
-                index++;
+
             }
-    
-            if(validPoseCount > 0) {
-                Pose3d averagedPose = addedPose.transformBy(new Transform3d(
-                    addedPose.getX() / validPoseCount,
-                    addedPose.getY() / validPoseCount,
-                    addedPose.getZ() / validPoseCount,
-                    new Rotation3d(
-                        addedPose.getRotation().getX() / validPoseCount,
-                        addedPose.getRotation().getY() / validPoseCount,
-                        addedPose.getRotation().getZ() / validPoseCount
-                    )
-                ));
+            index++;
+        }
 
-                //targetExist = true;
-                updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
-                lastUpdateTime = currentTime;
+        if(validPoseCount > 0) {
+            
+            updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
+            lastUpdateTime = currentTime;
 
-                
-            collectiveEstimatedPose = Optional.of(new EstimatedRobotPose(averagedPose, 0, List.of(), PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR));
+            addedPose = new Pose3d(
+                            addedPose.getX() / validPoseCount,
+                            addedPose.getY() / validPoseCount,
+                            addedPose.getZ() / validPoseCount,
+                            new Rotation3d(
+                                addedPose.getRotation().getX() / validPoseCount,
+                                addedPose.getRotation().getY() / validPoseCount,
+                                addedPose.getRotation().getZ() / validPoseCount
+                            )
+                        );
+
+            SmartDashboard.putNumber("valid Poses", validPoseCount);
+        
         } else if (currentTime - lastUpdateTime > PhotonConsts.TIMEOUT) {
             collectiveEstimatedPose = Optional.of(PhotonConsts.NO_APRILTAG_ESTIMATE); //clear result if too great of time difference
             //no change to swerve pose
@@ -153,6 +151,7 @@ public class PhotonSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Pose X", pose.getX());
             SmartDashboard.putNumber("Pose Y", pose.getY());
             SmartDashboard.putNumber("Pose theata", pose.getRotation().getZ());
+            
         } else {
             SmartDashboard.putString("Robot Pose", "No pose available");
         }

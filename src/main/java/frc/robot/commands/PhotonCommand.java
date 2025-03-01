@@ -81,6 +81,9 @@ public class PhotonCommand {
             validTargetID = true;
             
             Pose2d aprilTagPose = aprilTagPoseOpt.get().toPose2d();
+            SmartDashboard.putNumber("Aptil Tag Pose Opt X", aprilTagPose.getX());
+            SmartDashboard.putNumber("Aptil Tag Pose Opt Y", aprilTagPose.getY());
+            SmartDashboard.putNumber("Aptil Tag Pose Opt Rotation", aprilTagPose.getRotation().getRadians());
 
             double offsetDistance = 2.0; // meters
             Translation2d tagTranslation = aprilTagPose.getTranslation();
@@ -97,8 +100,9 @@ public class PhotonCommand {
             rSpeed = rController.calculate(estimatedPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
 
             SmartDashboard.putNumber("xSpeed", targetPose.getX());
-        SmartDashboard.putNumber("ySpeed", targetPose.getY());
-        SmartDashboard.putNumber("rSpeed", targetPose.getRotation().getRadians());
+            SmartDashboard.putNumber("ySpeed", targetPose.getY());
+            SmartDashboard.putNumber("rSpeed", targetPose.getRotation().getRadians());
+            //drivetrain.drive(xSpeed, ySpeed, rSpeed);
 
         }, drivetrain).finallyDo(() -> drivetrain.stop());
     }

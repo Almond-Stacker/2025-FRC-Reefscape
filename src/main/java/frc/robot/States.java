@@ -1,32 +1,51 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class States {
 
-    /*
-    when ready just program it all into elevatorCommand
-    where it will figure needed height divided between
-    the two systems of the elevator. Mainly make a transition
-    from relative rotations to a general unit like meters? or somethin
     public enum ElevatorStates {
-        //overall height is primary + inner elevator heights
-        PRIMARY_MIN(0),
-        PRIMARY_MAX(101),
-        INNER_MIN(0),
-        INNER_MAX(5);
+        //tune
+        HOME_ABS(0.57, 0.1, 210),
+        MAX_ABS(101, 0.8, 255),
+        MIN_ABS(0, -2.7, 70),
+        HOME_REL(0.5, 210),
+        L2_REL(1, 210),
+        L3_REL(1, 210),
+        L4_REL(1, 210);
 
-        public final double height;
+        public final double primaryHeight;
+        public final double innerHeight;
+        public final double relTotalHeight;
         public final double angle;
-        ElevatorStates(double height, double angle) {
-            this.height = height;
+
+        ElevatorStates(double primaryHeight, double innerHeight, double angle) {
+            this.primaryHeight = primaryHeight;
+            this.innerHeight = innerHeight;
             this.angle = angle;
+
+            this.relTotalHeight = 0;
+            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
+
         }
 
-        ElevatorStates(double height) {
-            this.height = height;
+        ElevatorStates(double relTotalHeight, double angle) {
+            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
+
+            this.relTotalHeight = relTotalHeight;
+            this.angle = angle;
+
+            this.primaryHeight = 0;
+            this.innerHeight = 0;
+        }
+        
+        ElevatorStates() {
+            //refrence HOME instead somehow
+            this(0.57, 0.01, 210);
         }
     }
-    */
 
+    /*
     public enum PrimaryElevatorStates {
         // allow for easy changing of elevator states 
         HOME(0.57),
@@ -91,6 +110,7 @@ public class States {
             this.angle = 0; 
         }
     }
+    */
 
     public enum SuckStates {
         // allow for easy changing of elevator states 
@@ -111,8 +131,8 @@ public class States {
 
     public enum ClimbStates {
         STOP(0),
-        CLIMB(0.5),
-        DROP(-0.5);
+        CLIMB(0.06),
+        DROP(-0.06);
 
         public final double speed;
 

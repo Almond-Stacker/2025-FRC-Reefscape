@@ -11,15 +11,15 @@ import choreo.auto.AutoChooser;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 import frc.robot.Constants.PhotonConsts;
 import frc.robot.States.ClimbStates;
-import frc.robot.States.InnerElevatorStates;
-import frc.robot.States.IntakeArmStates;
-import frc.robot.States.PrimaryElevatorStates;
 import frc.robot.States.SuckStates;
+import frc.robot.States.ElevatorStates;
 import frc.robot.commands.ClimbCommand;
+import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.InnerElevatorCommand;
 import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.PhotonCommand;
@@ -67,6 +67,11 @@ public class RobotContainer {
     private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
     private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
 
+    private final ElevatorCommandHandler elevatorCommandHandler = 
+    new ElevatorCommandHandler(
+        primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem
+    );
+    
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
     private final ClimbCommand climbCommand = climbSubsystem.getCommand();
 
@@ -89,9 +94,9 @@ public class RobotContainer {
         
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+                    .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed * 0.4) // Drive left with negative X (left)
+                    .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate * 0.4 ) // Drive counterclockwise with negative X (left)
         ));
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -114,7 +119,7 @@ public class RobotContainer {
         driver1.rightBumper().whileTrue(climbCommand.setClimb(ClimbStates.DROP)).whileFalse(climbCommand.setClimb(ClimbStates.STOP));
 
         driver1.x().toggleOnTrue(
-            photonCommand.goInFrontOfTag(4)
+            photonCommand.goInFrontOfTag(1)
                 .beforeStarting(() -> {
                     isTrackingAprilTag = true;
                     SmartDashboard.putBoolean("Tracking AprilTag", isTrackingAprilTag);
@@ -125,6 +130,15 @@ public class RobotContainer {
                 })
         );
 
+        driver1.pov(0).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.HOME_REL.relTotalHeight)));
+        driver1.pov(90).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L2_REL.relTotalHeight)));
+        driver1.pov(180).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L3_REL.relTotalHeight)));
+        driver1.pov(270).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L4_REL.relTotalHeight)));
+
+        driver1.y().onTrue(new InstantCommand(() -> {
+            SmartDashboard.putNumber("Rel Inner Height", elevatorCommandHandler.getRelativeInnerHeight());
+            SmartDashboard.putNumber("Rel Primary Height", elevatorCommandHandler.getRelativePrimaryHeight());
+        }));
         //driver1.pov(90).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L1));
         //driver1.pov(90).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L1));
 

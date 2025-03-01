@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.States.InnerElevatorStates;
+import frc.robot.States.ElevatorStates;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 
 public class InnerElevatorCommand {
@@ -10,12 +10,13 @@ public class InnerElevatorCommand {
 
     public InnerElevatorCommand(InnerElevatorSubsystem elevatorInner) {
         this.elevatorInner = elevatorInner;
+        this.elevatorInner.reset();
     }
 
-    public Command set(InnerElevatorStates state) {
-        SmartDashboard.putString("Inner elevator state", state.toString());
+    public Command set(double innerHeight) {
+        SmartDashboard.putNumber("goal Inner Height", innerHeight);
         return elevatorInner
-            .runOnce(() -> elevatorInner.setHeight(state.height))
+            .runOnce(() -> elevatorInner.setHeight(innerHeight))
             .until(elevatorInner::atHeight)
             .handleInterrupt(elevatorInner::reset);
     }

@@ -6,26 +6,22 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.SparkFlexUtil;
 import frc.robot.Constants.InnerElevatorConsts;
-import frc.robot.States.InnerElevatorStates;
+import frc.robot.States.ElevatorStates;
 import frc.robot.commands.InnerElevatorCommand;
 
 public class InnerElevatorSubsystem extends SubsystemBase{
     private final SparkFlex elevatorMotor;
-    private final ProfiledPIDController elevatorPID;
+    private final PIDController elevatorPID;
     private final ElevatorFeedforward elevatorFeedforward;
     private final RelativeEncoder elevatorEncoder;
 
     private double motorOutput;
     private boolean inBounds;
-
-    private double lastSpeed = 0;
-    private double timeStamp = Timer.getFPGATimestamp();
 
     private InnerElevatorCommand commands;
 
@@ -35,7 +31,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         elevatorEncoder = elevatorMotor.getEncoder();
 
         elevatorFeedforward = new ElevatorFeedforward(InnerElevatorConsts.kS, InnerElevatorConsts.kG, InnerElevatorConsts.kV);
-        elevatorPID = new ProfiledPIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD, InnerElevatorConsts.PROFILE);
+        elevatorPID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
 
         commands = new InnerElevatorCommand(this);
     }
@@ -44,33 +40,28 @@ public class InnerElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         double relativeElevatorPosition = getHeight();
 
-        if(relativeElevatorPosition >= InnerElevatorStates.MAX.height
-                || relativeElevatorPosition <= InnerElevatorStates.MIN.height) {
-            //elevatorMotor.set(0);
+        if(relativeElevatorPosition >= ElevatorStates.MAX_ABS.innerHeight
+                || relativeElevatorPosition <= ElevatorStates.MIN_ABS.innerHeight) {
+            motorOutput = 0;
             inBounds = false;
         } else {
-            motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedforward.calculate(elevatorPID.getSetpoint().velocity, (elevatorPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
-            //elevatorMotor.set(motorOutput);
+            motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedforward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
             inBounds = true;
         }
-
-        lastSpeed = elevatorPID.getSetpoint().velocity;
-        timeStamp = Timer.getFPGATimestamp();
-
+        //elevatorMotor.set(motorOutput);
         setSmartdashboard();
     }
 
     public void setHeight(double height) {
-        elevatorPID.setGoal(height);
+        elevatorPID.setSetpoint(height);
     }
 
     public void reset() {
-        elevatorPID.setGoal(getHeight());
-        elevatorPID.reset(getHeight());
+        elevatorPID.setSetpoint(getHeight());
     }
 
     public boolean atHeight() {
-        return elevatorPID.atGoal();
+        return elevatorPID.atSetpoint();
     }
 
     public double getHeight() {
@@ -81,7 +72,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
         SmartDashboard.putNumber("Inner elevator speed", motorOutput);
         SmartDashboard.putNumber("Inner elevator posotion ", getHeight());
-        SmartDashboard.putNumber("Inner elevator goal position", elevatorPID.getGoal().position);
+        SmartDashboard.putNumber("Inner elevator goal position", elevatorPID.getSetpoint());
     }
 
     public InnerElevatorCommand getCommands() {
