@@ -15,25 +15,25 @@ import frc.robot.States.ElevatorStates;
 import frc.robot.commands.InnerElevatorCommand;
 
 public class InnerElevatorSubsystem extends SubsystemBase{
-    private final SparkFlex elevatorMotor;
-    private final PIDController elevatorPID;
-    private final ElevatorFeedforward elevatorFeedforward;
-    private final RelativeEncoder elevatorEncoder;
+    private final SparkFlex motor;
+    private final PIDController PID;
+    private final ElevatorFeedforward feedFoward;
+    private final RelativeEncoder encoder; 
+    private final InnerElevatorCommand command;
 
     private double motorOutput;
     private boolean inBounds;
 
-    private InnerElevatorCommand commands;
+    public InnerElevatorSubsystem() {   
+        motor = new SparkFlex(InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
+        SparkFlexUtil.setSparkFlexBusUsage(motor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
 
-    public InnerElevatorSubsystem() {
-        elevatorMotor = new SparkFlex(InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
-        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
-        elevatorEncoder = elevatorMotor.getEncoder();
+        encoder = motor.getEncoder();
 
-        elevatorFeedforward = new ElevatorFeedforward(InnerElevatorConsts.kS, InnerElevatorConsts.kG, InnerElevatorConsts.kV);
-        elevatorPID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
-
-        commands = new InnerElevatorCommand(this);
+        PID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
+        feedFoward = new ElevatorFeedforward(motorOutput, motorOutput, motorOutput);
+        
+        command = new InnerElevatorCommand(this);
     }
 
     @Override
@@ -76,6 +76,6 @@ public class InnerElevatorSubsystem extends SubsystemBase{
     }
 
     public InnerElevatorCommand getCommands() {
-        return commands;
+        return command;
     }
 }

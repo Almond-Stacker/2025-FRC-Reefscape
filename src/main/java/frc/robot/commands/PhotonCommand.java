@@ -104,7 +104,7 @@ public class PhotonCommand {
             SmartDashboard.putNumber("rSpeed", targetPose.getRotation().getRadians());
             //drivetrain.drive(xSpeed, ySpeed, rSpeed);
 
-        }, drivetrain).finallyDo(() -> drivetrain.stop());
+        }, drivetrain); 
     }
 
     public void setTarget(int targetAprilTagID) {

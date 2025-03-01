@@ -76,4 +76,3 @@ public class ElevatorCommandHandler {
         return (ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight) * relPrimaryHeight + ElevatorStates.MIN_ABS.primaryHeight;
     }
 }
-
