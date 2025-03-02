@@ -53,9 +53,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during field-centric path following */
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
-
-    private final PIDController m_pathXController = new PIDController(1.5, 0.01, 0.5);
-    private final PIDController m_pathYController = new PIDController(1.5, 0.01, 0.5);
+    private final PIDController m_pathXController = new PIDController(3.2, 
+    0.0,0.8);
+    private final PIDController m_pathYController = new PIDController(3.2 , 0.0, 0.8);
     private final PIDController m_pathThetaController = new PIDController(10, 0, 0);
 
     /* Swerve requests to apply during SysId characterization */
@@ -71,19 +71,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         new SwerveModuleState(),
         new SwerveModuleState()
     }; 
-
-    public void drive(double xSpeed, double ySpeed, double rSpeed) {
-        setControl(
-            new SwerveRequest.FieldCentric()
-                .withVelocityX(xSpeed)
-                .withVelocityY(ySpeed)
-                .withRotationalRate(rSpeed)
-        );
-    }
-
-    public void stop() {
-        setControl(new SwerveRequest.SwerveDriveBrake());
-    }
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -300,12 +287,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
             pose.getRotation().getRadians(), sample.heading
         );
-            SmartDashboard.putNumber("sigma foward", targetSpeeds.vxMetersPerSecond);
-            SmartDashboard.putNumber("sigma back", targetSpeeds.vyMetersPerSecond);
-
-            SmartDashboard.putNumber("sigma turn", targetSpeeds.omegaRadiansPerSecond);
-
-
+    
+        SmartDashboard.putNumber("thaoeutsnaoheutsnhoaeu", targetSpeeds.vxMetersPerSecond);
         setControl(
             m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds)
                 .withWheelForceFeedforwardsX(sample.moduleForcesX())

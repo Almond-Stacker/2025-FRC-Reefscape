@@ -39,6 +39,7 @@ public class IntakeArmSubsystem extends SubsystemBase{
         armPID = new PIDController(IntakeArmConsts.kP, IntakeArmConsts.kI, IntakeArmConsts.kD);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
+        disableSubsystem();
         commands = new IntakeArmCommand(this);
     }
 

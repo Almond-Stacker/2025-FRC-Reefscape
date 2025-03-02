@@ -36,8 +36,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
 
         commands = new PrimaryElevatorCommand(this);
-        leftElevatorMotor.disable();
-        rightElevatorMotor.disable();
+        disableSubsytems();
     }
     
     @Override

@@ -35,6 +35,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
 
         command = new InnerElevatorCommand(this);
+        disableSubsystem();
     }
 
     @Override

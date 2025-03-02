@@ -11,7 +11,7 @@ public class AutoRoutines {
         m_factory = factory;
     }
 
-    public AutoRoutine simplePathAuto1() {
+    public AutoRoutine simplePathAuto() {
         final AutoRoutine routine = m_factory.newRoutine("Straight Test");
         final AutoTrajectory simplePath = routine.trajectory("Straight Test");
 
@@ -22,8 +22,7 @@ public class AutoRoutines {
         return routine;
     }
 
-    
-    public AutoRoutine simplePathAuto2() {
+    public AutoRoutine simplePathAuto1() {
         final AutoRoutine routine = m_factory.newRoutine("New Path");
         final AutoTrajectory simplePath = routine.trajectory("New Path");
 
@@ -34,19 +33,7 @@ public class AutoRoutines {
         return routine;
     }
 
-    public AutoRoutine simplePathAuto3() {
-        final AutoRoutine routine = m_factory.newRoutine("New Path (1)");
-        final AutoTrajectory simplePath = routine.trajectory("New Path (1)");
-
-        routine.active().onTrue(
-            simplePath.resetOdometry()
-                .andThen(simplePath.cmd())
-        );
-        return routine;
-    }
-
-    
-    public AutoRoutine simplePathAuto4() {
+    public AutoRoutine simplePathAuto12() {
         final AutoRoutine routine = m_factory.newRoutine("New Path (2)");
         final AutoTrajectory simplePath = routine.trajectory("New Path (2)");
 
@@ -57,7 +44,6 @@ public class AutoRoutines {
         return routine;
     }
 
- 
 
 
 }
