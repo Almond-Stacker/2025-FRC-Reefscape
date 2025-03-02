@@ -55,7 +55,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
             setMotorSpeed(0.1);
             return; 
         }
-
+        
         inBounds = true;
         //goal points are set in command
         motorOutput = elevatorPID.calculate(getHeight());

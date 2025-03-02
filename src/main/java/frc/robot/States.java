@@ -6,7 +6,7 @@ public class States {
 
     public enum ElevatorStates {
         //tune
-        HOME_ABS(0.57, 0.1, 210),
+        HOME_ABS(0.57, 0.1004, 210),
         MAX_ABS(101, 0.8, 255),
         MIN_ABS(0, -2.7, 70),
         HOME_REL(0.5, 210),
