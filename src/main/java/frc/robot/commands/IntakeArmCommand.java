@@ -8,6 +8,7 @@ import frc.robot.subsystems.IntakeArmSubsystem;
 
 public class IntakeArmCommand {
     private final IntakeArmSubsystem arm;
+    private Command command; 
 
     public IntakeArmCommand(IntakeArmSubsystem arm) {
         this.arm = arm;
@@ -15,23 +16,17 @@ public class IntakeArmCommand {
 
     public Command setArm(double angle) {
         SmartDashboard.putNumber("goal angle", angle);
-        return arm
-            .runOnce(() -> arm.setAngle(angle))
-            .until(arm::atAngle)
-            .handleInterrupt(arm::resetIntakeArm);
+        command = arm.runOnce(() -> arm.setAngle(angle))
+                .until(arm::atAngle)
+                .handleInterrupt(arm::resetIntakeArm);
+        return command;
     }
 
     public Command setIntakeState(IntakeStates state) {
         SmartDashboard.putString(" intake state", state.toString());
-        Command command = arm.run(() -> arm.setIntakeStates(state.speed)); //set timeout??
+        command = arm.run(() -> arm.setIntakeStates(state.speed)); //set timeout??
 
-        if(state.equals(IntakeStates.FEED_OUT) || state.equals(IntakeStates.INTAKE)) {
-            return command
-                .withTimeout(IntakeArmConsts.OUT_TIMEOUT)//seconds on
-                .finallyDo(() -> arm.resetIntake());
-        }
-
-        return command.finallyDo(() -> arm.resetIntake());
+        return command;
     }
 
     public IntakeArmSubsystem getIntakeArmSubsystem() {

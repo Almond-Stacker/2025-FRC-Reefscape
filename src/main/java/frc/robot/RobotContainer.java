@@ -16,11 +16,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 
 import frc.robot.commands.ClimbCommand;
@@ -60,9 +66,37 @@ public class RobotContainer {
     private final AutoRoutines autoRoutines = new AutoRoutines(autoFactory);
     private final AutoChooser autoChooser = new AutoChooser();
 
-    //private final PhotonSubsystem camera0 = new PhotonSubsystem(Constants.Photon.camera0.cameraName,  Constants.Photon.camera0.cameraHeight, Constants.Photon.camera0.cameraPitch, PhotonStates.driveTag4);
+    //subsystems and commands init
+    // private final PrimaryElevatorSubsystem primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
+    // private final PrimaryElevatorCommand primaryElevatorCommand = primaryElevatorSubsystem.getCommands();
 
-    /** Subsystems **/
+    // private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
+    // private final InnerElevatorCommand innerElevatorCommand = innerElevatorSubsystem.getCommands();
+
+     private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
+     private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
+
+    // private final ElevatorCommandHandler elevatorCommandHandler = 
+    // new ElevatorCommandHandler(
+    //     primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem
+    // );
+    
+
+    // private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
+    // private final PhotonCommand photonCommand = photonSubsystem.getCommands();
+
+    // //logging vars
+    // private boolean isTrackingAprilTag = false;
+
+    //** Subsystems **//
+    private final PrimaryElevatorSubsystem s_primaryElevator = new PrimaryElevatorSubsystem();
+    private final InnerElevatorSubsystem s_innerElevator = new InnerElevatorSubsystem();
+    private final IntakeArmSubsystem s_intakeArm = new IntakeArmSubsystem();
+    private final ClimbSubsystem s_climb = new ClimbSubsystem();
+
+    //** Command Handlers **/
+    private final ClimbCommand ch_climb = s_climb.getCommand();
+    private final ElevatorCommandHandler ch_elevator = new ElevatorCommandHandler(s_primaryElevator, s_innerElevator, s_intakeArm);
 
     public RobotContainer() {
         configureAutos();
@@ -94,13 +128,36 @@ public class RobotContainer {
     }
     
 
-    private void configureSYSTests() {
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        driver0.back().and(driver0.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driver0.back().and(driver0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driver0.start().and(driver0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driver0.start().and(driver0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    private void configureSYSTests() { 
+
+    }
+
+    private void configureAutos() {
+        // register all auto commands
+        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
+
+        // add all auto paths
+        autoChooser.addRoutine("Straight Path Short", autoRoutines::ShortTest);
+        autoChooser.addRoutine("Diagonal Path", autoRoutines::DiagonalTest);
+        autoChooser.addRoutine("Curve Path", autoRoutines::CurveTest);
+        autoChooser.addRoutine("Straight Path Long", autoRoutines::StraightTest);
+        autoChooser.addRoutine("Game Auto", autoRoutines::GameAuto1);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
+    
+    private void configureDriver1Commands() {
+        driver1.a().onTrue(ch_climb.setClimb(ClimbStates.CLIMB));
+        driver1.a().onFalse(ch_climb.setClimb(ClimbStates.STOP));
+
+        driver1.b().onTrue(ch_climb.setClimb(ClimbStates.DROP));
+        driver1.b().onFalse(ch_climb.setClimb(ClimbStates.STOP));
+
+        driver1.leftBumper().onTrue(intakeArmCommand.setIntakeState(States.IntakeStates.INTAKE));
+        driver1.leftBumper().onFalse(intakeArmCommand.setIntakeState(States.IntakeStates.STOP));
+
+        driver1.rightBumper().onTrue(intakeArmCommand.setIntakeState(States.IntakeStates.FEED_OUT));
+        driver1.rightBumper().onFalse(intakeArmCommand.setIntakeState(States.IntakeStates.STOP));
     }
 
     public Command getAutonomousCommand() {

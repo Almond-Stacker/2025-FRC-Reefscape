@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.PrimaryElevatorCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.PrimaryElevatorConsts;
 import frc.robot.States.ElevatorStates;
 
@@ -36,7 +37,10 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
 
         commands = new PrimaryElevatorCommand(this);
-        disableSubsytems();
+
+        if(Constants.disableSubsystems) {
+            disableSubsystem();
+        }
     }
     
     @Override
@@ -78,7 +82,7 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         return rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
     }
 
-    private void disableSubsytems() {
+    private void disableSubsystem() {
         leftElevatorMotor.disable();
         rightElevatorMotor.disable();
     }

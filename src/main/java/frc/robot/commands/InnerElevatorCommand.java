@@ -6,6 +6,7 @@ import frc.robot.subsystems.InnerElevatorSubsystem;
 
 public class InnerElevatorCommand {
     private final InnerElevatorSubsystem elevatorInner;
+    private Command command;
 
     public InnerElevatorCommand(InnerElevatorSubsystem elevatorInner) {
         this.elevatorInner = elevatorInner;
@@ -14,10 +15,12 @@ public class InnerElevatorCommand {
 
     public Command set(double innerHeight) {
         SmartDashboard.putNumber("goal Inner Height", innerHeight);
-        return elevatorInner
-            .runOnce(() -> elevatorInner.setHeight(innerHeight))
-            .until(elevatorInner::atHeight)
-            .handleInterrupt(elevatorInner::reset);
+        command = elevatorInner
+                .runOnce(() -> elevatorInner.setHeight(innerHeight))
+                .until(elevatorInner::atHeight)
+                .handleInterrupt(elevatorInner::reset);
+        
+        return command;
     }
 
     public InnerElevatorSubsystem getInnerElevatorSubsystem() {

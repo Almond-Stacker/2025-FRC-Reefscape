@@ -40,32 +40,35 @@ public class ElevatorCommandHandler {
     }
     //finds minimum distance for both elevators to move to total height give current height of both
     //total Relative Goal Height bounds {x|0<=x<=2}
-    public void setElevatorHeight(ElevatorStates state) {
+    public double[] distributeElevatorHeights(ElevatorStates state) {
         SmartDashboard.putString("Elevator state", state.toString());
         SmartDashboard.putNumber("Relative Goal", state.relTotalHeight);
-        double totalRelativeGoalHeight = state.relTotalHeight;
+        
+       double curInner = getRelativeInnerHeight();
+        double curPrimary = getRelativePrimaryHeight();
 
-        double relInnerHeight = getRelativeInnerHeight();
-        double relPrimaryHeight = getRelativePrimaryHeight();
-        SmartDashboard.putNumber("Relative Inner Height", relInnerHeight);
-        SmartDashboard.putNumber("Relative Primary Height", relPrimaryHeight);
-        double relDistributedGoalHeight = (totalRelativeGoalHeight - (relInnerHeight + relPrimaryHeight))/2;
+        double availableInner = 1 - curInner;
+        double availablePrimary = 1 - curPrimary;
 
-        //ik ghetto but whatever
-        double new_relInnerHeight = Math.max(0, Math.min(1, relInnerHeight + relDistributedGoalHeight));
-        double new_relPrimaryHeight = Math.max(0, Math.min(1, relPrimaryHeight + 2*relDistributedGoalHeight + relInnerHeight - new_relInnerHeight));
-        double differencedHeight = new_relInnerHeight + new_relPrimaryHeight - totalRelativeGoalHeight;
-        if(Math.abs(differencedHeight) >= 0.08) {
-            new_relInnerHeight = Math.max(0, Math.min(1, new_relInnerHeight + differencedHeight));
+        double remainingHeight = state.relTotalHeight - (curInner + curPrimary);
+        double newRelInnerHeight = curInner + Math.min(remainingHeight / 2, availableInner);
+        double newRelPrimaryHeight = curPrimary + Math.min(remainingHeight / 2, availablePrimary);
+
+        if (newRelInnerHeight > 1) {
+            double overflow = newRelInnerHeight - 1;
+            newRelInnerHeight = 1;
+            newRelPrimaryHeight = Math.min(newRelPrimaryHeight + overflow, 1);
+        } else if (newRelPrimaryHeight > 1) {
+            double overflow = newRelPrimaryHeight - 1;
+            newRelPrimaryHeight = 1;
+            newRelInnerHeight = Math.min(newRelInnerHeight + overflow, 1);
         }
 
-        SmartDashboard.putNumber("Relative Inner Goal Height", new_relInnerHeight);
-        SmartDashboard.putNumber("Relative Primary Goal Height", new_relPrimaryHeight);
+        //lower bound
+        newRelInnerHeight = Math.max(newRelInnerHeight, 0);
+        newRelPrimaryHeight = Math.max(newRelPrimaryHeight, 0);
 
-        innerCommand.set(relToAbsInnerHeight(new_relInnerHeight)).initialize();
-        primaryCommand.set(relToAbsPrimaryHeight(new_relPrimaryHeight)).initialize();
-        armCommand.setArm(state.angle).initialize();
-
+        return new double[]{newRelInnerHeight, newRelPrimaryHeight};
     }
 
     //max total relative Height is 2

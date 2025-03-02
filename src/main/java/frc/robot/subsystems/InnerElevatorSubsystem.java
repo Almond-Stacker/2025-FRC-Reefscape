@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.SparkFlexUtil;
+import frc.robot.Constants;
 import frc.robot.Constants.InnerElevatorConsts;
 import frc.robot.States.ElevatorStates;
 import frc.robot.commands.InnerElevatorCommand;
@@ -35,7 +36,10 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
 
         command = new InnerElevatorCommand(this);
-        disableSubsystem();
+
+        if(Constants.disableSubsystems) {
+            disableSubsystem();
+        }
     }
 
     @Override

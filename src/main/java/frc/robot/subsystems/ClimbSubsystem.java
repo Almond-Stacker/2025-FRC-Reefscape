@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ClimbConsts;
 import frc.robot.commands.ClimbCommand;
 
@@ -17,6 +18,9 @@ public class ClimbSubsystem extends SubsystemBase{
         climbMotor.setNeutralMode(NeutralModeValue.Brake);
 
         commands = new ClimbCommand(this);
+     if(Constants.disableSubsystems) {
+            disableSubsystem();
+        }
     }
     
     public void setClimb(double speed) {
@@ -25,5 +29,9 @@ public class ClimbSubsystem extends SubsystemBase{
 
     public ClimbCommand getCommand() {
         return commands;
+    }
+
+    public void disableSubsystem() {
+        climbMotor.disable();
     }
 }
