@@ -99,7 +99,7 @@ public class Constants {
     }
 
     public static final class ClimbConsts {
-        public static final int climbMotorID = 16; //find
+        public static final int climbMotorID = 18; 
     }
 
 }

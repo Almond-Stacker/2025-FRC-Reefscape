@@ -15,39 +15,45 @@ import frc.robot.States.ElevatorStates;
 import frc.robot.commands.InnerElevatorCommand;
 
 public class InnerElevatorSubsystem extends SubsystemBase{
-    private final SparkFlex motor;
-    private final PIDController PID;
-    private final ElevatorFeedforward feedFoward;
-    private final RelativeEncoder encoder; 
+    private final SparkFlex elevatorMotor;
+    private final PIDController elevatorPID;
+  //  private final ElevatorFeedforward elevatorFeedFoward;
+    private final RelativeEncoder elevatorEncoder; 
     private final InnerElevatorCommand command;
 
     private double motorOutput;
     private boolean inBounds;
+    private double currentHeight;
 
     public InnerElevatorSubsystem() {   
-        motor = new SparkFlex(InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
-        SparkFlexUtil.setSparkFlexBusUsage(motor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
+        elevatorMotor = new SparkFlex(InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
+        elevatorEncoder = elevatorMotor.getEncoder();
 
-        encoder = motor.getEncoder();
+        elevatorPID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
+        //elevatorFeedFoward = new ElevatorFeedforward(motorOutput, motorOutput, motorOutput);
 
-        PID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
-        feedFoward = new ElevatorFeedforward(motorOutput, motorOutput, motorOutput);
-        
+        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
+
         command = new InnerElevatorCommand(this);
     }
 
     @Override
     public void periodic() {
-        double relativeElevatorPosition = getHeight();
+        currentHeight = getHeight();
+        inBounds = false;
 
-        if(relativeElevatorPosition >= ElevatorStates.MAX_ABS.innerHeight
-                || relativeElevatorPosition <= ElevatorStates.MIN_ABS.innerHeight) {
-            motorOutput = 0;
-            inBounds = false;
-        } else {
-            motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedforward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
-            inBounds = true;
+        if(currentHeight > ElevatorStates.MAX_ABS.innerHeight) {
+            elevatorMotor.set(-0.1);
+            return;
         }
+
+        if(currentHeight < ElevatorStates.MIN_ABS.innerHeight) {
+            elevatorMotor.set(0.1);
+            return; 
+        }
+        
+        //motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
+        inBounds = true;
         //elevatorMotor.set(motorOutput);
         setSmartdashboard();
     }
@@ -65,7 +71,11 @@ public class InnerElevatorSubsystem extends SubsystemBase{
     }
 
     public double getHeight() {
-        return elevatorEncoder.getPosition() + 0.01;
+         return elevatorEncoder.getPosition() + 0.01;
+    }
+
+    private void disableSubsystem() {
+        elevatorMotor.disable();
     }
 
     private void setSmartdashboard() {

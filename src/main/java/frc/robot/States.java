@@ -112,7 +112,7 @@ public class States {
     }
     */
 
-    public enum SuckStates {
+    public enum IntakeStates {
         // allow for easy changing of elevator states 
         STOP(0),
         INTAKE(1),
@@ -120,28 +120,20 @@ public class States {
 
         public final double speed;
 
-        SuckStates(double speed) {
+        IntakeStates(double speed) {
             this.speed = speed;
-        }
-
-        SuckStates() {
-            this.speed = 0; 
         }
     }
 
     public enum ClimbStates {
         STOP(0),
-        CLIMB(0.06),
-        DROP(-0.06);
+        CLIMB(1),
+        DROP(-1);
 
         public final double speed;
 
         ClimbStates(double speed) {
             this.speed = speed;
-        }
-
-        ClimbStates() {
-            this.speed = 0;
         }
     }
 }

@@ -9,13 +9,13 @@ import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 
 public class ElevatorCommandHandler {
-    PrimaryElevatorCommand primaryCommand;
-    InnerElevatorCommand innerCommand;
-    IntakeArmCommand armCommand;
+    private final PrimaryElevatorCommand primaryCommand;
+    private final InnerElevatorCommand innerCommand;
+    private final IntakeArmCommand armCommand;
 
-    PrimaryElevatorSubsystem primarySubsystem;
-    InnerElevatorSubsystem innerSubsystem;
-    IntakeArmSubsystem armSubsystem;
+    private final PrimaryElevatorSubsystem primarySubsystem;
+    private final InnerElevatorSubsystem innerSubsystem;
+    private final IntakeArmSubsystem armSubsystem;
 
     //rename 2/26
     public ElevatorCommandHandler(PrimaryElevatorSubsystem elevatorPrimary, InnerElevatorSubsystem elevatorInner, IntakeArmSubsystem arm) {
@@ -39,7 +39,7 @@ public class ElevatorCommandHandler {
     }
     //finds minimum distance for both elevators to move to total height give current height of both
     //total Relative Goal Height bounds {x|0<=x<=2}
-    public void setElevatorHeight(double totalRelativeGoalHeight) {
+    private void calculateElevatorGoalHeight(double totalRelativeGoalHeight) {
         double relInnerHeight = getRelativeInnerHeight();
         double relPrimaryHeight = getRelativePrimaryHeight();
         double relDistributedGoalHeight = (totalRelativeGoalHeight - (relInnerHeight + relPrimaryHeight))/2;
@@ -51,10 +51,9 @@ public class ElevatorCommandHandler {
         if(differencedHeight >= 0.1) {
             new_relInnerHeight = Math.max(0, Math.min(1, new_relInnerHeight + differencedHeight));
         }
-
+        
         innerCommand.set(relToAbsInnerHeight(new_relInnerHeight)).initialize();
         primaryCommand.set(relToAbsPrimaryHeight(new_relPrimaryHeight)).initialize();
-
     }
 
     //max total relative Height is 2
