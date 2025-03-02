@@ -9,13 +9,13 @@ import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 
 public class ElevatorCommandHandler {
-    PrimaryElevatorCommand primaryCommand;
-    InnerElevatorCommand innerCommand;
-    IntakeArmCommand armCommand;
+    private final PrimaryElevatorCommand primaryCommand;
+    private final InnerElevatorCommand innerCommand;
+    private final IntakeArmCommand armCommand;
 
-    PrimaryElevatorSubsystem primarySubsystem;
-    InnerElevatorSubsystem innerSubsystem;
-    IntakeArmSubsystem armSubsystem;
+    private final PrimaryElevatorSubsystem primarySubsystem;
+    private final InnerElevatorSubsystem innerSubsystem;
+    private final IntakeArmSubsystem armSubsystem;
 
     //rename 2/26
     public ElevatorCommandHandler(PrimaryElevatorSubsystem elevatorPrimary, InnerElevatorSubsystem elevatorInner, IntakeArmSubsystem arm) {
@@ -49,12 +49,14 @@ public class ElevatorCommandHandler {
         double relPrimaryHeight = getRelativePrimaryHeight();
         SmartDashboard.putNumber("Relative Inner Height", relInnerHeight);
         SmartDashboard.putNumber("Relative Primary Height", relPrimaryHeight);
+
         double relDistributedGoalHeight = (totalRelativeGoalHeight - (relInnerHeight + relPrimaryHeight))/2;
 
         //ik ghetto but whatever
         double new_relInnerHeight = Math.max(0, Math.min(1, relInnerHeight + relDistributedGoalHeight));
         double new_relPrimaryHeight = Math.max(0, Math.min(1, relPrimaryHeight + 2*relDistributedGoalHeight + relInnerHeight - new_relInnerHeight));
         double differencedHeight = new_relInnerHeight + new_relPrimaryHeight - totalRelativeGoalHeight;
+
         if(Math.abs(differencedHeight) >= 0.08) {
             new_relInnerHeight = Math.max(0, Math.min(1, new_relInnerHeight + differencedHeight));
         }
@@ -65,7 +67,6 @@ public class ElevatorCommandHandler {
         innerCommand.set(relToAbsInnerHeight(new_relInnerHeight)).initialize();
         primaryCommand.set(relToAbsPrimaryHeight(new_relPrimaryHeight)).initialize();
         armCommand.setArm(state.angle).initialize();
-
     }
 
     //max total relative Height is 2
@@ -87,4 +88,3 @@ public class ElevatorCommandHandler {
         return (ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight) * relPrimaryHeight + ElevatorStates.MIN_ABS.primaryHeight;
     }
 }
-

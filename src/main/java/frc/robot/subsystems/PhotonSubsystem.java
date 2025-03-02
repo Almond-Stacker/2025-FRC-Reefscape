@@ -40,6 +40,7 @@ public class PhotonSubsystem extends SubsystemBase {
 
     private boolean targetExist = false;//testing
     private boolean poseExist = false;
+
     
     public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -125,6 +126,7 @@ public class PhotonSubsystem extends SubsystemBase {
             lastUpdateTime = currentTime;
 
             collectiveEstimatedPose = new Pose3d(
+
                             addedPose.getX() / validPoseCount,
                             addedPose.getY() / validPoseCount,
                             addedPose.getZ() / validPoseCount,

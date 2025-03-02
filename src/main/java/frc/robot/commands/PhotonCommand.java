@@ -72,12 +72,11 @@ public class PhotonCommand {
             availablePose = true;
             SmartDashboard.putBoolean("AVAILABLE POSE", availablePose);
             Pose2d estimatedPose2d = estimatedPose3d.toPose2d();
-
             SmartDashboard.putNumber("Aptil Tag Pose Opt X", aprilTagPose.getX());
             SmartDashboard.putNumber("Aptil Tag Pose Opt Y", aprilTagPose.getY());
             SmartDashboard.putNumber("Aptil Tag Pose Opt Rotation", aprilTagPose.getRotation().getRadians());
 
-            double offsetDistance = 1.0; // meters
+            double offsetDistance = 1.0; // meterse
             Translation2d tagTranslation = aprilTagPose.getTranslation();
             Rotation2d tagRotation = aprilTagPose.getRotation();
 
@@ -102,6 +101,7 @@ public class PhotonCommand {
     public void setTarget(int targetAprilTagID) {
         this.targetAprilTagID = targetAprilTagID;
         aprilTagPose = PhotonConsts.aprilTagFieldLayout.getTagPose(targetAprilTagID).get().toPose2d();
+
     }
 
     public void setSmartDashboard() {
@@ -113,5 +113,5 @@ public class PhotonCommand {
     public PhotonSubsystem getPhotonSubsystem() {
         return photon;
     }
-
 }
+

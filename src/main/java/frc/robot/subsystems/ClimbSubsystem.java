@@ -9,33 +9,22 @@ import frc.robot.Constants.ClimbConsts;
 import frc.robot.States.ClimbStates;
 import frc.robot.commands.ClimbCommand;
 
-
 public class ClimbSubsystem extends SubsystemBase{
-    private final TalonFX leftClimbMotor;
-    
-    private ClimbCommand commands; 
+    private final TalonFX climbMotor;
+    private final ClimbCommand commands;
 
     public ClimbSubsystem() {
-        leftClimbMotor = new TalonFX(ClimbConsts.leftClimbMotorID);
-        leftClimbMotor.setNeutralMode(NeutralModeValue.Brake); 
+        climbMotor = new TalonFX(ClimbConsts.climbMotorID);
+        climbMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        commands = new ClimbCommand(this); 
+        commands = new ClimbCommand(this);
     }
-
-    @Override
-    public void periodic() {
-        setSmartdashboard(); 
-    }
-
+    
     public void setClimb(double speed) {
-        leftClimbMotor.set(speed); 
+        climbMotor.set(speed);
     }
 
-    public void setSmartdashboard() {
-        // idk what do put in here :()
+    public ClimbCommand getCommand() {
+        return commands;
     }
-
-    public ClimbCommand getCommand () {
-        return commands; 
-    }    
 }

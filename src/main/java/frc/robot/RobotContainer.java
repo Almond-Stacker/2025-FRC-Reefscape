@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,12 +17,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 import frc.robot.Constants.PhotonConsts;
 import frc.robot.States.ClimbStates;
-import frc.robot.States.SuckStates;
 import frc.robot.States.ElevatorStates;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.InnerElevatorCommand;
-import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.PhotonCommand;
 import frc.robot.commands.PrimaryElevatorCommand;
 import frc.robot.generated.TunerConstants;
@@ -55,36 +54,42 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     //put choreo
+    // Choreo set up 
+    private final AutoFactory autoFactory = drivetrain.createAutoFactory();
+    private final AutoRoutines autoRoutines = new AutoRoutines(autoFactory);
     private final AutoChooser autoChooser = new AutoChooser();
 
     //subsystems and commands init
-    private final PrimaryElevatorSubsystem primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
-    private final PrimaryElevatorCommand primaryElevatorCommand = primaryElevatorSubsystem.getCommands();
+    // private final PrimaryElevatorSubsystem primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
+    // private final PrimaryElevatorCommand primaryElevatorCommand = primaryElevatorSubsystem.getCommands();
 
-    private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
-    private final InnerElevatorCommand innerElevatorCommand = innerElevatorSubsystem.getCommands();
+    // private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
+    // private final InnerElevatorCommand innerElevatorCommand = innerElevatorSubsystem.getCommands();
 
-    private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
-    private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
+    // private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
+    // private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
 
-    private final ElevatorCommandHandler elevatorCommandHandler = 
-    new ElevatorCommandHandler(
-        primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem
-    );
+    // private final ElevatorCommandHandler elevatorCommandHandler = 
+    // new ElevatorCommandHandler(
+    //     primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem
+    // );
+    
 
-    private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
-    private final PhotonCommand photonCommand = photonSubsystem.getCommands();
+    // private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
+    // private final PhotonCommand photonCommand = photonSubsystem.getCommands();
 
-    //logging vars
-    private boolean isTrackingAprilTag = false;
+    // //logging vars
+    // private boolean isTrackingAprilTag = false;
+
+    //** Subsystems **//
+    private final ClimbSubsystem s_climb = new ClimbSubsystem();
+
+    //** Command Handlers **/
+    private final ClimbCommand ch_climb = s_climb.getCommand();
 
     public RobotContainer() {
         configureDriveBindings();
         configureDriver1Commands();
-    }
-    
-    private void configureAutos() {
-
     }
 
     private void configureDriveBindings() {
@@ -103,44 +108,25 @@ public class RobotContainer {
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
     }
 
-    private void configureSYSTests() {
+    private void configureSYSTests() { 
 
     }
+
+    private void configureAutos() {
+        autoChooser.addRoutine("Straight Path Short", autoRoutines::simplePathAuto2);
+        autoChooser.addRoutine("Diagonal Path", autoRoutines::simplePathAuto3);
+        autoChooser.addRoutine("Curve Path", autoRoutines::simplePathAuto4);
+        autoChooser.addRoutine("Straight Path Long", autoRoutines::simplePathAuto1);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
     
     private void configureDriver1Commands() {
-        //should not deal with states in subsystem but only in command
-        driver1.a().onTrue(intakeArmCommand.setSuck(SuckStates.INTAKE));
-        driver1.b().onTrue(intakeArmCommand.setSuck(SuckStates.FEED_OUT));
+        driver1.a().onTrue(ch_climb.setClimb(ClimbStates.CLIMB));
+        driver1.a().onFalse(ch_climb.setClimb(ClimbStates.STOP));
 
-        driver1.x().toggleOnTrue(
-            photonCommand.goInFrontOfTag(1)
-                .beforeStarting(() -> {
-                    isTrackingAprilTag = true;
-                    SmartDashboard.putBoolean("Tracking AprilTag", isTrackingAprilTag);
-                })
-                .finallyDo(() -> {
-                    isTrackingAprilTag = false;
-                    SmartDashboard.putBoolean("Tracking AprilTag", isTrackingAprilTag);
-                })
-        );
-
-        driver1.pov(0).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.HOME_REL)));
-        driver1.pov(90).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L2_REL)));
-        driver1.pov(180).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L3_REL)));
-        driver1.pov(270).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L4_REL)));
-
-        driver1.y().onTrue(new InstantCommand(() -> {
-            SmartDashboard.putNumber("Rel Inner Height", elevatorCommandHandler.getRelativeInnerHeight());
-            SmartDashboard.putNumber("Rel Primary Height", elevatorCommandHandler.getRelativePrimaryHeight());
-        }));
-        //driver1.pov(90).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L1));
-        //driver1.pov(90).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L1));
-
-        //driver1.pov(180).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L3));
-        //driver1.pov(180).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L3));
-
-        //driver1.pov(0).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.HOME));
-        //driver1.pov(0).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.HOME));
+        driver1.b().onTrue(ch_climb.setClimb(ClimbStates.DROP));
+        driver1.b().onFalse(ch_climb.setClimb(ClimbStates.STOP));
     }
 
     public Command getAutonomousCommand() {
