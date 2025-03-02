@@ -10,9 +10,9 @@ public class States {
         MAX_ABS(101, 0.8, 255),
         MIN_ABS(0, -2.7, 70),
         HOME_REL(0.5, 210),
-        L2_REL(1, 210),
-        L3_REL(1, 210),
-        L4_REL(1, 210);
+        L2_REL(.9, 210),
+        L3_REL(1.5, 190),
+        L4_REL(1.8, 180);
 
         public final double primaryHeight;
         public final double innerHeight;
@@ -25,13 +25,10 @@ public class States {
             this.angle = angle;
 
             this.relTotalHeight = 0;
-            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
 
         }
 
         ElevatorStates(double relTotalHeight, double angle) {
-            SmartDashboard.putNumber("Relative Goal", relTotalHeight);
-
             this.relTotalHeight = relTotalHeight;
             this.angle = angle;
 
@@ -130,7 +127,7 @@ public class States {
     }
 
     public enum ClimbStates {
-        STOP(0),
+        STOP(),
         CLIMB(0.06),
         DROP(-0.06);
 

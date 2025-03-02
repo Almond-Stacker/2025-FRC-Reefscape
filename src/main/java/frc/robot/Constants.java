@@ -57,25 +57,31 @@ public class Constants {
         public static final int suckMotorID = 21;
         public static final double OUT_TIMEOUT = 1;//one second 
 
-        public static final double kP = 0.004;
+        public static final double kP = 0.01;
         public static final double kI = 0;
         public static final double kD = 0;
         public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(0.1, 0.03);
         public static final double kS = 0;
-        public static final double kG = 0.009;
+        public static final double kG = 0.008;
         public static final double kV = 0;
     }
 
     public static final class PhotonConsts {
         public static final List<String> CAM_NAMES = Arrays.asList("gray_photon_camera", "blue_photon_camera");
 
-        public static final Transform3d front_cam_transform = new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, 0, 0)
+        public static final Transform3d blue_cam_transform = new Transform3d(
+                    new Translation3d(-0.1956816, 0.2815336, 0),
+                    new Rotation3d(0, 0, -0.43633231)
                 );
+
+        public static final Transform3d gray_cam_transform = new Transform3d(
+                    new Translation3d(-0.1956816, -0.2815336, 0),
+                    new Rotation3d(0, 0, 0.43633231)
+                );
+
         //MEANSURE TRANSFORMATIONS CAM --> ROBOT 2/27
-        public static final List<Transform3d> CAM_TO_ROBOT_TRANSFORMS = List.of(front_cam_transform);
-        public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+        public static final List<Transform3d> CAM_TO_ROBOT_TRANSFORMS = List.of(gray_cam_transform, blue_cam_transform);
+        public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
         public static final double TIMEOUT = 0.3;
         public static final double MIN_AMBIGUITY = 0.2;//tune
@@ -93,7 +99,8 @@ public class Constants {
     }
 
     public static final class ClimbConsts {
-        public static final int climbMotorID = 16; //find
+        public static final int leftClimbMotorID = 21; //find
+        public static final int rightClimbMotorID = 20;
     }
 
 }

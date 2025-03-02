@@ -71,9 +71,6 @@ public class RobotContainer {
     new ElevatorCommandHandler(
         primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem
     );
-    
-    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-    private final ClimbCommand climbCommand = climbSubsystem.getCommand();
 
     private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
     private final PhotonCommand photonCommand = photonSubsystem.getCommands();
@@ -115,9 +112,6 @@ public class RobotContainer {
         driver1.a().onTrue(intakeArmCommand.setSuck(SuckStates.INTAKE));
         driver1.b().onTrue(intakeArmCommand.setSuck(SuckStates.FEED_OUT));
 
-        driver1.leftBumper().whileTrue(climbCommand.setClimb(ClimbStates.CLIMB)).whileFalse(climbCommand.setClimb(ClimbStates.STOP));
-        driver1.rightBumper().whileTrue(climbCommand.setClimb(ClimbStates.DROP)).whileFalse(climbCommand.setClimb(ClimbStates.STOP));
-
         driver1.x().toggleOnTrue(
             photonCommand.goInFrontOfTag(1)
                 .beforeStarting(() -> {
@@ -130,10 +124,10 @@ public class RobotContainer {
                 })
         );
 
-        driver1.pov(0).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.HOME_REL.relTotalHeight)));
-        driver1.pov(90).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L2_REL.relTotalHeight)));
-        driver1.pov(180).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L3_REL.relTotalHeight)));
-        driver1.pov(270).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L4_REL.relTotalHeight)));
+        driver1.pov(0).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.HOME_REL)));
+        driver1.pov(90).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L2_REL)));
+        driver1.pov(180).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L3_REL)));
+        driver1.pov(270).onTrue(new InstantCommand(() -> elevatorCommandHandler.setElevatorHeight(ElevatorStates.L4_REL)));
 
         driver1.y().onTrue(new InstantCommand(() -> {
             SmartDashboard.putNumber("Rel Inner Height", elevatorCommandHandler.getRelativeInnerHeight());

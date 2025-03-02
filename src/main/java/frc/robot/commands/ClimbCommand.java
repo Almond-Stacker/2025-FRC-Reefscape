@@ -7,18 +7,17 @@ import frc.robot.subsystems.ClimbSubsystem;
 
 public class ClimbCommand {
     
-    ClimbSubsystem climb;
+    ClimbSubsystem climb; 
 
     public ClimbCommand(ClimbSubsystem climb) {
         this.climb = climb;
-        setClimb(ClimbStates.STOP);
-        
-    }
+        setClimb(ClimbStates.STOP); 
+    } 
+
     public Command setClimb(ClimbStates state) {
-        SmartDashboard.putString("Climb State", state.toString());
-        Command command = climb.run(() -> climb.setClimb(state.speed));
+        SmartDashboard.putString("Climb State", state.toString()); 
+        Command command = climb.run(() -> climb.setClimb(state.speed)); 
 
-        return command;
+        return command; 
     }
-
 }

@@ -31,9 +31,10 @@ public class PhotonCommand {
     private final ProfiledPIDController rController;
 
     private int targetAprilTagID;
-    private Optional<Pose3d> aprilTagPoseOpt;
     private boolean validTargetID = false;
     private boolean availablePose = false;
+
+    private Pose2d aprilTagPose;
     
     private double xSpeed;
     private double ySpeed;
@@ -60,9 +61,9 @@ public class PhotonCommand {
         setTarget(targetAprilTagID);
 
         return new RunCommand(() -> {
-            Optional<EstimatedRobotPose> estimatedPoseOpt = photon.getCollectiveEstimatedPose();
+            Pose3d estimatedPose3d = photon.getCollectiveEstimatedPose();
 
-            if(estimatedPoseOpt.isEmpty()) {
+            if(estimatedPose3d == null) {
                 availablePose = false;
                 SmartDashboard.putBoolean("AVAILABLE POSE", availablePose);
                 //drivetrain.stop();
@@ -70,22 +71,13 @@ public class PhotonCommand {
             }
             availablePose = true;
             SmartDashboard.putBoolean("AVAILABLE POSE", availablePose);
-            Pose2d estimatedPose = estimatedPoseOpt.get().estimatedPose.toPose2d();
+            Pose2d estimatedPose2d = estimatedPose3d.toPose2d();
 
-            if(aprilTagPoseOpt.isEmpty()) {
-                validTargetID = false;
-                SmartDashboard.putBoolean("VALID ID", validTargetID);
-                return;
-            }
-            SmartDashboard.putBoolean("VALID ID", validTargetID);
-            validTargetID = true;
-            
-            Pose2d aprilTagPose = aprilTagPoseOpt.get().toPose2d();
             SmartDashboard.putNumber("Aptil Tag Pose Opt X", aprilTagPose.getX());
             SmartDashboard.putNumber("Aptil Tag Pose Opt Y", aprilTagPose.getY());
             SmartDashboard.putNumber("Aptil Tag Pose Opt Rotation", aprilTagPose.getRotation().getRadians());
 
-            double offsetDistance = 2.0; // meters
+            double offsetDistance = 1.0; // meters
             Translation2d tagTranslation = aprilTagPose.getTranslation();
             Rotation2d tagRotation = aprilTagPose.getRotation();
 
@@ -95,9 +87,9 @@ public class PhotonCommand {
 
             Pose2d targetPose = new Pose2d(desiredTranslation, tagRotation);
 
-            xSpeed = xController.calculate(estimatedPose.getX(), targetPose.getX());
-            ySpeed = yController.calculate(estimatedPose.getY(), targetPose.getY());
-            rSpeed = rController.calculate(estimatedPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+            xSpeed = xController.calculate(estimatedPose2d.getX(), targetPose.getX());
+            ySpeed = yController.calculate(estimatedPose2d.getY(), targetPose.getY());
+            rSpeed = rController.calculate(estimatedPose2d.getRotation().getRadians(), targetPose.getRotation().getRadians());
 
             SmartDashboard.putNumber("xSpeed", targetPose.getX());
             SmartDashboard.putNumber("ySpeed", targetPose.getY());
@@ -109,7 +101,7 @@ public class PhotonCommand {
 
     public void setTarget(int targetAprilTagID) {
         this.targetAprilTagID = targetAprilTagID;
-        aprilTagPoseOpt = PhotonConsts.aprilTagFieldLayout.getTagPose(targetAprilTagID);
+        aprilTagPose = PhotonConsts.aprilTagFieldLayout.getTagPose(targetAprilTagID).get().toPose2d();
     }
 
     public void setSmartDashboard() {
