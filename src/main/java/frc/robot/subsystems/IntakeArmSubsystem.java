@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeArmConsts;
 import frc.robot.States.ElevatorStates;
 import frc.robot.States.IntakeStates;
@@ -40,6 +41,10 @@ public class IntakeArmSubsystem extends SubsystemBase{
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
         commands = new IntakeArmCommand(this);
+
+        if(Constants.disableSubsystems) {
+            disableSubsystem();
+        }
     }
 
     @Override

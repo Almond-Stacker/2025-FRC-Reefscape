@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 import frc.robot.Constants.PhotonConsts;
@@ -83,10 +85,14 @@ public class RobotContainer {
     // private boolean isTrackingAprilTag = false;
 
     //** Subsystems **//
+    private final PrimaryElevatorSubsystem s_primaryElevator = new PrimaryElevatorSubsystem();
+    private final InnerElevatorSubsystem s_innerElevator = new InnerElevatorSubsystem();
+    private final IntakeArmSubsystem s_intakeArm = new IntakeArmSubsystem();
     private final ClimbSubsystem s_climb = new ClimbSubsystem();
 
     //** Command Handlers **/
     private final ClimbCommand ch_climb = s_climb.getCommand();
+    private final ElevatorCommandHandler ch_elevator = new ElevatorCommandHandler(s_primaryElevator, s_innerElevator, s_intakeArm);
 
     public RobotContainer() {
         configureDriveBindings();
@@ -113,10 +119,15 @@ public class RobotContainer {
     }
 
     private void configureAutos() {
-        autoChooser.addRoutine("Straight Path Short", autoRoutines::simplePathAuto2);
-        autoChooser.addRoutine("Diagonal Path", autoRoutines::simplePathAuto3);
-        autoChooser.addRoutine("Curve Path", autoRoutines::simplePathAuto4);
-        autoChooser.addRoutine("Straight Path Long", autoRoutines::simplePathAuto1);
+        // register all auto commands
+        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
+
+        // add all auto paths
+        autoChooser.addRoutine("Straight Path Short", autoRoutines::ShortTest);
+        autoChooser.addRoutine("Diagonal Path", autoRoutines::DiagonalTest);
+        autoChooser.addRoutine("Curve Path", autoRoutines::CurveTest);
+        autoChooser.addRoutine("Straight Path Long", autoRoutines::StraightTest);
+        autoChooser.addRoutine("Game Auto", autoRoutines::GameAuto1);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 

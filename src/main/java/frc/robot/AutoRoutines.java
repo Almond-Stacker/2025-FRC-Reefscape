@@ -11,7 +11,7 @@ public class AutoRoutines {
         m_factory = factory;
     }
 
-    public AutoRoutine simplePathAuto1() {
+    public AutoRoutine StraightTest() {
         final AutoRoutine routine = m_factory.newRoutine("Straight Test");
         final AutoTrajectory simplePath = routine.trajectory("Straight Test");
 
@@ -23,9 +23,9 @@ public class AutoRoutines {
     }
 
     
-    public AutoRoutine simplePathAuto2() {
-        final AutoRoutine routine = m_factory.newRoutine("New Path");
-        final AutoTrajectory simplePath = routine.trajectory("New Path");
+    public AutoRoutine ShortTest() {
+        final AutoRoutine routine = m_factory.newRoutine("Short Test");
+        final AutoTrajectory simplePath = routine.trajectory("Short Test");
 
         routine.active().onTrue(
             simplePath.resetOdometry()
@@ -34,9 +34,9 @@ public class AutoRoutines {
         return routine;
     }
 
-    public AutoRoutine simplePathAuto3() {
-        final AutoRoutine routine = m_factory.newRoutine("New Path (1)");
-        final AutoTrajectory simplePath = routine.trajectory("New Path (1)");
+    public AutoRoutine CurveTest() {
+        final AutoRoutine routine = m_factory.newRoutine("Curve Test");
+        final AutoTrajectory simplePath = routine.trajectory("Curve Test");
 
         routine.active().onTrue(
             simplePath.resetOdometry()
@@ -45,10 +45,20 @@ public class AutoRoutines {
         return routine;
     }
 
+    public AutoRoutine DiagonalTest() {
+        final AutoRoutine routine = m_factory.newRoutine("Diagonal Test");
+        final AutoTrajectory simplePath = routine.trajectory("Diagonal Test");
+
+        routine.active().onTrue(
+            simplePath.resetOdometry()
+                .andThen(simplePath.cmd())
+        );
+        return routine;
+    }
     
-    public AutoRoutine simplePathAuto4() {
-        final AutoRoutine routine = m_factory.newRoutine("New Path (2)");
-        final AutoTrajectory simplePath = routine.trajectory("New Path (2)");
+    public AutoRoutine GameAuto1() {
+        final AutoRoutine routine = m_factory.newRoutine("Game Auto 1");
+        final AutoTrajectory simplePath = routine.trajectory("Game Auto 1");
 
         routine.active().onTrue(
             simplePath.resetOdometry()

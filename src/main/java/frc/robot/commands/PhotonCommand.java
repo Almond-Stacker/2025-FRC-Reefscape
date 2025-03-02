@@ -21,7 +21,6 @@ import frc.robot.subsystems.PhotonSubsystem;
 //This class simply provideds necessary setpoints on the x-y plane spanning the field,
 //where translation into physical movement it done outside of PhotonCommand (drive command)
 public class PhotonCommand {
-    
     private PhotonSubsystem photon;
     private CommandSwerveDrivetrain drivetrain;
 

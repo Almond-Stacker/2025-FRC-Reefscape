@@ -38,78 +38,9 @@ public class States {
         }
         
         ElevatorStates() {
-            //refrence HOME instead somehow
             this(0.57, 0.01, 210);
         }
     }
-
-    /*
-    public enum PrimaryElevatorStates {
-        // allow for easy changing of elevator states 
-        HOME(0.57),
-        L1(37),
-        L2(99.5),
-        L3(99.5),
-        PRE_INTAKE(65),
-        INTAKE(52),
-        MIN(0),
-        MAX(101);
-
-        public final double height;
-
-        PrimaryElevatorStates(double height) {
-            this.height = height;
-        }
-
-        PrimaryElevatorStates() {
-            this.height = 0; 
-        }
-    }
-
-    public enum InnerElevatorStates {
-        // allow for easy changing of elevator states 
-        HOME(0.01),
-        L1(2),
-        L2(),
-        L3(4.8),
-        MIN(0),
-        MAX(5);
-
-        public final double height;
-
-        InnerElevatorStates(double height) {
-            this.height = height;
-        }
-
-        InnerElevatorStates() {
-            this.height = 0; 
-        }
-    }
-
-    public enum IntakeArmStates {
-        // allow for easy changing of elevator states 
-        HOME(210),
-        INTAKE(60),
-        STARTING_POSITION(240),
-        L1(210),
-        L2(210),
-        L3(210),
-        FEED_OUT(207),
-        MIN(0),
-        MAX(360);
-
-        public final double angle;
-
-        IntakeArmStates(double angle) {
-            this.angle = angle;
-        }
-
-        IntakeArmStates() {
-            this.angle = 0; 
-        }
-    }
-    */
-
 
     public enum IntakeStates {
         // allow for easy changing of elevator states 
