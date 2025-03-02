@@ -34,11 +34,12 @@ public class PhotonSubsystem extends SubsystemBase {
 
     private List<PhotonCamera> cameras; // pain transforms and cameras later
     private List<Transform3d> cameraToRobotTransforms;
-    private Optional<EstimatedRobotPose> collectiveEstimatedPose = Optional.empty();
+    private Pose3d collectiveEstimatedPose = new Pose3d();
 
     private double lastUpdateTime = 0;
 
     private boolean targetExist = false;//testing
+    private boolean poseExist = false;
     
     public PhotonSubsystem(List<String> cameraNames, List<Transform3d> cameraToRobotTransforms, CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -69,13 +70,15 @@ public class PhotonSubsystem extends SubsystemBase {
         double avgDist = 0;//for standard deviation
         int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
         int index = 0;//which cam for pose transforms
+        collectiveEstimatedPose = null;
 
         double currentTime = Timer.getFPGATimestamp();
 
+        poseExist = false;
+        targetExist = false;
         for(PhotonCamera cam : cameras) {
             List<PhotonPipelineResult> results = cam.getAllUnreadResults();
             for(PhotonPipelineResult result : results) {
-                targetExist = false;
                 //check if targets are resonable
                 List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
                     .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
@@ -88,13 +91,15 @@ public class PhotonSubsystem extends SubsystemBase {
                     Optional<Pose3d> tagPoseOpt = PhotonConsts.aprilTagFieldLayout.getTagPose(target.getFiducialId());
                     //check if pose was resonable
                     if(tagPoseOpt.isPresent()) {
-                        SmartDashboard.putBoolean("SIGMA", true);
+                        poseExist = true;
                         //transforms here to utalize index, consider creating a higher level pose handler
                         Pose3d tagPose = tagPoseOpt.get();
-                        Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget().inverse());
-                        Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index).inverse());
+                        SmartDashboard.putNumber("TAG POSE X", tagPose.getX());
+                        SmartDashboard.putNumber("TAG POSE Y", tagPose.getY());
+                        Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget());
+                        Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index));
 
-                        avgDist += transformedPose.getTranslation().getNorm();
+                        avgDist += cameraPose.toPose2d().getTranslation().getNorm();
                         addedPose = new Pose3d(
                             addedPose.getX() + transformedPose.getX(),
                             addedPose.getY() + transformedPose.getY(),
@@ -119,7 +124,7 @@ public class PhotonSubsystem extends SubsystemBase {
             updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
             lastUpdateTime = currentTime;
 
-            addedPose = new Pose3d(
+            collectiveEstimatedPose = new Pose3d(
                             addedPose.getX() / validPoseCount,
                             addedPose.getY() / validPoseCount,
                             addedPose.getZ() / validPoseCount,
@@ -133,25 +138,24 @@ public class PhotonSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("valid Poses", validPoseCount);
         
         } else if (currentTime - lastUpdateTime > PhotonConsts.TIMEOUT) {
-            collectiveEstimatedPose = Optional.of(PhotonConsts.NO_APRILTAG_ESTIMATE); //clear result if too great of time difference
+            collectiveEstimatedPose = null; //clear result if too great of time difference
             //no change to swerve pose
         }
 
+        SmartDashboard.putNumber("Distance", avgDist);
         setSmartDashboard();
     }
 
-    public Optional<EstimatedRobotPose> getCollectiveEstimatedPose() {
+    public Pose3d getCollectiveEstimatedPose() {
         return collectiveEstimatedPose;
     }
 
     //distance and angle to specific tag
     public void setSmartDashboard() {
-        if(collectiveEstimatedPose.isPresent()) {
-            Pose3d pose = collectiveEstimatedPose.get().estimatedPose;
-            SmartDashboard.putNumber("Pose X", pose.getX());
-            SmartDashboard.putNumber("Pose Y", pose.getY());
-            SmartDashboard.putNumber("Pose theata", pose.getRotation().getZ());
-            
+        if(poseExist) {
+            SmartDashboard.putNumber("Pose X", collectiveEstimatedPose.getX());
+            SmartDashboard.putNumber("Pose Y", collectiveEstimatedPose.getY());
+            SmartDashboard.putNumber("Pose theata", collectiveEstimatedPose.getRotation().getZ());            
         } else {
             SmartDashboard.putString("Robot Pose", "No pose available");
         }

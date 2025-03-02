@@ -53,6 +53,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during field-centric path following */
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
+
     private final PIDController m_pathXController = new PIDController(1.5, 0.01, 0.5);
     private final PIDController m_pathYController = new PIDController(1.5, 0.01, 0.5);
     private final PIDController m_pathThetaController = new PIDController(10, 0, 0);
@@ -70,6 +71,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         new SwerveModuleState(),
         new SwerveModuleState()
     }; 
+
+    public void drive(double xSpeed, double ySpeed, double rSpeed) {
+        setControl(
+            new SwerveRequest.FieldCentric()
+                .withVelocityX(xSpeed)
+                .withVelocityY(ySpeed)
+                .withRotationalRate(rSpeed)
+        );
+    }
+
+    public void stop() {
+        setControl(new SwerveRequest.SwerveDriveBrake());
+    }
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(

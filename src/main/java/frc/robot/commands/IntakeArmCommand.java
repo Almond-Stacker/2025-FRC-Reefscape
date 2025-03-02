@@ -25,7 +25,7 @@ public class IntakeArmCommand {
         SmartDashboard.putString(" intake state", state.toString());
         Command command = arm.run(() -> arm.setIntakeStates(state.speed)); //set timeout??
 
-        if(state.equals(IntakeStates.FEED_OUT)) {
+        if(state.equals(IntakeStates.FEED_OUT) || state.equals(IntakeStates.INTAKE)) {
             return command
                 .withTimeout(IntakeArmConsts.OUT_TIMEOUT)//seconds on
                 .finallyDo(() -> arm.resetIntake());

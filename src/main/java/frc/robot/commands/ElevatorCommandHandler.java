@@ -9,13 +9,13 @@ import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 
 public class ElevatorCommandHandler {
-    private final PrimaryElevatorCommand primaryCommand;
-    private final InnerElevatorCommand innerCommand;
-    private final IntakeArmCommand armCommand;
+    PrimaryElevatorCommand primaryCommand;
+    InnerElevatorCommand innerCommand;
+    IntakeArmCommand armCommand;
 
-    private final PrimaryElevatorSubsystem primarySubsystem;
-    private final InnerElevatorSubsystem innerSubsystem;
-    private final IntakeArmSubsystem armSubsystem;
+    PrimaryElevatorSubsystem primarySubsystem;
+    InnerElevatorSubsystem innerSubsystem;
+    IntakeArmSubsystem armSubsystem;
 
     //rename 2/26
     public ElevatorCommandHandler(PrimaryElevatorSubsystem elevatorPrimary, InnerElevatorSubsystem elevatorInner, IntakeArmSubsystem arm) {
@@ -32,6 +32,7 @@ public class ElevatorCommandHandler {
 
     public void setABS(ElevatorStates state) {
         SmartDashboard.putString("Elevator state", state.toString());
+        SmartDashboard.putNumber("Relative Goal", state.relTotalHeight);
 
         primaryCommand.set(state.primaryHeight).initialize();
         innerCommand.set(state.innerHeight).initialize();
@@ -39,21 +40,32 @@ public class ElevatorCommandHandler {
     }
     //finds minimum distance for both elevators to move to total height give current height of both
     //total Relative Goal Height bounds {x|0<=x<=2}
-    private void calculateElevatorGoalHeight(double totalRelativeGoalHeight) {
+    public void setElevatorHeight(ElevatorStates state) {
+        SmartDashboard.putString("Elevator state", state.toString());
+        SmartDashboard.putNumber("Relative Goal", state.relTotalHeight);
+        double totalRelativeGoalHeight = state.relTotalHeight;
+
         double relInnerHeight = getRelativeInnerHeight();
         double relPrimaryHeight = getRelativePrimaryHeight();
+        SmartDashboard.putNumber("Relative Inner Height", relInnerHeight);
+        SmartDashboard.putNumber("Relative Primary Height", relPrimaryHeight);
         double relDistributedGoalHeight = (totalRelativeGoalHeight - (relInnerHeight + relPrimaryHeight))/2;
 
         //ik ghetto but whatever
         double new_relInnerHeight = Math.max(0, Math.min(1, relInnerHeight + relDistributedGoalHeight));
         double new_relPrimaryHeight = Math.max(0, Math.min(1, relPrimaryHeight + 2*relDistributedGoalHeight + relInnerHeight - new_relInnerHeight));
         double differencedHeight = new_relInnerHeight + new_relPrimaryHeight - totalRelativeGoalHeight;
-        if(differencedHeight >= 0.1) {
+        if(Math.abs(differencedHeight) >= 0.08) {
             new_relInnerHeight = Math.max(0, Math.min(1, new_relInnerHeight + differencedHeight));
         }
-        
+
+        SmartDashboard.putNumber("Relative Inner Goal Height", new_relInnerHeight);
+        SmartDashboard.putNumber("Relative Primary Goal Height", new_relPrimaryHeight);
+
         innerCommand.set(relToAbsInnerHeight(new_relInnerHeight)).initialize();
         primaryCommand.set(relToAbsPrimaryHeight(new_relPrimaryHeight)).initialize();
+        armCommand.setArm(state.angle).initialize();
+
     }
 
     //max total relative Height is 2

@@ -47,12 +47,12 @@ public class IntakeArmSubsystem extends SubsystemBase{
         armAngle = getAngle();
 
         if(armAngle > ElevatorStates.MAX_ABS.angle) {
-            armMotor.set(-0.1);
+            //armMotor.set(-0.1);
             return;
         }
 
         if(armAngle < ElevatorStates.MIN_ABS.angle) {
-            armMotor.set(0.1);
+            //armMotor.set(0.1);
             return; 
         }
 

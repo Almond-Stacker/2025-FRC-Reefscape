@@ -21,6 +21,7 @@ import frc.robot.States.ElevatorStates;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.InnerElevatorCommand;
+import frc.robot.commands.IntakeArmCommand;
 import frc.robot.commands.PhotonCommand;
 import frc.robot.commands.PrimaryElevatorCommand;
 import frc.robot.generated.TunerConstants;
@@ -66,8 +67,8 @@ public class RobotContainer {
     // private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
     // private final InnerElevatorCommand innerElevatorCommand = innerElevatorSubsystem.getCommands();
 
-    // private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
-    // private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
+     private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
+     private final IntakeArmCommand intakeArmCommand = intakeArmSubsystem.getCommands();
 
     // private final ElevatorCommandHandler elevatorCommandHandler = 
     // new ElevatorCommandHandler(
@@ -126,6 +127,12 @@ public class RobotContainer {
 
         driver1.b().onTrue(ch_climb.setClimb(ClimbStates.DROP));
         driver1.b().onFalse(ch_climb.setClimb(ClimbStates.STOP));
+
+        driver1.leftBumper().onTrue(intakeArmCommand.setIntakeState(States.IntakeStates.INTAKE));
+        driver1.leftBumper().onFalse(intakeArmCommand.setIntakeState(States.IntakeStates.STOP));
+
+        driver1.rightBumper().onTrue(intakeArmCommand.setIntakeState(States.IntakeStates.FEED_OUT));
+        driver1.rightBumper().onFalse(intakeArmCommand.setIntakeState(States.IntakeStates.STOP));
     }
 
     public Command getAutonomousCommand() {
