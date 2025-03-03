@@ -96,7 +96,6 @@ public class PhotonSubsystem extends SubsystemBase {
                         Pose3d tagPose = tagPoseOpt.get();
                         SmartDashboard.putNumber("TAG POSE X", tagPose.getX());
                         SmartDashboard.putNumber("TAG POSE Y", tagPose.getY());
-                        SmartDashboard.putNumber("TAG POSE R", tagPose.getRotation().getZ());
                         Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget());
                         Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index));
 

@@ -4,9 +4,6 @@ import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,35 +13,22 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.robot.Constants.PhotonConsts;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.PhotonSubsystem;
 
-
 //This class simply provideds necessary setpoints on the x-y plane spanning the field,
 //where translation into physical movement it done outside of PhotonCommand (drive command)
 public class PhotonCommand {
-    private final PhotonSubsystem photon;
-    private final CommandSwerveDrivetrain drivetrain;
-    private final SwerveRequest.RobotCentric robotCentricDrive;
-
+    
+    private PhotonSubsystem photon;
+    private CommandSwerveDrivetrain drivetrain;
 
     //calculate the PID values
     private final ProfiledPIDController xController;
     private final ProfiledPIDController yController;
     private final ProfiledPIDController rController;
-
-    private final double offsetDistance;
-
-    private Pose3d estimatedPose3d; 
-    private Pose2d estimatedPose2d;
-    private Translation2d tagTranslation;
-    private Rotation2d tagRotation;
-    private Translation2d desiredTranslation;
-    private Pose2d targetPose;
 
     private int targetAprilTagID;
     private boolean validTargetID = false;
@@ -66,12 +50,9 @@ public class PhotonCommand {
         yController = new ProfiledPIDController(0.5, 0, 0, PhotonConsts.translationConstraints);
         rController = new ProfiledPIDController(2, 0, 0, PhotonConsts.rotationConstraints);
 
-        offsetDistance = 1.0;
         xSpeed = 0;
         ySpeed = 0;
         rSpeed = 0;
-
-        robotCentricDrive = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
         rController.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -79,40 +60,7 @@ public class PhotonCommand {
     public Command goInFrontOfTag(int targetAprilTagID) {
         setTarget(targetAprilTagID);
 
-        // return new RunCommand(() -> {
-        //         estimatedPose3d = photon.getCollectiveEstimatedPose();
-
-        //         if(estimatedPose3d == null) {
-        //             availablePose = false;
-        //             //drivetrain.stop();
-        //             return;
-        //         }
-        //         availablePose = true;
-        //         estimatedPose2d = estimatedPose3d.toPose2d();
-
-
-        //         tagTranslation = aprilTagPose.getTranslation();
-        //         tagRotation = aprilTagPose.getRotation();
-
-        //         desiredTranslation = tagTranslation.plus(
-        //             new Translation2d(-offsetDistance, new Rotation2d(tagRotation.getRadians()))
-        //         );
-
-        //         targetPose = new Pose2d(desiredTranslation, tagRotation);
-
-        //         xSpeed = xController.calculate(estimatedPose2d.getX(), targetPose.getX());
-        //         ySpeed = yController.calculate(estimatedPose2d.getY(), targetPose.getY());
-        //         rSpeed = rController.calculate(estimatedPose2d.getRotation().getRadians(), targetPose.getRotation().getRadians());
-
-                
-        //         drivetrain.setControl(() -> robotCentricDrive.withVelocityX(xSpeed)
-        //             .withVelocityY(ySpeed)
-        //             .withAngularVelocity(rSpeed));
-
-        //         setSmartDashboard();
-        // }.finallyDo(() -> drivetrain.stop(), drivetrain);
-
-        return new RepeatCommand(new InstantCommand(() -> {
+        return new RunCommand(() -> {
             Pose3d estimatedPose3d = photon.getCollectiveEstimatedPose();
 
             if(estimatedPose3d == null) {
@@ -148,8 +96,7 @@ public class PhotonCommand {
             SmartDashboard.putNumber("rSpeed", targetPose.getRotation().getRadians());
             //drivetrain.drive(xSpeed, ySpeed, rSpeed);
 
-        }));//.finallyDo(() -> drivetrain.stop());
-
+        }, drivetrain).finallyDo(() -> drivetrain.stop());
     }
 
     public void setTarget(int targetAprilTagID) {
@@ -161,12 +108,6 @@ public class PhotonCommand {
         SmartDashboard.putNumber("xSpeed", xSpeed);
         SmartDashboard.putNumber("ySpeed", ySpeed);
         SmartDashboard.putNumber("rSpeed", rSpeed);
-
-        SmartDashboard.putNumber("Aptil Tag Pose Opt X", aprilTagPose.getX());
-        SmartDashboard.putNumber("Aptil Tag Pose Opt Y", aprilTagPose.getY());
-        SmartDashboard.putNumber("Aptil Tag Pose Opt Rotation", aprilTagPose.getRotation().getRadians()); 
-
-        SmartDashboard.putBoolean("AVAILABLE POSE", availablePose);
     }
 
     public PhotonSubsystem getPhotonSubsystem() {

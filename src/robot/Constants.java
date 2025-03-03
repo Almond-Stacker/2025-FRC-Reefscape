@@ -17,7 +17,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 //if want to import with .* to avoid typing exact class dependances
 //consider seperate constants files
-public class Constants {    
+public class Constants {
+    
     public static final class PrimaryElevatorConsts {
         public static final int leftElevatorMotorID = 14;
         public static final int rightElevatorMotorID = 15;
@@ -29,11 +30,6 @@ public class Constants {
         public static final double kP = 0.02;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double kS = 0;
-        public static final double kG = 0;
-        public static final double kV = 0;
-        public static final TrapezoidProfile.Constraints TRAPEZOID_PROFILE =
-            new TrapezoidProfile.Constraints(0,0);
         
         //tune this as well too, could be very off ##note it's reading height
         public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -43,14 +39,13 @@ public class Constants {
     public static final class InnerElevatorConsts {
         public static final int elevatorMotorID = 22;
 
-        public static final double kP = 0.38;
+        public static final double kP = 0.36;
         public static final double kI = 0;
         public static final double kD = 0.03;
 
         public static final double kS = 0;
-        public static final double kG = 0.03;
+        public static final double kG = 0.08;
         public static final double kV = 0;
-
 
         public static final double gravityNegationConstant = 0.7;
         public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -59,16 +54,16 @@ public class Constants {
     public static final class IntakeArmConsts {
         public static final int armMotorID = 17;
         public static final int encoderID = 0;
-        public static final int suckMotorID = 25;
+        public static final int suckMotorID = 21;
         public static final double OUT_TIMEOUT = 1;//one second 
-        
-        public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(0.1, 0.03);
+
         public static final double kP = 0.01;
         public static final double kI = 0;
         public static final double kD = 0;
+        public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(0.1, 0.03);
         public static final double kS = 0;
-        public static final double kG = 0.003;
-        public static final double kV = 0;  
+        public static final double kG = 0.008;
+        public static final double kV = 0;
     }
 
     public static final class PhotonConsts {
@@ -103,9 +98,9 @@ public class Constants {
         public static final TrapezoidProfile.Constraints rotationConstraints = new TrapezoidProfile.Constraints(Math.PI, Math.PI / 2);
     }
 
-
     public static final class ClimbConsts {
-        public static final int climbMotorID = 18; 
+        public static final int leftClimbMotorID = 21; //find
+        public static final int rightClimbMotorID = 20;
     }
 
 }

@@ -7,56 +7,53 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.PrimaryElevatorCommand;
-import frc.robot.Constants;
 import frc.robot.Constants.PrimaryElevatorConsts;
 import frc.robot.States.ElevatorStates;
 
 public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX leftElevatorMotor;
     private final TalonFX rightElevatorMotor;
+    private final DutyCycleEncoder absoluteEncoder;
     private final PIDController elevatorPID;
 
     private boolean inBounds;
     private double motorOutput;
-    private double currentHeight;
-
-    private PrimaryElevatorCommand commands;
 
     public PrimaryElevatorSubsystem() {
         //motor configurations? and initializations
         leftElevatorMotor = new TalonFX(PrimaryElevatorConsts.leftElevatorMotorID);
         rightElevatorMotor = new TalonFX(PrimaryElevatorConsts.rightElevatorMotorID);
+        absoluteEncoder = new DutyCycleEncoder(PrimaryElevatorConsts.encoderID);
+
         elevatorPID = new PIDController(PrimaryElevatorConsts.kP, PrimaryElevatorConsts.kI, PrimaryElevatorConsts.kD);
         
+        setHeight(getHeight());
         elevatorPID.setTolerance(PrimaryElevatorConsts.PID_TOLERANCE);
         motorOutput = 0;
 
         //config
+        absoluteEncoder.setDutyCycleRange(0, 1750);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
-
-        commands = new PrimaryElevatorCommand(this);
-
     }
     
     @Override
     public void periodic() {
-        currentHeight = getHeight();
-        inBounds = false;
+        double relativeElevatorPosition = getHeight();
 
-        // move out of the min and max zones 
-        if(currentHeight > ElevatorStates.MAX_ABS.primaryHeight) {
-            motorOutput = -0.1;
-        }
-        else if(currentHeight < ElevatorStates.MIN_ABS.primaryHeight) {
-            motorOutput = 0.1; 
+        if(relativeElevatorPosition >= ElevatorStates.MAX_ABS.primaryHeight 
+                || relativeElevatorPosition <= ElevatorStates.MIN_ABS.primaryHeight) {
+            //leftElevatorMotor.set(0);
+            //rightElevatorMotor.set(0);
+            inBounds = false;
         } else {
-            motorOutput = elevatorPID.calculate(currentHeight);
             inBounds = true;
+            //goal points are set in command
+            motorOutput = elevatorPID.calculate(getHeight());
+            //leftElevatorMotor.set(motorOutput);
+            //rightElevatorMotor.set(motorOutput);
         }
-        
-        //setMotorSpeed(motorOutput); 
+
         setSmartdashboard();
     }
 
@@ -64,43 +61,25 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         elevatorPID.setSetpoint(height);
     }
 
-    public double getRelativePrimaryHeight() {
-        return (getHeight() - ElevatorStates.MIN_ABS.primaryHeight)/(ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight);
-    }
-
     public void reset() {
-        elevatorPID.setSetpoint(getHeight()); //stops elevator from moving
+        elevatorPID.setSetpoint(getHeight()); //stops elevator from rotating
     }
 
     public boolean atHeight() {
         return elevatorPID.atSetpoint();
     }
     
+    //either return changing variable or calculate here idk.
     public double getHeight() {
         return rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
     }
 
-    private void disableSubsystem() {
-        leftElevatorMotor.disable();
-        rightElevatorMotor.disable();
-    }
-
-    private void setMotorSpeed(double speed) {
-        //leftElevatorMotor.set(speed);
-        //rightElevatorMotor.set(speed);
-    }
-
     private void setSmartdashboard() {
         //state is printed in Command conjugate
-        SmartDashboard.putNumber("Primary elevator goal position", getHeight());
-        SmartDashboard.putNumber("Primary elevator Relative position", getRelativePrimaryHeight());
+        SmartDashboard.putNumber("Primary elevator goal position", elevatorPID.getSetpoint());
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorOutput);
         SmartDashboard.putNumber("Primary elevator position ", getHeight());
-    }
-
-    public PrimaryElevatorCommand getCommands() {
-        return commands;
     }
 
 }
