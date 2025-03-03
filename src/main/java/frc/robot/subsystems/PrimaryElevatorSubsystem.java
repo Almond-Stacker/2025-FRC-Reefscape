@@ -38,9 +38,6 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
 
         commands = new PrimaryElevatorCommand(this);
 
-        if(Constants.disableSubsystems) {
-            disableSubsystem();
-        }
     }
     
     @Override
@@ -50,24 +47,25 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
 
         // move out of the min and max zones 
         if(currentHeight > ElevatorStates.MAX_ABS.primaryHeight) {
-            setMotorSpeed(-0.1);
-            return;
+            motorOutput = -0.1;
         }
-
-        if(currentHeight < ElevatorStates.MIN_ABS.primaryHeight) {
-            setMotorSpeed(0.1);
-            return; 
+        else if(currentHeight < ElevatorStates.MIN_ABS.primaryHeight) {
+            motorOutput = 0.1; 
+        } else {
+            motorOutput = elevatorPID.calculate(currentHeight);
+            inBounds = true;
         }
         
-        inBounds = true;
-        //goal points are set in command
-        motorOutput = elevatorPID.calculate(getHeight());
         //setMotorSpeed(motorOutput); 
         setSmartdashboard();
     }
 
     public void setHeight(double height) {
         elevatorPID.setSetpoint(height);
+    }
+
+    public double getRelativePrimaryHeight() {
+        return (getHeight() - ElevatorStates.MIN_ABS.primaryHeight)/(ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight);
     }
 
     public void reset() {
@@ -88,13 +86,14 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     }
 
     private void setMotorSpeed(double speed) {
-        leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
+        //leftElevatorMotor.set(speed);
+        //rightElevatorMotor.set(speed);
     }
 
     private void setSmartdashboard() {
         //state is printed in Command conjugate
-        SmartDashboard.putNumber("Primary elevator goal position", elevatorPID.getSetpoint());
+        SmartDashboard.putNumber("Primary elevator goal position", getHeight());
+        SmartDashboard.putNumber("Primary elevator Relative position", getRelativePrimaryHeight());
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorOutput);
         SmartDashboard.putNumber("Primary elevator position ", getHeight());

@@ -40,30 +40,24 @@ public class IntakeArmSubsystem extends SubsystemBase{
         armPID = new PIDController(IntakeArmConsts.kP, IntakeArmConsts.kI, IntakeArmConsts.kD);
 
         armMotor.setNeutralMode(NeutralModeValue.Brake);
-        disableSubsystem();
         commands = new IntakeArmCommand(this);
-
-        if(Constants.disableSubsystems) {
-            disableSubsystem();
-        }
     }
 
     @Override
     public void periodic() {
         armAngle = getAngle();
+        inBounds = false; 
 
         if(armAngle > ElevatorStates.MAX_ABS.angle) {
-            //armMotor.set(-0.1);
-            return;
+            motorOutput = -0.1;
+        } else if(armAngle < ElevatorStates.MIN_ABS.angle) {
+            motorOutput = 0.1;
+        } else {
+            motorOutput = armPID.calculate(getAngle()) 
+                + armFeedforward.calculate(Units.degreesToRadians(armAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
+            inBounds = true;
         }
 
-        if(armAngle < ElevatorStates.MIN_ABS.angle) {
-            //armMotor.set(0.1);
-            return; 
-        }
-
-        motorOutput = armPID.calculate(getAngle()) 
-            + armFeedforward.calculate(Units.degreesToRadians(armAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
         //armMotor.set(motorOutput);
         setSmartdashboard();
     }
@@ -93,17 +87,11 @@ public class IntakeArmSubsystem extends SubsystemBase{
         return Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
     }
 
-    // used to disable everythinzg 
-    private void disableSubsystem() {
-        armMotor.disable();
-        intakeMotor.disable();
-    }
-
     private void setSmartdashboard() {
-        SmartDashboard.putNumber("Arm Subsystem position", getAngle());
-        SmartDashboard.putNumber("Arm Subsystem motor speed", motorOutput);
-        SmartDashboard.putBoolean("Arm Subsystem inbounds", inBounds);
-        SmartDashboard.putNumber("Arm Subsystem arm position goal", armPID.getSetpoint());
+        SmartDashboard.putNumber("Arm Subsystem positionm", getAngle());
+        SmartDashboard.putNumber("Arm Subsystem motor speedd", motorOutput);
+        SmartDashboard.putBoolean("Arm Subsystem inboundss", inBounds);
+        SmartDashboard.putNumber("Arm Subsystem arm position goall", armPID.getSetpoint());
     }
 
     public IntakeArmCommand getCommands() {

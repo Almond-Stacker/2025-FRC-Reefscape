@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.States.ElevatorStates;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.IntakeArmSubsystem;
@@ -26,8 +28,8 @@ public class ElevatorCommandHandler {
         primaryCommand = elevatorPrimary.getCommands();
         innerCommand = elevatorInner.getCommands();
         armCommand = arm.getCommands();
-
-        setABS(ElevatorStates.HOME_ABS);
+    
+        set(ElevatorStates.HOME_ABS);
     }
 
     public void setABS(ElevatorStates state) {
@@ -68,7 +70,49 @@ public class ElevatorCommandHandler {
         newRelInnerHeight = Math.max(newRelInnerHeight, 0);
         newRelPrimaryHeight = Math.max(newRelPrimaryHeight, 0);
 
+        SmartDashboard.putNumber("Relative Inner Height", newRelInnerHeight);
+        SmartDashboard.putNumber("Relative Primary Height", newRelPrimaryHeight);
+
         return new double[]{newRelInnerHeight, newRelPrimaryHeight};
+    }
+
+    //can't run with command I think, no subsystem
+    public SequentialCommandGroup set(ElevatorStates state) {
+        if(!state.ABS) {
+            double[] distribuedHeights = distributeElevatorHeights(state);
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> {
+                primaryCommand.set(relToAbsPrimaryHeight(distribuedHeights[1]));
+                innerCommand.set(relToAbsInnerHeight(distribuedHeights[0]));
+            }).onlyIf(() -> isRestricted(getRelativeInnerHeight(), state.angle)),
+            new InstantCommand(() -> {
+                primaryCommand.set(relToAbsPrimaryHeight(distribuedHeights[1]));
+                innerCommand.set(relToAbsInnerHeight(distribuedHeights[0]));
+                armCommand.setArm(state.angle);
+            })
+        );
+        } else {
+            return new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    primaryCommand.set(state.primaryHeight);
+                    innerCommand.set(state.innerHeight);
+                }).onlyIf(() -> isRestricted(innerSubsystem.getHeight(), state.angle)),
+                new InstantCommand(() -> {
+                    primaryCommand.set(state.primaryHeight);
+                    innerCommand.set(state.innerHeight);
+                    armCommand.setArm(state.angle);
+                })
+            );
+        }
+        
+    }
+
+    //ABS
+    public boolean isRestricted(double targetABSInnerHeight, double targetABSAngle) {
+        if(targetABSInnerHeight < 0.5 && targetABSAngle < 82.9) {
+            return true;
+        } 
+        return false;
     }
 
     //max total relative Height is 2

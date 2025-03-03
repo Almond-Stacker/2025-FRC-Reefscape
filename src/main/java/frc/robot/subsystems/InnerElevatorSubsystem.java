@@ -27,7 +27,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
     private double currentHeight;
 
     public InnerElevatorSubsystem() {   
-        elevatorMotor = new SparkFlex(InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
+        elevatorMotor = new SparkFlex(Constants.InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
 
         elevatorPID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
@@ -36,10 +36,6 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
 
         command = new InnerElevatorCommand(this);
-
-        if(Constants.disableSubsystems) {
-            disableSubsystem();
-        }
     }
 
     @Override
@@ -48,23 +44,26 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         inBounds = false;
 
         if(currentHeight > ElevatorStates.MAX_ABS.innerHeight) {
-            elevatorMotor.set(-0.1);
+            motorOutput = -0.1;
             return;
-        }
-
-        if(currentHeight < ElevatorStates.MIN_ABS.innerHeight) {
-            elevatorMotor.set(0.1);
+        } else if(currentHeight < ElevatorStates.MIN_ABS.innerHeight) {
+            motorOutput = 0.1;
             return; 
+        } else {
+            motorOutput = elevatorPID.calculate(getHeight()); //+ elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
+            inBounds = true;
         }
         
-        //motorOutput = elevatorPID.calculate(getHeight()) + elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
-        inBounds = true;
         //elevatorMotor.set(motorOutput);
         setSmartdashboard();
     }
 
     public void setHeight(double height) {
         elevatorPID.setSetpoint(height);
+    }
+
+    public double getRelativeInnerHeight() {
+        return (getHeight() - ElevatorStates.MIN_ABS.innerHeight)/(ElevatorStates.MAX_ABS.innerHeight - ElevatorStates.MIN_ABS.innerHeight);
     }
 
     public void reset() {
@@ -87,6 +86,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
         SmartDashboard.putNumber("Inner elevator speed", motorOutput);
         SmartDashboard.putNumber("Inner elevator posotion ", getHeight());
+        SmartDashboard.putNumber("Inner elevator Relative position", getRelativeInnerHeight());
         SmartDashboard.putNumber("Inner elevator goal position", elevatorPID.getSetpoint());
     }
 

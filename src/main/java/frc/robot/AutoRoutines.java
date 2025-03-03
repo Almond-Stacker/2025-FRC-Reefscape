@@ -35,8 +35,8 @@ public class AutoRoutines {
     }
 
     public AutoRoutine CurveTest() {
-        final AutoRoutine routine = m_factory.newRoutine("Curve Test");
-        final AutoTrajectory simplePath = routine.trajectory("Curve Test");
+        final AutoRoutine routine = m_factory.newRoutine("New Path");
+        final AutoTrajectory simplePath = routine.trajectory("New Path");
 
         routine.active().onTrue(
             simplePath.resetOdometry()
@@ -57,8 +57,8 @@ public class AutoRoutines {
     }
     
     public AutoRoutine GameAuto1() {
-        final AutoRoutine routine = m_factory.newRoutine("Game Auto 1");
-        final AutoTrajectory simplePath = routine.trajectory("Game Auto 1");
+        final AutoRoutine routine = m_factory.newRoutine("Game Auto Test 1");
+        final AutoTrajectory simplePath = routine.trajectory("Game Auto Test 1");
 
         routine.active().onTrue(
             simplePath.resetOdometry()
