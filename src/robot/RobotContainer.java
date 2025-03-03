@@ -74,13 +74,8 @@ public class RobotContainer {
         //configureDriveBindings();
         configureDriver1Commands();
     }
-    
-    private void configureAutos() {
-
-    }
 
     private void configureDriveBindings() {
-        
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed * 0.4) // Drive forward with negative Y (forward)
@@ -106,7 +101,6 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", m_chooser);
     }
 
-    
     private void configureDriver1Commands() {
         //should not deal with states in subsystem but only in command
         //driver1.a().onTrue(intakeArmCommand.setSuck(SuckStates.INTAKE));
@@ -128,6 +122,7 @@ public class RobotContainer {
         driver1.pov(90).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L2_REL));
         driver1.pov(180).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L3_REL));
         driver1.pov(270).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L4_REL));
+        driver1.pov(-1).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_REL));
         //driver1.pov(90).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L1));
         //driver1.pov(90).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L1));
 
