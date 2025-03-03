@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
@@ -95,6 +98,14 @@ public class RobotContainer {
     private void configureSYSTests() {
 
     }
+
+    private void configureAutos() {
+        // register all auto commands
+        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
+        m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
+        SmartDashboard.putData("Auto Chooser", m_chooser);
+    }
+
     
     private void configureDriver1Commands() {
         //should not deal with states in subsystem but only in command
