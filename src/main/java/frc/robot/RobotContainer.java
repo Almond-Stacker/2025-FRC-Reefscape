@@ -96,9 +96,9 @@ public class RobotContainer {
 
     private void configureAutos() {
         // register all auto commands
-        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
-        m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
-        SmartDashboard.putData("Auto Chooser", m_chooser);
+        // NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
+        // m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
+        // SmartDashboard.putData("Auto Chooser", m_chooser);
     }
 
     private void configureDriver1Commands() {
