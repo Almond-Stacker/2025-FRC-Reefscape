@@ -7,12 +7,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.ejml.equation.Sequence;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -62,9 +65,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     // ** Choreo Auto set up **//
-    private final AutoFactory autoFactory = drivetrain.createAutoFactory();
-    private final AutoRoutines autoRoutines = new AutoRoutines(autoFactory);
-    private final AutoChooser autoChooser = new AutoChooser();
+    private final SendableChooser<Command> m_chooser = AutoBuilder.buildAutoChooser();
+
 
     //** Subsystems **//
     private final PrimaryElevatorSubsystem s_primaryElevator = new PrimaryElevatorSubsystem();
@@ -108,21 +110,8 @@ public class RobotContainer {
     private void configureAutos() {
         // register all auto commands
         NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
-        autoChooser.addCmd("woait", () -> new WaitCommand(2));
-        autoChooser.select("Straight Path Short");
-        sigma = autoChooser.selectedCommand();
-        autoChooser.select("Curve Path");
-        Command x = autoChooser.selectedCommand();
-        group = new SequentialCommandGroup(sigma, new WaitCommand(2), x, new WaitCommand(3));
-
-        // add all auto paths
-        autoChooser.addRoutine("Straight Path Short", autoRoutines::ShortTest);
-        autoChooser.addRoutine("Diagonal Path", autoRoutines::DiagonalTest);
-        autoChooser.addRoutine("Curve Path", autoRoutines::CurveTest);
-        autoChooser.addRoutine("Straight Path Long", autoRoutines::StraightTest);
-        autoChooser.addRoutine("Game Auto", autoRoutines::GameAuto1);
-        autoChooser.addCmd("sntaoheunsaoeu", () -> group);
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        
+        SmartDashboard.putData("Auto Chooser", m_chooser);
     }
 
     
@@ -150,6 +139,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
+        return m_chooser.getSelected();
     }
 }
