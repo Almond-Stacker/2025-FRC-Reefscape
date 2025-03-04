@@ -68,10 +68,18 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     public boolean atHeight() {
         return elevatorPID.atSetpoint();
     }
+
+    public double relToAbsPrimaryHeight(double relPrimaryHeight) {
+        return (ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight) * relPrimaryHeight + ElevatorStates.MIN_ABS.primaryHeight;
+    }
     
     //either return changing variable or calculate here idk.
     public double getHeight() {
         return rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
+    }
+
+    public double getRelativePrimaryHeight() {
+        return (getHeight() - ElevatorStates.MIN_ABS.primaryHeight)/(ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight);
     }
 
     private void setSmartdashboard() {

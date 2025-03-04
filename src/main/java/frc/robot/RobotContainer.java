@@ -12,9 +12,12 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
 import frc.robot.Constants.PhotonConsts;
@@ -23,12 +26,12 @@ import frc.robot.States.SuckStates;
 import frc.robot.States.ElevatorStates;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.commands.PhotonCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
-import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
@@ -55,7 +58,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     //put choreo
-    private final AutoChooser autoChooser = new AutoChooser();
+    //private final AutoChooser autoChooser = new AutoChooser();
+    private final SendableChooser<Command> m_chooser = new SendableChooser<Command>();
 
     //subsystems and commands init
     private final PrimaryElevatorSubsystem primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
@@ -96,9 +100,9 @@ public class RobotContainer {
 
     private void configureAutos() {
         // register all auto commands
-        // NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
-        // m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
-        // SmartDashboard.putData("Auto Chooser", m_chooser);
+        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
+        m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
+        SmartDashboard.putData("Auto Chooser", m_chooser);
     }
 
     private void configureDriver1Commands() {
@@ -118,7 +122,8 @@ public class RobotContainer {
                 })
         );
 
-        driver1.pov(0).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_REL));
+
+        //driver1.pov(0).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_REL));
         driver1.pov(90).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L2_REL));
         driver1.pov(180).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L3_REL));
         driver1.pov(270).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L4_REL));
@@ -134,6 +139,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.selectedCommand();
+        return m_chooser.getSelected();
     }
 }

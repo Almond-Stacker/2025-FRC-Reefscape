@@ -59,8 +59,16 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         return elevatorPID.atSetpoint();
     }
 
+    public double relToAbsInnerHeight(double relInnerHeight) {
+        return (ElevatorStates.MAX_ABS.innerHeight - ElevatorStates.MIN_ABS.innerHeight) * relInnerHeight + ElevatorStates.MIN_ABS.innerHeight;
+    }
+
     public double getHeight() {
         return elevatorEncoder.getPosition() + 0.01;
+    }
+
+    public double getRelativeInnerHeight() {
+        return (getHeight() - ElevatorStates.MIN_ABS.innerHeight)/(ElevatorStates.MAX_ABS.innerHeight - ElevatorStates.MIN_ABS.innerHeight);
     }
 
     private void setSmartdashboard() {

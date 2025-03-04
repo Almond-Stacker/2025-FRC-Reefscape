@@ -24,8 +24,11 @@ public class ElevatorCommandHandler extends Command {
     private final ElevatorStates state;
 
     private boolean isRestricted;
-    private double targetPrimary, targetInner, targetArmAngle;
+    private double targetPrimary;
+    private double targetInner;
+    private double targetArmAngle;
     private double safeArmAngle;
+    private double currentInnerHeight;
 
     //rename 2/26
     public ElevatorCommandHandler(PrimaryElevatorSubsystem elevatorPrimary, InnerElevatorSubsystem elevatorInner, IntakeArmSubsystem arm, ElevatorStates state) {
@@ -38,25 +41,25 @@ public class ElevatorCommandHandler extends Command {
 
     @Override
     public void initialize() {
-        double curInnerHeight = getRelativeInnerHeight();
+        currentInnerHeight = innerSubsystem.getRelativeInnerHeight();
         targetArmAngle = state.angle;
-        isRestricted = isRestricted(curInnerHeight, targetArmAngle);
-        safeArmAngle = getMinimumSafeArmAngle(curInnerHeight);
+        isRestricted = isRestricted(currentInnerHeight, targetArmAngle);
+        safeArmAngle = getMinimumSafeArmAngle(currentInnerHeight);
 
         if(state.isABS) {
             targetPrimary = state.primaryHeight;
             targetInner = state.innerHeight;
         } else {
             double totalRelHeight = state.relTotalHeight;
-            SmartDashboard.putNumber("Relative Goal", totalRelHeight);
-            double curPrimaryHeight = getRelativePrimaryHeight();
+            SmartDashboard.putNumber("Relative Goall", totalRelHeight);
+            double curPrimaryHeight = primarySubsystem.getRelativePrimaryHeight();
 
-            double[] optimizedHeights = distributeElevatorHeights(totalRelHeight, curInnerHeight, curPrimaryHeight);
-            targetInner = relToAbsInnerHeight(optimizedHeights[0]);
-            targetPrimary = relToAbsPrimaryHeight(optimizedHeights[1]);
+            double[] optimizedHeights = distributeElevatorHeights(totalRelHeight, currentInnerHeight, curPrimaryHeight);
+            targetInner = innerSubsystem.relToAbsInnerHeight(optimizedHeights[0]);
+            targetPrimary = primarySubsystem.relToAbsPrimaryHeight(optimizedHeights[1]);
         }
 
-        SmartDashboard.putString("Elevator state", state.toString());
+        SmartDashboard.putString("Elevator statee", state.toString());
 
         innerSubsystem.setHeight(targetInner);
         primarySubsystem.setHeight(targetPrimary);
@@ -64,9 +67,9 @@ public class ElevatorCommandHandler extends Command {
 
     @Override
     public void execute() {
-        double curInnerHeight = getRelativeInnerHeight();
+        double currentInnerHeight = innerSubsystem.getRelativeInnerHeight();
         if(isRestricted) {
-            armSubsystem.setAngle(getMinimumSafeArmAngle(curInnerHeight));
+            armSubsystem.setAngle(getMinimumSafeArmAngle(currentInnerHeight));
         }
     }
 
@@ -125,8 +128,6 @@ public class ElevatorCommandHandler extends Command {
         return (angle < 82) && innerHeight < 0.5;
     }
 
-    
-
     private double getMinimumSafeArmAngle(double innerHeight) {
         double minSafeHeight = 0.5;
         if(innerHeight >= minSafeHeight) return 82;
@@ -134,24 +135,4 @@ public class ElevatorCommandHandler extends Command {
         double safeAngle = Math.toDegrees(Math.atan(heightDeficit / 1));
         return Math.max(0, safeAngle);
     }
-
-    //max total relative Height is 2
-    public double getRelativeInnerHeight() {
-        double height = innerSubsystem.getHeight();
-        return (height - ElevatorStates.MIN_ABS.innerHeight)/(ElevatorStates.MAX_ABS.innerHeight - ElevatorStates.MIN_ABS.innerHeight);
-    }
-
-    public double relToAbsInnerHeight(double relInnerHeight) {
-        return (ElevatorStates.MAX_ABS.innerHeight - ElevatorStates.MIN_ABS.innerHeight) * relInnerHeight + ElevatorStates.MIN_ABS.innerHeight;
-    }
-
-    public double getRelativePrimaryHeight() {
-        double height = primarySubsystem.getHeight();
-        return (height - ElevatorStates.MIN_ABS.primaryHeight)/(ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight);
-    }
-
-    public double relToAbsPrimaryHeight(double relPrimaryHeight) {
-        return (ElevatorStates.MAX_ABS.primaryHeight - ElevatorStates.MIN_ABS.primaryHeight) * relPrimaryHeight + ElevatorStates.MIN_ABS.primaryHeight;
-    }
 }
-
