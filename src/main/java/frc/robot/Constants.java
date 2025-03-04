@@ -39,9 +39,9 @@ public class Constants {
     public static final class InnerElevatorConsts {
         public static final int elevatorMotorID = 22;
 
-        public static final double kP = 0.36;
+        public static final double kP = 0.125;
         public static final double kI = 0;
-        public static final double kD = 0.03;
+        public static final double kD = 0;
 
         public static final double kS = 0;
         public static final double kG = 0.08;
@@ -52,9 +52,9 @@ public class Constants {
     }
 
     public static final class IntakeArmConsts {
-        public static final int armMotorID = 17;
+        public static final int armMotorID = 16;
         public static final int encoderID = 0;
-        public static final int suckMotorID = 21;
+        public static final int suckMotorID = 25;
         public static final double OUT_TIMEOUT = 1;//one second 
 
         public static final double kP = 0.01;
@@ -99,8 +99,7 @@ public class Constants {
     }
 
     public static final class ClimbConsts {
-        public static final int leftClimbMotorID = 21; //find
-        public static final int rightClimbMotorID = 20;
+        public static final int climbMotorID = 27;
     }
 
 }

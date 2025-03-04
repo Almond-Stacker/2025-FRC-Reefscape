@@ -4,36 +4,43 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import choreo.auto.AutoChooser;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.SerialPort.StopBits;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import frc.lib.util.Utilities;
+
 import frc.robot.Constants.PhotonConsts;
+
 import frc.robot.States.ClimbStates;
-import frc.robot.States.SuckStates;
 import frc.robot.States.ElevatorStates;
+
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
+import frc.robot.commands.IntakeCommand;
+
 import frc.robot.subsystems.IntakeArmSubsystem;
-import frc.robot.commands.PhotonCommand;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevatorSubsystem;
-import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
+
+import frc.robot.generated.TunerConstants;
+
 
 //overall structure of the robot here, no real robot logic
 //subsystems, commands, and triggermappings, respectively
@@ -59,23 +66,32 @@ public class RobotContainer {
 
     //put choreo
     //private final AutoChooser autoChooser = new AutoChooser();
-    private final SendableChooser<Command> m_chooser = new SendableChooser<Command>();
+    private SendableChooser<Command> m_chooser;
 
-    //subsystems and commands init
-    private final PrimaryElevatorSubsystem primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
-    private final InnerElevatorSubsystem innerElevatorSubsystem = new InnerElevatorSubsystem();
-    private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
+    //** Subsystems **//
+    private final PrimaryElevatorSubsystem s_primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
+    private final InnerElevatorSubsystem s_innerElevatorSubsystem = new InnerElevatorSubsystem();
+    private final IntakeArmSubsystem s_intakeArmSubsystem = new IntakeArmSubsystem();
+    private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
+
+    //** Command Handlers **//
+    private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_innerElevatorSubsystem, s_primaryElevatorSubsystem, s_intakeArmSubsystem);
+    private final IntakeCommand ch_intakeCommandHandler = new IntakeCommand(s_intakeArmSubsystem);
+    private final ClimbCommand ch_climbCommandHandler = new ClimbCommand(s_climbSubsystem);
+
+    //** Commands **//
 
     //goHome = new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_ABS);
 
-    private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
-    private final PhotonCommand photonCommand = photonSubsystem.getCommands();
+    //private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
+   // private final PhotonCommand photonCommand = photonSubsystem.getCommands();
 
     //logging vars
-    private boolean isTrackingAprilTag = false;
+   /// private boolean isTrackingAprilTag = false;
 
     public RobotContainer() {
-        //configureDriveBindings();
+        m_chooser = AutoBuilder.buildAutoChooser("Straight Test");
+        configureDriveBindings();
         configureDriver1Commands();
     }
 
@@ -94,48 +110,12 @@ public class RobotContainer {
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
     }
 
-    private void configureSYSTests() {
-
-    }
-
-    private void configureAutos() {
-        // register all auto commands
-        NamedCommands.registerCommand("Wait Command", new WaitCommand(2));
-        m_chooser.addOption("Straight PP Test ", new PathPlannerAuto("Straight Test"));
-        SmartDashboard.putData("Auto Chooser", m_chooser);
-    }
-
     private void configureDriver1Commands() {
-        //should not deal with states in subsystem but only in command
-        //driver1.a().onTrue(intakeArmCommand.setSuck(SuckStates.INTAKE));
-        //driver1.b().onTrue(intakeArmCommand.setSuck(SuckStates.FEED_OUT));
+        driver1.a().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.CLIMB));
+        driver1.a().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
 
-        driver1.x().toggleOnTrue(
-            photonCommand.goInFrontOfTag(1)
-                .beforeStarting(() -> {
-                    isTrackingAprilTag = true;
-                    SmartDashboard.putBoolean("Tracking AprilTag", isTrackingAprilTag);
-                })
-                .finallyDo(() -> {
-                    isTrackingAprilTag = false;
-                    SmartDashboard.putBoolean("Tracking AprilTag", isTrackingAprilTag);
-                })
-        );
-
-
-        //driver1.pov(0).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_REL));
-        driver1.pov(90).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L2_REL));
-        driver1.pov(180).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L3_REL));
-        driver1.pov(270).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.L4_REL));
-        driver1.pov(-1).onTrue(new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_REL));
-        //driver1.pov(90).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L1));
-        //driver1.pov(90).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L1));
-
-        //driver1.pov(180).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.L3));
-        //driver1.pov(180).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.L3));
-
-        //driver1.pov(0).toggleOnTrue(primaryElevatorCommand.set(PrimaryElevatorStates.HOME));
-        //driver1.pov(0).toggleOnTrue(innerElevatorCommand.set(InnerElevatorStates.HOME));
+        driver1.b().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.DROP));
+        driver1.b().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
     }
 
     public Command getAutonomousCommand() {

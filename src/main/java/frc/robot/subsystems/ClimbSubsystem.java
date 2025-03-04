@@ -2,40 +2,26 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.SparkFlexUtil;
 import frc.robot.Constants.ClimbConsts;
 import frc.robot.States.ClimbStates;
-import frc.robot.commands.ClimbCommand;
 
 
 public class ClimbSubsystem extends SubsystemBase{
-    private final TalonFX leftClimbMotor;
-    
-    private ClimbCommand commands; 
+    private final SparkFlex climbMotor;
 
     public ClimbSubsystem() {
-        leftClimbMotor = new TalonFX(ClimbConsts.leftClimbMotorID);
-        leftClimbMotor.setNeutralMode(NeutralModeValue.Brake); 
-
-        commands = new ClimbCommand(this); 
+        climbMotor = new SparkFlex(ClimbConsts.climbMotorID, MotorType.kBrushless);
+        SparkFlexUtil.setSparkFlexBusUsage(climbMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, true);
     }
 
-    @Override
-    public void periodic() {
-        setSmartdashboard(); 
+    public void setClimbState(ClimbStates climbState) {
+        climbMotor.set(climbState.speed);
     }
 
-    public void setClimb(double speed) {
-        //leftClimbMotor.set(speed); 
-    }
-
-    public void setSmartdashboard() {
-        // idk what do put in here :()
-    }
-
-    public ClimbCommand getCommand () {
-        return commands; 
-    }    
 }
