@@ -51,12 +51,12 @@ public class IntakeArmSubsystem extends SubsystemBase{
         } else if(currentAngle < ElevatorStates.MIN.armAngle) {
             motorOutput = 0.05;
         } else {
-            motorOutput = //armPID.calculate(currentAngle); 
+            motorOutput = armPID.calculate(currentAngle) + 
                  armFeedforward.calculate(Units.degreesToRadians(currentAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
             inBounds = true;
         }
 
-        //armMotor.set(motorOutput + addMotor);
+       // armMotor.set(motorOutput + addMotor);
         setSmartdashboard();
     }
 
@@ -90,3 +90,4 @@ public class IntakeArmSubsystem extends SubsystemBase{
         SmartDashboard.putBoolean("Intake Arm In Bounds", inBounds);
     }
 }
+

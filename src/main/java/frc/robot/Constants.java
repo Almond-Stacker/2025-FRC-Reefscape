@@ -39,7 +39,7 @@ public class Constants {
     public static final class InnerElevatorConsts {
         public static final int elevatorMotorID = 22;
 
-        public static final double kP = 0.125;
+        public static final double kP = 0.12;
         public static final double kI = 0;
         public static final double kD = 0;
 

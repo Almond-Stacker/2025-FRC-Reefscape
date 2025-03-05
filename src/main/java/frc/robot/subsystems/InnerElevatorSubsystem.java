@@ -48,7 +48,8 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         } else if(currentHeight < ElevatorStates.MIN.innerHeight) {
             motorOutput = 0.05;
         } else {
-            motorOutput =  elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
+            motorOutput = elevatorPID.calculate(currentHeight)
+                + elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
             //elevatorPID.calculate(currentHeight) +
             // if (motorOutput < -0.1) {
             //     motorOutput *= 0.2;
@@ -56,7 +57,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
             inBounds = true;
         }
         
-        //elevatorMotor.set(motorOutput + addMotor);
+       // elevatorMotor.set(motorOutput + addMotor);
         setSmartdashboard();
     }
 

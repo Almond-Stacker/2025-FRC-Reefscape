@@ -90,7 +90,7 @@ public class RobotContainer {
    /// private boolean isTrackingAprilTag = false;
 
     public RobotContainer() {
-        m_chooser = AutoBuilder.buildAutoChooser("Straight Test");
+        m_chooser = AutoBuilder.buildAutoChooser("Blue Bottom Corner");
         SmartDashboard.putData(m_chooser);
         configureDriveBindings();
         configureDriver1Commands();
@@ -124,6 +124,12 @@ public class RobotContainer {
         driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1, false));
         driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2, false));
         driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3, false));
+
+        // driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
+        // driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
+        // driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        // driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
+        // driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
 
         driver1.leftBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0.05);}));
         driver1.leftBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));

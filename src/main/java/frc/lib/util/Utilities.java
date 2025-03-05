@@ -35,4 +35,12 @@ public class Utilities {
         return new double[]{newRelInnerHeight, newRelPrimaryHeight};
 
     }
+
+            //ik its not dynamic but idc, get outta here
+    public static double calculateTotalRelHeight(double primaryHeight, double innerHeight) {
+        double relPrimaryHeight = (primaryHeight - 1) / (107);//108 - 1
+        double relInnerHeight = (innerHeight - 1.2) / (22.5 - 1.2);
+
+        return relPrimaryHeight + relInnerHeight;
+    }
 }
