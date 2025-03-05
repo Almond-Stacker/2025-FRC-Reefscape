@@ -69,11 +69,6 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
         rightElevatorMotor.disable();
     }
 
-    private void setMotorSpeed(double speed) {
-        //leftElevatorMotor.set(speed);
-        //rightElevatorMotor.set(speed);
-    }
-
     private void setSmartdashboard() {
         SmartDashboard.putNumber("Primary Elevator Motor Output", motorOutput);
         SmartDashboard.putNumber("Primary Elevator Current Height", currentHeight);
