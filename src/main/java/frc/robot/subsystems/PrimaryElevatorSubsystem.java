@@ -38,30 +38,48 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
 
         // move out of the min and max zones 
         if(currentHeight < ElevatorStates.MIN.primaryHeight) {
-            motorOutput = -0.1;
+            motorOutput = 0.1;
         }
         else if(currentHeight > ElevatorStates.MAX.primaryHeight) {
-            motorOutput = 0.1; 
+            motorOutput = -0.1; 
         } else {
             motorOutput = elevatorPID.calculate(currentHeight);
             inBounds = true;
         }
         
-        setMotorSpeed(motorOutput); 
+        //leftElevatorMotor.set(motorOutput);
+        //rightElevatorMotor.set(motorOutput);
         setSmartdashboard();
     }
 
-    public void setPrimaryElevatorHeight(ElevatorStates primaryElevatorStates) {
-        goalPosition = primaryElevatorStates.primaryHeight;
+    public void setMotorSpeed(double speed) {
+        leftElevatorMotor.set(speed);
+        rightElevatorMotor.set(speed);
+    }
+
+    public void setPrimaryElevatorHeight(double primaryHeight) {
+        goalPosition = primaryHeight;
         elevatorPID.setSetpoint(goalPosition);
     }
 
+    public void setPrimaryElevatorHeight(double primaryHeight, boolean isABS) {
+        if(isABS) {
+            setPrimaryElevatorHeight(primaryHeight);
+        } else {
+            setPrimaryElevatorHeight(relToABSHeight(primaryHeight));
+        }
+    }
+
     public double getHeight() {
-        return rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
+        return rightElevatorMotor.getPosition().getValueAsDouble() + 17.3;
     }
 
     public double getRelativeHeight() {
         return (getHeight() - ElevatorStates.MIN.primaryHeight) / (ElevatorStates.MAX.primaryHeight - ElevatorStates.MIN.primaryHeight);
+    }
+
+    private double relToABSHeight(double relativeHeight) {
+        return (ElevatorStates.MAX.primaryHeight - ElevatorStates.MIN.primaryHeight) * relativeHeight + ElevatorStates.MIN.primaryHeight;
     }
 
     private void disableSubsystem() {

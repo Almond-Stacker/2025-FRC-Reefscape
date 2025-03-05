@@ -13,7 +13,7 @@ public class IntakeCommand {
     public IntakeCommand(IntakeArmSubsystem intake) {
         this.intake = intake;
         state = IntakeStates.STOP;
-        intake.setIntakeSpeed(state);
+        intake.setIntakeSpeed(state.speed);
     } 
 
     public IntakeStates getCurrentState() {
@@ -22,6 +22,6 @@ public class IntakeCommand {
 
     public Command setIntake(IntakeStates intakeState) {
         this.state = intakeState;
-        return new InstantCommand(() -> intake.setIntakeSpeed(state), intake);
+        return new InstantCommand(() -> intake.setIntakeSpeed(state.speed), intake);
     }
 }

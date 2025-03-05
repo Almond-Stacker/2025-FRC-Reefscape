@@ -44,7 +44,7 @@ public class Constants {
         public static final double kD = 0;
 
         public static final double kS = 0;
-        public static final double kG = 0.08;
+        public static final double kG = 0.01;
         public static final double kV = 0;
 
         public static final double gravityNegationConstant = 0.7;
@@ -62,7 +62,7 @@ public class Constants {
         public static final double kD = 0;
         public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(0.1, 0.03);
         public static final double kS = 0;
-        public static final double kG = 0.008;
+        public static final double kG = 0.015;
         public static final double kV = 0;
     }
 

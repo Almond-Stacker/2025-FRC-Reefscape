@@ -27,6 +27,7 @@ public class IntakeArmSubsystem extends SubsystemBase{
     private double motorOutput;
     private double currentAngle;
     private double goalPosition;
+    private double addMotor;
 
     public IntakeArmSubsystem() {
         armMotor = new TalonFX(IntakeArmConsts.armMotorID);
@@ -46,26 +47,30 @@ public class IntakeArmSubsystem extends SubsystemBase{
         inBounds = false; 
 
         if(currentAngle > ElevatorStates.MAX.armAngle) {
-            motorOutput = -0.1;
+            motorOutput = -0.05;
         } else if(currentAngle < ElevatorStates.MIN.armAngle) {
-            motorOutput = 0.1;
+            motorOutput = 0.05;
         } else {
-            motorOutput = armPID.calculate(currentAngle); 
-                //+ armFeedforward.calculate(Units.degreesToRadians(currentAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
+            motorOutput = //armPID.calculate(currentAngle); 
+                 armFeedforward.calculate(Units.degreesToRadians(currentAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
             inBounds = true;
         }
 
-        //armMotor.set(motorOutput);
+        armMotor.set(motorOutput + addMotor);
         setSmartdashboard();
     }
 
-    public void setArmPosition(ElevatorStates intakeArmStates) {
-        goalPosition = intakeArmStates.armAngle;
+    public void setMotorSpeed(double speed) {
+        addMotor = speed;
+    }
+
+    public void setArmPosition(double armAngle) {
+        goalPosition = armAngle;
         armPID.setSetpoint(goalPosition);
     }
 
-    public void setIntakeSpeed(IntakeStates intakeState) {
-        //intakeMotor.set(intakeState.speed);
+    public void setIntakeSpeed(double speed) {
+        intakeMotor.set(speed);
     }
 
     private double getCurrentAngle() {

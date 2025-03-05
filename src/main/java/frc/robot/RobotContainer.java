@@ -111,11 +111,30 @@ public class RobotContainer {
     }
 
     private void configureDriver1Commands() {
-        driver1.a().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.CLIMB));
-        driver1.a().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
+        // driver1.a().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.CLIMB));
+        // driver1.a().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
 
-        driver1.b().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.DROP));
-        driver1.b().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
+        // driver1.b().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.DROP));
+        // driver1.b().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
+
+        //elevator system
+        driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME, true));
+        driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME, false));
+        driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1, false));
+        driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2, false));
+        driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3, false));
+
+        driver1.leftBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0.05);}));
+        driver1.leftBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
+
+        driver1.rightBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(-0.05);}));
+        driver1.rightBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
+
+        driver1.leftTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0.05);}));
+        driver1.leftTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
+
+        driver1.rightTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(-0.05);}));
+        driver1.rightTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
     }
 
     public Command getAutonomousCommand() {
