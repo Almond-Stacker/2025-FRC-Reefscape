@@ -83,7 +83,8 @@ public class Constants {
         public static final List<Transform3d> CAM_TO_ROBOT_TRANSFORMS = List.of(gray_cam_transform, blue_cam_transform);
         public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-        public static final double TIMEOUT = 0.3;
+        public static final double TIMEOUT_SUBSYSTEM = 0.3;
+        public static final double TIMEOUT_COMMAND = 0.5;
         public static final double MIN_AMBIGUITY = 0.2;//tune
 
         //no reading consideration
@@ -96,6 +97,8 @@ public class Constants {
 
         public static final TrapezoidProfile.Constraints translationConstraints = new TrapezoidProfile.Constraints(2.0, 1.0);
         public static final TrapezoidProfile.Constraints rotationConstraints = new TrapezoidProfile.Constraints(Math.PI, Math.PI / 2);
+    
+        public static final double DESIRED_RANGE = 0.2;
     }
 
     public static final class ClimbConsts {

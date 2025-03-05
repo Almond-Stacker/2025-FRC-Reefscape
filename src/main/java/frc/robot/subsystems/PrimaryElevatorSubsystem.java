@@ -53,8 +53,8 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double speed) {
-        leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
+        //leftElevatorMotor.set(speed);
+        //rightElevatorMotor.set(speed);
     }
 
     public void setPrimaryElevatorHeight(double primaryHeight) {

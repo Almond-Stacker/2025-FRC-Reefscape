@@ -91,6 +91,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         m_chooser = AutoBuilder.buildAutoChooser("Straight Test");
+        SmartDashboard.putData(m_chooser);
         configureDriveBindings();
         configureDriver1Commands();
     }

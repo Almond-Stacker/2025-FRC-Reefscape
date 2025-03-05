@@ -56,7 +56,7 @@ public class IntakeArmSubsystem extends SubsystemBase{
             inBounds = true;
         }
 
-        armMotor.set(motorOutput + addMotor);
+        //armMotor.set(motorOutput + addMotor);
         setSmartdashboard();
     }
 

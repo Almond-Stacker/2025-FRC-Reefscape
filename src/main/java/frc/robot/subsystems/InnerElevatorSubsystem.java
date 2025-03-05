@@ -56,7 +56,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
             inBounds = true;
         }
         
-        elevatorMotor.set(motorOutput + addMotor);
+        //elevatorMotor.set(motorOutput + addMotor);
         setSmartdashboard();
     }
 
