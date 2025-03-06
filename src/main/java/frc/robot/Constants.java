@@ -7,6 +7,10 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.robot.generated.TunerConstants;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,6 +107,12 @@ public class Constants {
 
     public static final class ClimbConsts {
         public static final int climbMotorID = 27;
+    }
+
+    public static final class DriveVelConsts {
+        public static final double driveVelFriction = 0.05;
+        public static final double MAXSPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
     }
 
 }

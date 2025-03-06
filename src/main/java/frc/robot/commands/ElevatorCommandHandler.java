@@ -18,20 +18,15 @@ public class ElevatorCommandHandler {
     private ElevatorStates state;
     private Command command; 
 
-    public ElevatorCommandHandler(InnerElevatorSubsystem innerElevatorSubsystem, 
-                        PrimaryElevatorSubsystem primaryElevatorSubsystem, 
-                        IntakeArmSubsystem intakeArmSubsystem) {
+    public ElevatorCommandHandler(InnerElevatorSubsystem innerElevatorSubsystem, PrimaryElevatorSubsystem primaryElevatorSubsystem, IntakeArmSubsystem intakeArmSubsystem) {
         this.innerElevatorSubsystem = innerElevatorSubsystem;
         this.primaryElevatorSubsystem = primaryElevatorSubsystem;
         this.intakeArmSubsystem = intakeArmSubsystem;
-
-        state = ElevatorStates.STARTING_POSITION;
-        setElevatorStates(state, true);
     }
 
-    public Command setElevators(ElevatorStates elevatorStates, boolean isABS) {
+    public Command setElevators(ElevatorStates elevatorStates) {
         this.state = elevatorStates;
-        command = new InstantCommand(() -> setElevatorStates(elevatorStates, isABS));
+        command = new InstantCommand(() -> setElevatorStates(elevatorStates));
         return command;
     }
 
@@ -39,28 +34,9 @@ public class ElevatorCommandHandler {
         return state;
     }
 
-    private void setElevatorStates(ElevatorStates elevatorStates, boolean isABS) {
-        SmartDashboard.putString("Elevator State", elevatorStates.toString());
-
-        if(isABS) {
-            innerElevatorSubsystem.setInnerElevatorHeight(elevatorStates.innerHeight);
-            primaryElevatorSubsystem.setPrimaryElevatorHeight(elevatorStates.primaryHeight);
-        } else {
-            double curInnerRel = innerElevatorSubsystem.getRelativeHeight();
-            double curPrimaryRel = primaryElevatorSubsystem.getRelativeHeight();
-
-            //return [innerHeight, primaryHeight]
-            double[] distributedHeights = 
-                Utilities.distributeElevatorHeights(elevatorStates.totalRelativeHeight,
-                                            curInnerRel, curPrimaryRel);
-
-            SmartDashboard.putNumber("Inner Relative Goal", distributedHeights[0]);
-            SmartDashboard.putNumber("Primary Relative Goal", distributedHeights[1]);
-            innerElevatorSubsystem.setInnerElevatorHeight(distributedHeights[0], false);
-            primaryElevatorSubsystem.setPrimaryElevatorHeight(distributedHeights[1], false);
-        }
-
-        intakeArmSubsystem.setArmPosition(elevatorStates.armAngle);
-        
+    private void setElevatorStates(ElevatorStates state) {
+        innerElevatorSubsystem.setInnerElevatorState(state);
+        primaryElevatorSubsystem.setElevatorState(state);
+        intakeArmSubsystem.setArmState(state);
     }
 }

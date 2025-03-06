@@ -1,93 +1,89 @@
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkFlex;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.IntakeArmConsts;
-import frc.robot.States.ElevatorStates;
-import frc.robot.States.IntakeStates;
 
-public class IntakeArmSubsystem extends SubsystemBase{
+import frc.robot.Constants;
+import frc.robot.States.ElevatorStates;
+import frc.robot.States.IndexStates;
+
+public class IntakeArmSubsystem extends SubsystemBase {   
     private final TalonFX armMotor;
-    private final SparkMax intakeMotor;
-    private final DutyCycleEncoder armEncoder;
+    private final SparkMax indexingMotor;
+    private final DutyCycleEncoder armEncoder; 
     private final ArmFeedforward armFeedforward;
     private final PIDController armPID;
 
-    private boolean inBounds;
-    private double motorOutput;
-    private double currentAngle;
-    private double goalPosition;
-    private double addMotor;
+    private IndexStates indexState;
+    private ElevatorStates state;
+    private double armPosition;
+    private double motorSpeed; 
+    public boolean override; 
 
     public IntakeArmSubsystem() {
-        armMotor = new TalonFX(IntakeArmConsts.armMotorID);
-        intakeMotor = new SparkMax(IntakeArmConsts.suckMotorID, MotorType.kBrushless);
-        armEncoder = new DutyCycleEncoder(IntakeArmConsts.encoderID);
+        armMotor = new TalonFX(Constants.IntakeArmConsts.armMotorID);
+        indexingMotor = new SparkMax(Constants.IntakeArmConsts.suckMotorID, MotorType.kBrushless);
+        armEncoder = new DutyCycleEncoder(Constants.IntakeArmConsts.encoderID);
 
-        armFeedforward = new ArmFeedforward(IntakeArmConsts.kS, IntakeArmConsts.kG, IntakeArmConsts.kV);
-        armPID = new PIDController(IntakeArmConsts.kP, IntakeArmConsts.kI, IntakeArmConsts.kD);
+        armFeedforward = new ArmFeedforward(Constants.IntakeArmConsts.kS, Constants.IntakeArmConsts.kG, Constants.IntakeArmConsts.kV);
+        armPID = new PIDController(Constants.IntakeArmConsts.kP, Constants.IntakeArmConsts.kI, Constants.IntakeArmConsts.kD);
 
-        armMotor.setNeutralMode(NeutralModeValue.Brake);
-        disableSubsystem();
+        state = ElevatorStates.STARTING_POSITION;
+        indexState = IndexStates.STOP;
+        setIndexState(indexState);
+        setArmState(state);
     }
 
     @Override
     public void periodic() {
-        currentAngle = getCurrentAngle();
-        inBounds = false; 
-
-        if(currentAngle > ElevatorStates.MAX.armAngle) {
-            motorOutput = -0.05;
-        } else if(currentAngle < ElevatorStates.MIN.armAngle) {
-            motorOutput = 0.05;
-        } else {
-            motorOutput = armPID.calculate(currentAngle) + 
-                 armFeedforward.calculate(Units.degreesToRadians(currentAngle - 158), armMotor.getVelocity().getValueAsDouble());// (armPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - timeStamp));
-            inBounds = true;
+        armPosition = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
+        
+        if(armPosition >= ElevatorStates.MAX.armAngle) {
+            // posotive is up
+            motorSpeed = -0.1;
+        } else if(armPosition <= ElevatorStates.MIN.armAngle) {
+            motorSpeed = 0.1;
+        } else if(!override) {
+            motorSpeed = armPID.calculate(armPosition) + armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getVelocity().getValueAsDouble());
         }
 
-       // armMotor.set(motorOutput + addMotor);
+        armMotor.set(motorSpeed);
         setSmartdashboard();
     }
 
-    public void setMotorSpeed(double speed) {
-        addMotor = speed;
+    public void setArmState(ElevatorStates state) {
+        this.state = state;
+        armPID.setSetpoint(state.armAngle);
     }
 
-    public void setArmPosition(double armAngle) {
-        goalPosition = armAngle;
-        armPID.setSetpoint(goalPosition);
+    public void setIndexState(IndexStates state) {
+        indexingMotor.set(state.speed);
+        this.indexState = state;
     }
 
-    public void setIntakeSpeed(double speed) {
-        intakeMotor.set(speed);
+    public void setOverride(double motorSpeed, boolean override) {
+        this.override = override;
+        this.motorSpeed = motorSpeed;
     }
-
-    private double getCurrentAngle() {
-        return Units.rotationsToDegrees(armEncoder.get()) - 87;
-    }
-
-    private void disableSubsystem() {
-        armMotor.disable();
-        intakeMotor.disable();
-    }
-
+    
     private void setSmartdashboard() {
-        SmartDashboard.putNumber("Intake Arm Angle", currentAngle);
-        SmartDashboard.putNumber("Intake Arm Motor Output", motorOutput);
-        SmartDashboard.putNumber("Intake Arm Goal Angle", goalPosition);
-
-        SmartDashboard.putBoolean("Intake Arm In Bounds", inBounds);
+        SmartDashboard.putString("Arm Subsytem index state", indexState.toString());
+        SmartDashboard.putString("Arm Subsystem arm state ", state.toString());
+        SmartDashboard.putNumber("Arm Subsystem position", armPosition);
+        SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
+        SmartDashboard.putNumber("Arm Subsystem arm position goal", state.armAngle);
     }
 }
-

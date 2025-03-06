@@ -1,106 +1,79 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Utils;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.lib.util.SparkFlexUtil;
+import frc.lib.util.Utilities;
+import frc.lib.util.SparkFlexUtil.Usage;
 import frc.robot.Constants;
-import frc.robot.Constants.InnerElevatorConsts;
 import frc.robot.States.ElevatorStates;
 
-public class InnerElevatorSubsystem extends SubsystemBase{
+public class InnerElevatorSubsystem extends SubsystemBase {
     private final SparkFlex elevatorMotor;
     private final PIDController elevatorPID;
-    private final ElevatorFeedforward elevatorFeedForward;
-    private final RelativeEncoder elevatorEncoder; 
-
-    private double motorOutput;
+   // private final ArmFeedforward armFeedforward;
+    //private final SparkAbsoluteEncoder elevatorEncoder;
+    private final RelativeEncoder elevatorEncoder;
+    private ElevatorStates state;
+    private double currentPosition; 
+    private double motorSpeed;
     private boolean inBounds;
-    private double currentHeight;
-    private double goalPosition;
-    private double addMotor = 0; //idc bout allocation arlen
 
-    public InnerElevatorSubsystem() {   
+    public InnerElevatorSubsystem() {
+        this.state = ElevatorStates.STARTING_POSITION;
         elevatorMotor = new SparkFlex(Constants.InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
+        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kCoast, false, false);
+        //elevatorEncoder = elevatorMotor.getAbsoluteEncoder();
         elevatorEncoder = elevatorMotor.getEncoder();
-
-        elevatorPID = new PIDController(InnerElevatorConsts.kP, InnerElevatorConsts.kI, InnerElevatorConsts.kD);
-        elevatorFeedForward = new ElevatorFeedforward(InnerElevatorConsts.kS, InnerElevatorConsts.kG, InnerElevatorConsts.kV);
-
-        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
-        //disableSubsystem();
-
+        elevatorPID = new PIDController(Constants.InnerElevatorConsts.kP, Constants.InnerElevatorConsts.kI, Constants.InnerElevatorConsts.kD);
+        setInnerElevatorState(state);
     }
 
     @Override
     public void periodic() {
-        currentHeight = getHeight();
+        currentPosition = elevatorEncoder.getPosition() + 20; 
         inBounds = false;
 
-        if(currentHeight > ElevatorStates.MAX.innerHeight) {
-            motorOutput = -0.05;
-        } else if(currentHeight < ElevatorStates.MIN.innerHeight) {
-            motorOutput = 0.05;
+        if(currentPosition >= ElevatorStates.MAX.innerHeight) {
+            // positive goes up 
+            motorSpeed = -0.1;
+        } else if (currentPosition <= ElevatorStates.MIN.innerHeight) {
+            motorSpeed = 0.1;
         } else {
-            motorOutput = elevatorPID.calculate(currentHeight)
-                + elevatorFeedForward.calculate(elevatorPID.getSetpoint(), elevatorMotor.getEncoder().getVelocity());
-            //elevatorPID.calculate(currentHeight) +
-            // if (motorOutput < -0.1) {
-            //     motorOutput *= 0.2;
-            // }   
-            inBounds = true;
+            motorSpeed = elevatorPID.calculate(currentPosition) + 0.05;
+            if(motorSpeed > -0.1) {
+                motorSpeed *= 0.2;
+            }
         }
-        
-       // elevatorMotor.set(motorOutput + addMotor);
+
+        elevatorMotor.set(motorSpeed);
         setSmartdashboard();
     }
 
-    public void setMotorSpeed(double speed) {
-        addMotor = speed;
-        //elevatorMotor.set(motorOutput);
-    }
-
-    public void setInnerElevatorHeight(double innerHeight) {
-        goalPosition = innerHeight;
-        elevatorPID.setSetpoint(goalPosition);
-    }
-
-    public void setInnerElevatorHeight(double innerHeight, boolean isABS) {
-        if(isABS) {
-            setInnerElevatorHeight(innerHeight);
-        } else {
-            setInnerElevatorHeight(relToABSHeight(innerHeight));
-        }
-    }
-
-    public double getHeight() {
-        return elevatorEncoder.getPosition() + 18;
-    }
-
-    public double getRelativeHeight() {
-        return (getHeight() - ElevatorStates.MIN.innerHeight) / (ElevatorStates.MAX.innerHeight - ElevatorStates.MIN.innerHeight);
-    }
-
-    public double relToABSHeight(double relativeHeight) {
-        return (ElevatorStates.MAX.innerHeight - ElevatorStates.MIN.innerHeight) * relativeHeight + ElevatorStates.MIN.innerHeight;
-    }
-
-    private void disableSubsystem() {
-        elevatorMotor.disable();
+    public void setInnerElevatorState(ElevatorStates state) {
+        this.elevatorPID.setSetpoint(state.innerHeight);
+        this.state = state;
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.putNumber("Inner Elevator Current Height", currentHeight);
-        SmartDashboard.putNumber("Inner Elevator Goal Position", goalPosition);
-        SmartDashboard.putNumber("Inner Elevator Relative Height", getRelativeHeight());
-        SmartDashboard.putNumber("Inner Elevator Motor Output", motorOutput);
-        
-        SmartDashboard.putBoolean("Inner Elevator In Bounds", inBounds);
+        SmartDashboard.putString("Inner elevator state", state.toString());
+        SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
+        SmartDashboard.putNumber("Inner elevator speed", motorSpeed);
+        SmartDashboard.putNumber("Inner elevator posotion ", currentPosition);
+        SmartDashboard.putNumber("Inner elevator goal position", state.innerHeight);
     }
 }

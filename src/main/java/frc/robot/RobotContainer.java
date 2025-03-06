@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -28,14 +29,15 @@ import frc.robot.Constants.PhotonConsts;
 
 import frc.robot.States.ClimbStates;
 import frc.robot.States.ElevatorStates;
-
+import frc.robot.States.IndexStates;
 import frc.robot.commands.ClimbCommand;
+//import frc.robot.commands.DriveVelCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IntakeCommand;
-
 import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+//import frc.robot.subsystems.DriveVelSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
@@ -63,7 +65,7 @@ public class RobotContainer {
     private final CommandXboxController driver0 = new CommandXboxController(0);
     private final CommandXboxController driver1 = new CommandXboxController(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+    
     //put choreo
     //private final AutoChooser autoChooser = new AutoChooser();
     private SendableChooser<Command> m_chooser;
@@ -73,20 +75,28 @@ public class RobotContainer {
     private final InnerElevatorSubsystem s_innerElevatorSubsystem = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArmSubsystem = new IntakeArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
+   // private final DriveVelSubsystem s_driveVelSubsystem = new DriveVelSubsystem(driver0, drivetrain, drive);
 
     //** Command Handlers **//
     private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_innerElevatorSubsystem, s_primaryElevatorSubsystem, s_intakeArmSubsystem);
-    private final IntakeCommand ch_intakeCommandHandler = new IntakeCommand(s_intakeArmSubsystem);
     private final ClimbCommand ch_climbCommandHandler = new ClimbCommand(s_climbSubsystem);
+    private final IntakeCommand ch_intakeCommandHandler = new IntakeCommand(s_intakeArmSubsystem);
+    //private final DriveVelCommand ch_driveVelCommand = s_driveVelSubsystem.getCommands();
 
     //** Commands **//
-
+    private final SequentialCommandGroup score = new SequentialCommandGroup(
+        new InstantCommand(() -> s_intakeArmSubsystem.setOverride(-0.3, true)),
+        ch_intakeCommandHandler.setIntakeState(IndexStates.FEED_OUT),
+        new WaitCommand(0.3),
+        new InstantCommand(() -> s_intakeArmSubsystem.setOverride(0, false)),
+        ch_intakeCommandHandler.setIntakeState(IndexStates.STOP)
+    );
     //goHome = new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_ABS);
 
     //private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
    // private final PhotonCommand photonCommand = photonSubsystem.getCommands();
 
-    //logging vars
+    //logging vars 
    /// private boolean isTrackingAprilTag = false;
 
     public RobotContainer() {
@@ -97,12 +107,25 @@ public class RobotContainer {
     }
 
     private void configureDriveBindings() {
-        drivetrain.setDefaultCommand(
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-                    .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed * 0.4) // Drive left with negative X (left)
-                    .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate * 0.4 ) // Drive counterclockwise with negative X (left)
-        ));
+
+         drivetrain.setDefaultCommand(
+        //    // ch_driveVelCommand.setDrive()
+            
+        //     // new SequentialCommandGroup(
+        //     //     new InstantCommand(() -> {
+        //     //         driveVelX = driver0.getLeftX();
+        //     //         driveVelY = driver0.getLeftY();
+        //     //     }),
+                 drivetrain.applyRequest(() ->
+                     drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+                         .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed * 0.4) // Drive left with negative X (left)
+                         .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate * 0.4 ))// Drive counterclockwise with negativeX (left)
+        //     //     new InstantCommand(() -> {
+        //     //         driveVelX = driveVelX * velFriction;
+        //     //         driveVelY = driveVelY * velFriction;
+        //     //     })
+        //     // )
+         );
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
@@ -119,29 +142,37 @@ public class RobotContainer {
         // driver1.b().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
 
         //elevator system
-        driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME, true));
-        driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME, false));
-        driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1, false));
-        driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2, false));
-        driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3, false));
+       // driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
+        driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
+        ///driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.SIGMA));
+        driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
+        driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
+
+        driver1.rightTrigger().onTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE));
+        driver1.rightTrigger().onFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
+
+        driver1.leftTrigger().onTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.FEED_OUT));
+        driver1.leftTrigger().onFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
+
+        driver1.y().onTrue(score);
 
         // driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
-        // driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
+        // driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME))H;
         // driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
         // driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
         // driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
 
-        driver1.leftBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0.05);}));
-        driver1.leftBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
+        // driver1.leftBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0.05);}));
+        // driver1.leftBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
 
-        driver1.rightBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(-0.05);}));
-        driver1.rightBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
+        // driver1.rightBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(-0.05);}));
+        // driver1.rightBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
 
-        driver1.leftTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0.05);}));
-        driver1.leftTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
+        // driver1.leftTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0.05);}));
+        // driver1.leftTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
 
-        driver1.rightTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(-0.05);}));
-        driver1.rightTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
+        // driver1.rightTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(-0.05);}));
+        // driver1.rightTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
     }
 
     public Command getAutonomousCommand() {

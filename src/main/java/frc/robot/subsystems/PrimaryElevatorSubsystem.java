@@ -1,12 +1,16 @@
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.PrimaryElevatorConsts;
+
+import frc.robot.Constants;
 import frc.robot.States.ElevatorStates;
 
 public class PrimaryElevatorSubsystem extends SubsystemBase {
@@ -14,86 +18,55 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     private final TalonFX rightElevatorMotor;
     private final PIDController elevatorPID;
 
-    private boolean inBounds;
+    private ElevatorStates state;
+    private double currentHeight; 
     private double motorOutput;
-    private double currentHeight;
-    private double goalPosition;
+    private boolean inBounds;
 
     public PrimaryElevatorSubsystem() {
-        //motor configurations? and initializations
-        leftElevatorMotor = new TalonFX(PrimaryElevatorConsts.leftElevatorMotorID);
-        rightElevatorMotor = new TalonFX(PrimaryElevatorConsts.rightElevatorMotorID);
-        elevatorPID = new PIDController(PrimaryElevatorConsts.kP, PrimaryElevatorConsts.kI, PrimaryElevatorConsts.kD);
-        
-        //config
+        this.state = ElevatorStates.STARTING_POSITION;
+        leftElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.leftElevatorMotorID);
+        rightElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.rightElevatorMotorID);  
+        elevatorPID = new PIDController(Constants.PrimaryElevatorConsts.kP, Constants.PrimaryElevatorConsts.kI, Constants.PrimaryElevatorConsts.kD);
+
+        setElevatorState(state);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
-        disableSubsystem();
     }
-    
+
     @Override
     public void periodic() {
-        currentHeight = getHeight();
-        inBounds = false;
+       currentHeight = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
 
-        // move out of the min and max zones 
-        if(currentHeight < ElevatorStates.MIN.primaryHeight) {
+        inBounds = false;
+        if(currentHeight >= ElevatorStates.MAX.primaryHeight) {
+            motorOutput = -0.1;
+        } else if(currentHeight <= ElevatorStates.MIN.primaryHeight ) {
             motorOutput = 0.1;
-        }
-        else if(currentHeight > ElevatorStates.MAX.primaryHeight) {
-            motorOutput = -0.1; 
         } else {
-            motorOutput = elevatorPID.calculate(currentHeight);
             inBounds = true;
+            motorOutput = elevatorPID.calculate(currentHeight);
         }
-        
-        //leftElevatorMotor.set(motorOutput);
-        //rightElevatorMotor.set(motorOutput);
+
+        setElevatorSpeed(motorOutput);
         setSmartdashboard();
     }
 
-    public void setMotorSpeed(double speed) {
-        //leftElevatorMotor.set(speed);
-        //rightElevatorMotor.set(speed);
-    }
-
-    public void setPrimaryElevatorHeight(double primaryHeight) {
-        goalPosition = primaryHeight;
-        elevatorPID.setSetpoint(goalPosition);
-    }
-
-    public void setPrimaryElevatorHeight(double primaryHeight, boolean isABS) {
-        if(isABS) {
-            setPrimaryElevatorHeight(primaryHeight);
-        } else {
-            setPrimaryElevatorHeight(relToABSHeight(primaryHeight));
-        }
-    }
-
-    public double getHeight() {
-        return rightElevatorMotor.getPosition().getValueAsDouble() + 17.3;
-    }
-
-    public double getRelativeHeight() {
-        return (getHeight() - ElevatorStates.MIN.primaryHeight) / (ElevatorStates.MAX.primaryHeight - ElevatorStates.MIN.primaryHeight);
-    }
-
-    private double relToABSHeight(double relativeHeight) {
-        return (ElevatorStates.MAX.primaryHeight - ElevatorStates.MIN.primaryHeight) * relativeHeight + ElevatorStates.MIN.primaryHeight;
-    }
-
-    private void disableSubsystem() {
-        leftElevatorMotor.disable();
-        rightElevatorMotor.disable();
+    public void setElevatorState(ElevatorStates state) {
+        this.elevatorPID.setSetpoint(state.primaryHeight);
+        this.state = state;
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.putNumber("Primary Elevator Motor Output", motorOutput);
-        SmartDashboard.putNumber("Primary Elevator Current Height", currentHeight);
-        SmartDashboard.putNumber("Primary Elevator Relative Height", getRelativeHeight());
-        SmartDashboard.putNumber("Primary Elevator Goal Height", goalPosition);
+        SmartDashboard.putString("Primary elevator state", state.toString());
+        SmartDashboard.putNumber("Primary elevator goal position", state.primaryHeight);
+        SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
+        SmartDashboard.putNumber("Primary elevator speed", motorOutput);
+        SmartDashboard.putNumber("Primary elevator position ", currentHeight);
+    }
 
-        SmartDashboard.putBoolean("Primary Elevator In Bounds", inBounds);
+    private void setElevatorSpeed(double motor) {
+        leftElevatorMotor.set(motor);
+        rightElevatorMotor.set(motor);
     }
 }
-
