@@ -69,6 +69,10 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         this.state = state;
     }
 
+    public double distanceFromSetpoint() {
+        return state.innerHeight - this.currentPosition;
+    }
+
     private void setSmartdashboard() {
         SmartDashboard.putString("Inner elevator state", state.toString());
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);

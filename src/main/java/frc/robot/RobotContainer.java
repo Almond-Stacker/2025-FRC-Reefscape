@@ -34,7 +34,9 @@ import frc.robot.commands.ClimbCommand;
 //import frc.robot.commands.DriveVelCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.PhotonCommand;
 import frc.robot.subsystems.IntakeArmSubsystem;
+import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 //import frc.robot.subsystems.DriveVelSubsystem;
@@ -93,8 +95,8 @@ public class RobotContainer {
     );
     //goHome = new ElevatorCommandHandler(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_ABS);
 
-    //private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
-   // private final PhotonCommand photonCommand = photonSubsystem.getCommands();
+    private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
+    private final PhotonCommand photonCommand = photonSubsystem.getCommands();
 
     //logging vars 
    /// private boolean isTrackingAprilTag = false;

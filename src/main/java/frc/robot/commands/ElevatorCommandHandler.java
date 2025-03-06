@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.States.ElevatorStates;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.IntakeArmSubsystem;
@@ -16,7 +17,7 @@ public class ElevatorCommandHandler {
     private final IntakeArmSubsystem intakeArmSubsystem;
 
     private ElevatorStates state;
-    private Command command; 
+    private SequentialCommandGroup command; 
 
     public ElevatorCommandHandler(InnerElevatorSubsystem innerElevatorSubsystem, PrimaryElevatorSubsystem primaryElevatorSubsystem, IntakeArmSubsystem intakeArmSubsystem) {
         this.innerElevatorSubsystem = innerElevatorSubsystem;
@@ -24,9 +25,15 @@ public class ElevatorCommandHandler {
         this.intakeArmSubsystem = intakeArmSubsystem;
     }
 
-    public Command setElevators(ElevatorStates elevatorStates) {
+    public SequentialCommandGroup setElevators(ElevatorStates elevatorStates) {
+        if(state.innerHeight < ElevatorStates.CRITICAL_POINT.innerHeight && 
+                state.armAngle > ElevatorStates.CRITICAL_POINT.armAngle &&
+                elevatorStates.armAngle < ElevatorStates.CRITICAL_POINT.armAngle) {
+
+        } else {
+            command = new SequentialCommandGroup(new InstantCommand(() -> setElevatorStates(elevatorStates)));
+        }
         this.state = elevatorStates;
-        command = new InstantCommand(() -> setElevatorStates(elevatorStates));
         return command;
     }
 
@@ -38,5 +45,9 @@ public class ElevatorCommandHandler {
         innerElevatorSubsystem.setInnerElevatorState(state);
         primaryElevatorSubsystem.setElevatorState(state);
         intakeArmSubsystem.setArmState(state);
+    }
+
+    private SequentialCommandGroup criticalPointCommand() {
+
     }
 }
