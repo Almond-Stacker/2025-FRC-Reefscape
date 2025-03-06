@@ -34,18 +34,19 @@ public class InnerElevatorSubsystem extends SubsystemBase {
     private boolean inBounds;
 
     public InnerElevatorSubsystem() {
-        this.state = ElevatorStates.STARTING_POSITION;
         elevatorMotor = new SparkFlex(Constants.InnerElevatorConsts.elevatorMotorID, MotorType.kBrushless);
-        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kCoast, false, false);
+        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
         //elevatorEncoder = elevatorMotor.getAbsoluteEncoder();
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorPID = new PIDController(Constants.InnerElevatorConsts.kP, Constants.InnerElevatorConsts.kI, Constants.InnerElevatorConsts.kD);
-        setInnerElevatorState(state);
+
+       // state = ElevatorStates.STARTING_POSITION;
+        currentPosition = 0; 
     }
 
     @Override
     public void periodic() {
-        currentPosition = elevatorEncoder.getPosition() + 20; 
+        currentPosition = getHeight(); 
         inBounds = false;
 
         if(currentPosition >= ElevatorStates.MAX.innerHeight) {
@@ -55,7 +56,7 @@ public class InnerElevatorSubsystem extends SubsystemBase {
             motorSpeed = 0.1;
         } else {
             motorSpeed = elevatorPID.calculate(currentPosition) + 0.05;
-            if(motorSpeed > -0.1) {
+            if(motorSpeed < -0.1) {
                 motorSpeed *= 0.2;
             }
         }
@@ -64,20 +65,31 @@ public class InnerElevatorSubsystem extends SubsystemBase {
         setSmartdashboard();
     }
 
-    public void setInnerElevatorState(ElevatorStates state) {
-        this.elevatorPID.setSetpoint(state.innerHeight);
-        this.state = state;
+    public void setInnerElevatorState(double height) {
+        this.elevatorPID.setSetpoint(height);
+        //this.state = state;
     }
 
     public double distanceFromSetpoint() {
+        if(state == null) {
+            return 0.0;
+        }
         return state.innerHeight - this.currentPosition;
     }
 
+    public double getPIDGoal() {
+        return elevatorPID.getSetpoint();
+    }
+
+    public double getHeight() {
+        return elevatorEncoder.getPosition() + 20;
+    }
+
     private void setSmartdashboard() {
-        SmartDashboard.putString("Inner elevator state", state.toString());
+      //  SmartDashboard.putString("Inner elevator state", state.toString());
         SmartDashboard.putBoolean("Inner elevator in bounds", inBounds);
         SmartDashboard.putNumber("Inner elevator speed", motorSpeed);
         SmartDashboard.putNumber("Inner elevator posotion ", currentPosition);
-        SmartDashboard.putNumber("Inner elevator goal position", state.innerHeight);
+        SmartDashboard.putNumber("Inner elevator goal position", elevatorPID.getSetpoint());
     }
 }

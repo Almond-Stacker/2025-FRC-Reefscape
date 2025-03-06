@@ -24,12 +24,12 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     private boolean inBounds;
 
     public PrimaryElevatorSubsystem() {
-        this.state = ElevatorStates.STARTING_POSITION;
         leftElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.leftElevatorMotorID);
         rightElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.rightElevatorMotorID);  
         elevatorPID = new PIDController(Constants.PrimaryElevatorConsts.kP, Constants.PrimaryElevatorConsts.kI, Constants.PrimaryElevatorConsts.kD);
-
-        setElevatorState(state);
+        
+       // state = ElevatorStates.STARTING_POSITION;
+       // setElevatorState(state);
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
         rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -58,8 +58,8 @@ public class PrimaryElevatorSubsystem extends SubsystemBase {
     }
 
     private void setSmartdashboard() {
-        SmartDashboard.putString("Primary elevator state", state.toString());
-        SmartDashboard.putNumber("Primary elevator goal position", state.primaryHeight);
+       // SmartDashboard.putString("Primary elevator state", state.toString());
+        SmartDashboard.putNumber("Primary elevator goal position", elevatorPID.getSetpoint());
         SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
         SmartDashboard.putNumber("Primary elevator speed", motorOutput);
         SmartDashboard.putNumber("Primary elevator position ", currentHeight);

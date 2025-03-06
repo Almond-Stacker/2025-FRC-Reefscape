@@ -31,7 +31,7 @@ public class Constants {
         //temopory estamate, although resonable value?
         //smaller the better, however don't want occelations 
         public static final double PID_TOLERANCE = 10;
-        public static final double kP = 0.02;
+        public static final double kP = 0.03;
         public static final double kI = 0;
         public static final double kD = 0;
         
@@ -43,9 +43,9 @@ public class Constants {
     public static final class InnerElevatorConsts {
         public static final int elevatorMotorID = 22;
 
-        public static final double kP = 0.12;
+        public static final double kP = 0.32;
         public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double kD = 0.003;
 
         public static final double kS = 0;
         public static final double kG = 0.01;
@@ -58,15 +58,15 @@ public class Constants {
     public static final class IntakeArmConsts {
         public static final int armMotorID = 16;
         public static final int encoderID = 0;
-        public static final int suckMotorID = 25;
+        public static final int suckMotorID = 25;   
         public static final double OUT_TIMEOUT = 1;//one second 
 
-        public static final double kP = 0.01;
+        public static final double kP = 0.012;
         public static final double kI = 0;
-        public static final double kD = 0;
+        public static final double kD = 0.;
         public static final TrapezoidProfile.Constraints PROFILE = new TrapezoidProfile.Constraints(0.1, 0.03);
         public static final double kS = 0;
-        public static final double kG = 0.015;
+        public static final double kG = 0.003;
         public static final double kV = 0;
     }
 

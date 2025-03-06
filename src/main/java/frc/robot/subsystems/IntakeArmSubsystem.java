@@ -41,15 +41,15 @@ public class IntakeArmSubsystem extends SubsystemBase {
         armFeedforward = new ArmFeedforward(Constants.IntakeArmConsts.kS, Constants.IntakeArmConsts.kG, Constants.IntakeArmConsts.kV);
         armPID = new PIDController(Constants.IntakeArmConsts.kP, Constants.IntakeArmConsts.kI, Constants.IntakeArmConsts.kD);
 
-        state = ElevatorStates.STARTING_POSITION;
+       // state = ElevatorStates.STARTING_POSITION;
         indexState = IndexStates.STOP;
         setIndexState(indexState);
-        setArmState(state);
+       // setArm(state.armAngle);
     }
 
     @Override
     public void periodic() {
-        armPosition = Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
+        armPosition = getAngle();
         
         if(armPosition >= ElevatorStates.MAX.armAngle) {
             // posotive is up
@@ -64,9 +64,9 @@ public class IntakeArmSubsystem extends SubsystemBase {
         setSmartdashboard();
     }
 
-    public void setArmState(ElevatorStates state) {
-        this.state = state;
-        armPID.setSetpoint(state.armAngle);
+    public void setArm(double angle) {
+        //this.state = state;
+        armPID.setSetpoint(angle);
     }
 
     public void setIndexState(IndexStates state) {
@@ -78,12 +78,20 @@ public class IntakeArmSubsystem extends SubsystemBase {
         this.override = override;
         this.motorSpeed = motorSpeed;
     }
+
+    public double getAngle() {
+        return Units.rotationsToDegrees(armEncoder.get() - Units.degreesToRotations(87));
+    }
+    
+    public double getPIDGoal() {
+        return armPID.getSetpoint();
+    }
     
     private void setSmartdashboard() {
         SmartDashboard.putString("Arm Subsytem index state", indexState.toString());
-        SmartDashboard.putString("Arm Subsystem arm state ", state.toString());
-        SmartDashboard.putNumber("Arm Subsystem position", armPosition);
+      //  SmartDashboard.putString("Arm Subsystem arm state ", state.toString());
+        SmartDashboard.putNumber("Arm Subsystem position", getAngle());
         SmartDashboard.putNumber("Arm Subsystem motor speed", motorSpeed);
-        SmartDashboard.putNumber("Arm Subsystem arm position goal", state.armAngle);
+        SmartDashboard.putNumber("Arm Subsystem arm position goal", armPID.getSetpoint());
     }
 }

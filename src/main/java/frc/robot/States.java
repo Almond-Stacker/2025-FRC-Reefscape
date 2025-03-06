@@ -7,17 +7,17 @@ import frc.robot.States.ElevatorStates;
 public class States {
 
     public enum ElevatorStates {
-        MIN(0, 3.211, 65),
-        MAX(112 , 25,220),
-        STARTING_POSITION(0.01, 19.3,71),
-        PRE_INTAKE(0.01, 24.48, 71),
-        INTAKE(0, 23.40, 71),
+        MIN(0, 3.211, 55),
+        MAX(112 , 26,220),
+        STARTING_POSITION(0.01, 23,71),
+        PRE_INTAKE(61.55, 23.5, 90),
+        INTAKE(61.55, 21, 61),
        // SIGMA(0, 20, 70),
         //L1(0,2.15,210),-
 
         L2(1,7.416,203),
-        L3(23.9, 24.7, 200),
-        L4(108.5, 24.6, 210),
+        L3(23.9, 23.5, 200),
+        L4(108.5, 23.5, 210),
         CRITICAL_POINT(0,20.3, 80);
         /* 
         MIN(1, 1.2, 65),
@@ -29,6 +29,7 @@ public class States {
         INTAKE(0,18.5,71),
         L1(0,0,0),
         L2(0,1.25,210),
+
         L3(0, 20, 217),
         L4(105, 23, 195);
         */
@@ -74,7 +75,8 @@ public class States {
         // allow for easy changing of elevator states 
         STOP(0),
         INTAKE(1),
-        FEED_OUT(-1);
+        FEED_OUT(-1),
+        HOLD(0.4);
 
         public final double speed;
 
