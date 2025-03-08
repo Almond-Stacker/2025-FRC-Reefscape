@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import javax.xml.catalog.GroupEntry.PreferType;
+import org.photonvision.proto.Photon;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -14,6 +14,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.SerialPort.StopBits;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -37,7 +38,9 @@ import frc.robot.commands.ElevatorCommandHandler;
 //import frc.robot.commands.DriveVelCommand;
 //import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.positionRelativeToAprilTag;
 import frc.robot.subsystems.IntakeArmSubsystem;
+import frc.robot.subsystems.PhotonSubsystem1;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 //import frc.robot.subsystems.DriveVelSubsystem;
@@ -78,6 +81,10 @@ public class RobotContainer {
     private final InnerElevatorSubsystem s_innerElevatorSubsystem = new InnerElevatorSubsystem();
     private final IntakeArmSubsystem s_intakeArmSubsystem = new IntakeArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
+    private final PhotonSubsystem1 sigma = new PhotonSubsystem1("gray_photon_camera", Units.inchesToMeters(10), 0);
+    private final PhotonSubsystem1 graySigma = new PhotonSubsystem1("blue_photon_camera",Units.inchesToMeters(10), 0);
+    private final positionRelativeToAprilTag spot = new positionRelativeToAprilTag(graySigma, drivetrain);
+    private final positionRelativeToAprilTag spot1 = new positionRelativeToAprilTag(sigma, drivetrain);
    // private final DriveVelSubsystem s_driveVelSubsystem = new DriveVelSubsystem(driver0, drivetrain, drive);
 
     //** Command Handlers **//
@@ -158,6 +165,8 @@ public class RobotContainer {
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
+        driver0.y().whileTrue(spot);
+        driver0.x().whileTrue(spot1);
 
         // reset the field-centric heading on left bumper press
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

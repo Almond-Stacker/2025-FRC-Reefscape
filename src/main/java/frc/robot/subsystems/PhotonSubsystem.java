@@ -27,14 +27,14 @@
 
 // //built for multiple cameras, finds average pose of every reading then 
 // public class PhotonSubsystem extends SubsystemBase {
-//     private PhotonCommand commands;
 //     private CommandSwerveDrivetrain drivetrain;
 
 //     private Matrix<N3, N1> curStdDevs = PhotonConsts.SINGLE_STD_DEVS; // dynamic standard deviation
 
 //     private List<PhotonCamera> cameras; // pain transforms and cameras later
 //     private List<Transform3d> cameraToRobotTransforms;
-//     private Pose3d collectiveEstimatedPose = new Pose3d();
+//     private Optional<Pose3d> cameraPose = Optional.of(new Pose3d());
+//     private int targetID;
 
 //     private double lastUpdateTime = 0;
 //     private Optional<Pose3d> lastEstimatedPose = Optional.empty();
@@ -49,9 +49,8 @@
 //         this.cameras = cameraNames.stream().map(PhotonCamera::new).toList();
 
 //         this.drivetrain = drivetrain;
-//         commands = new PhotonCommand(this, drivetrain);
 
-//         this.closestValidTarget = Optional.empty();
+//         //this.closestValidTarget = Optional.empty();
 //     }
 
 //     //for swerve drive estimator type stuff
@@ -75,108 +74,165 @@
 //         double avgDist = 0;//for standard deviation
 //         int validPoseCount = 0; //for average pose among cameras, could also just get best target overall and best camera
 //         int index = 0;//which cam for pose transforms
-//         collectiveEstimatedPose = null;
+//         //collectiveEstimatedPose = null;
 
 //         double currentTime = Timer.getFPGATimestamp();
 
-//         poseExist = false;
 //         targetExist = false;
 //         for(PhotonCamera cam : cameras) {
 //             List<PhotonPipelineResult> results = cam.getAllUnreadResults();
+           
 //             for(PhotonPipelineResult result : results) {
-//                 //check if targets are resonable
-//                 List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
-//                     .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
-//                     .toList();
 
-//                 SmartDashboard.putNumber("amt Targets", filteredTargets.size());
+//                 List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
+//                             .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
+//                             .toList();
 
 //                 for(PhotonTrackedTarget target : filteredTargets) {
 //                     targetExist = true;
-//                     //Optional<Pose3d> tagPoseOpt = PhotonConsts.aprilTagFieldLayout.getTagPose(target.getFiducialId());
-//                     //check if pose was resonable
-//                     //if(tagPoseOpt.isPresent()) {
-//                     poseExist = true;
-//                     //transforms here to utalize index, consider creating a higher level pose handler
-//                     //Pose3d tagPose = tagPoseOpt.get();
-//                     // SmartDashboard.putNumber("TAG POSE X", tagPose.getX());
-//                     // SmartDashboard.putNumber("TAG POSE Y", tagPose.getY());
-//                     Pose3d cameraPose = new Pose3d().transformBy(target.getBestCameraToTarget().inverse());
-//                     //Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget());
-//                     //Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index));
 
-//                     double targetDistance = cameraPose.toPose2d().getTranslation().getNorm();
-//                     setClosestTarget(targetDistance, target.getFiducialId());
+//                     Pose3d tempCameraPose = new Pose3d().transformBy(cameraToRobotTransforms.get(index));
+//                     int currentTarget = target.getFiducialId();
 
-//                     avgDist += targetDistance;
-//                     addedPose = new Pose3d(
-//                         addedPose.getX() + cameraPose.getX(),
-//                         addedPose.getY() + cameraPose.getY(),
-//                         addedPose.getZ() + cameraPose.getZ(),
-//                         new Rotation3d(
-//                             addedPose.getRotation().getX() + cameraPose.getRotation().getX(),
-//                             addedPose.getRotation().getY() + cameraPose.getRotation().getY(),
-//                             addedPose.getRotation().getZ() + cameraPose.getRotation().getZ()
-//                         )
-//                     );
+//                     double dist = tempCameraPose.toPose2d().getTranslation().getNorm();
+//                     avgDist += dist;
+//                     setClosestTarget(dist, currentTarget);
 
-//                     validPoseCount++;
-//                     //}
+//                     if(currentTarget == targetID) {
+//                         addedPose = new Pose3d(
+//                             addedPose.getX() + tempCameraPose.getX(),
+//                             addedPose.getY() + tempCameraPose.getY(),
+//                             addedPose.getZ() + tempCameraPose.getZ(),
+//                             new Rotation3d(
+//                                 addedPose.getRotation().getX() + tempCameraPose.getRotation().getX(),
+//                                 addedPose.getRotation().getY() + tempCameraPose.getRotation().getY(),
+//                                 addedPose.getRotation().getZ() + tempCameraPose.getRotation().getZ()
+//                             )
+//                         );
+//                         validPoseCount++;
+//                     }
+                    
 //                 }
+//                 index++;
+//             }
+
+//             if(validPoseCount > 0) {
+//                 updateEstimationStdDevs(index, avgDist);
+//                 lastUpdateTime = currentTime; 
+
+//                 cameraPose = Optional.of(new Pose3d(
+//                     addedPose.getX() / validPoseCount,
+//                     addedPose.getY() / validPoseCount,
+//                     addedPose.getZ() / validPoseCount,
+//                     new Rotation3d(
+//                         addedPose.getRotation().getX() / validPoseCount,
+//                         addedPose.getRotation().getY() / validPoseCount,
+//                         addedPose.getRotation().getZ() / validPoseCount
+//                     )
+//                 ));
 
 //             }
-//             index++;
 //         }
+           
+           
+//             // for(PhotonPipelineResult result : results) {
+//         //         //check if targets are resonable
+//         //         List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
+//         //             .filter(target -> target.getPoseAmbiguity() < PhotonConsts.MIN_AMBIGUITY)
+//         //             .toList();
 
-//         if(validPoseCount > 0) {
+//         //         SmartDashboard.putNumber("amt Targets", filteredTargets.size());
+
+//         //         for(PhotonTrackedTarget target : filteredTargets) {
+//         //             targetExist = true;
+//         //             //Optional<Pose3d> tagPoseOpt = PhotonConsts.aprilTagFieldLayout.getTagPose(target.getFiducialId());
+//         //             //check if pose was resonable
+//         //             //if(tagPoseOpt.isPresent()) {
+//         //             poseExist = true;
+//         //             //transforms here to utalize index, consider creating a higher level pose handler
+//         //             //Pose3d tagPose = tagPoseOpt.get();
+//         //             // SmartDashboard.putNumber("TAG POSE X", tagPose.getX());
+//         //             // SmartDashboard.putNumber("TAG POSE Y", tagPose.getY());
+//         //             Pose3d cameraPose = new Pose3d().transformBy(target.getBestCameraToTarget().inverse());
+//         //             //Pose3d cameraPose = tagPose.transformBy(target.getBestCameraToTarget());
+//         //             //Pose3d transformedPose = cameraPose.transformBy(cameraToRobotTransforms.get(index));
+
+//         //             double targetDistance = cameraPose.toPose2d().getTranslation().getNorm();
+//         //             setClosestTarget(targetDistance, target.getFiducialId());
+
+//         //             avgDist += targetDistance;
+//         //             addedPose = new Pose3d(
+//         //                 addedPose.getX() + cameraPose.getX(),
+//         //                 addedPose.getY() + cameraPose.getY(),
+//         //                 addedPose.getZ() + cameraPose.getZ(),
+//         //                 new Rotation3d(
+//         //                     addedPose.getRotation().getX() + cameraPose.getRotation().getX(),
+//         //                     addedPose.getRotation().getY() + cameraPose.getRotation().getY(),
+//         //                     addedPose.getRotation().getZ() + cameraPose.getRotation().getZ()
+//         //                 )
+//         //             );
+
+//         //             validPoseCount++;
+//         //             //}
+//         //         }
+
+//         //     }
+//         //     index++;
+//         // }
+
+//         // if(validPoseCount > 0) {
             
-//             updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
-//             lastUpdateTime = currentTime;
+//         //     updateEstimationStdDevs(validPoseCount, avgDist / validPoseCount);
+//         //     lastUpdateTime = currentTime;
 
-//             collectiveEstimatedPose = new Pose3d(
-//                             addedPose.getX() / validPoseCount,
-//                             addedPose.getY() / validPoseCount,
-//                             addedPose.getZ() / validPoseCount,
-//                             new Rotation3d(
-//                                 addedPose.getRotation().getX() / validPoseCount,
-//                                 addedPose.getRotation().getY() / validPoseCount,
-//                                 addedPose.getRotation().getZ() / validPoseCount
-//                             )
-//                         );
-//             if(lastEstimatedPose.isPresent()) {
-//                 Pose3d lastPose = lastEstimatedPose.get();
+//         //     collectiveEstimatedPose = new Pose3d(
+//         //                     addedPose.getX() / validPoseCount,
+//         //                     addedPose.getY() / validPoseCount,
+//         //                     addedPose.getZ() / validPoseCount,
+//         //                     new Rotation3d(
+//         //                         addedPose.getRotation().getX() / validPoseCount,
+//         //                         addedPose.getRotation().getY() / validPoseCount,
+//         //                         addedPose.getRotation().getZ() / validPoseCount
+//         //                     )
+//         //                 );
+//         //     if(lastEstimatedPose.isPresent()) {
+//         //         Pose3d lastPose = lastEstimatedPose.get();
 
-//                 if(Math.abs(lastPose.getTranslation().getNorm() - collectiveEstimatedPose.getTranslation().getNorm()) > 0.3 
-//                     || Math.abs(lastPose.getRotation().getZ() - collectiveEstimatedPose.getRotation().getZ()) > 0.5) {
-//                         Rotation3d collectiveRotation = collectiveEstimatedPose.getRotation();
-//                         Rotation3d lastRotation = lastPose.getRotation();
+//         //         if(Math.abs(lastPose.getTranslation().getNorm() - collectiveEstimatedPose.getTranslation().getNorm()) > 0.3 
+//         //             || Math.abs(lastPose.getRotation().getZ() - collectiveEstimatedPose.getRotation().getZ()) > 0.5) {
+//         //                 Rotation3d collectiveRotation = collectiveEstimatedPose.getRotation();
+//         //                 Rotation3d lastRotation = lastPose.getRotation();
 
-//                         collectiveEstimatedPose = new Pose3d(
-//                             collectiveEstimatedPose.getX() + 0.01 * (collectiveEstimatedPose.getX() - lastPose.getX()),
-//                             collectiveEstimatedPose.getY() + 0.01 * (collectiveEstimatedPose.getY() - lastPose.getY()),
-//                             collectiveEstimatedPose.getZ() + 0.01 * (collectiveEstimatedPose.getZ() - lastPose.getZ()),
-//                             new Rotation3d(
-//                                 collectiveRotation.getX() + 0.01 * (collectiveRotation.getX() - lastRotation.getX()),
-//                                 collectiveRotation.getY() + 0.01 * (collectiveRotation.getY() - lastRotation.getY()),
-//                                 collectiveRotation.getZ() + 0.01 * (collectiveRotation.getZ() - lastRotation.getZ())
-//                             )
-//                         );
-//                 }
+//         //                 collectiveEstimatedPose = new Pose3d(
+//         //                     collectiveEstimatedPose.getX() + 0.01 * (collectiveEstimatedPose.getX() - lastPose.getX()),
+//         //                     collectiveEstimatedPose.getY() + 0.01 * (collectiveEstimatedPose.getY() - lastPose.getY()),
+//         //                     collectiveEstimatedPose.getZ() + 0.01 * (collectiveEstimatedPose.getZ() - lastPose.getZ()),
+//         //                     new Rotation3d(
+//         //                         collectiveRotation.getX() + 0.01 * (collectiveRotation.getX() - lastRotation.getX()),
+//         //                         collectiveRotation.getY() + 0.01 * (collectiveRotation.getY() - lastRotation.getY()),
+//         //                         collectiveRotation.getZ() + 0.01 * (collectiveRotation.getZ() - lastRotation.getZ())
+//         //                     )
+//         //                 );
+//         //         }
 
-//                 lastEstimatedPose = Optional.of(collectiveEstimatedPose);
-//             }
+//         //         lastEstimatedPose = Optional.of(collectiveEstimatedPose);
+//         //     }
 
-//             SmartDashboard.putNumber("valid Poses", validPoseCount);
+//         //     SmartDashboard.putNumber("valid Poses", validPoseCount);
         
-//         } else if (currentTime - lastUpdateTime > PhotonConsts.TIMEOUT_SUBSYSTEM) {
-//             collectiveEstimatedPose = null; //clear result if too great of time difference
-//             closestValidTarget = Optional.empty();
-//             lastEstimatedPose = Optional.empty();
-//             //no change to swerve pose
-//         }
+//         // } else if (currentTime - lastUpdateTime > PhotonConsts.TIMEOUT_SUBSYSTEM) {
+//         //     collectiveEstimatedPose = null; //clear result if too great of time difference
+//         //     closestValidTarget = Optional.empty();
+//         //     lastEstimatedPose = Optional.empty();
+//         //     //no change to swerve pose
+//         // }
 
-//         SmartDashboard.putNumber("Distance", avgDist);
-//         setSmartDashboard();
+//         // SmartDashboard.putNumber("Distance", avgDist);
+//         // setSmartDashboard();
+//     }
+
+//     public void setTarget(int targetID) {
+//         this.targetID = targetID;
 //     }
 
 //     //Double[targetDistance, targetID]
@@ -194,23 +250,20 @@
 //         return closestValidTarget;
 //     }
 
-//     public Pose3d getCollectiveEstimatedPose() {
-//         return collectiveEstimatedPose;
+//     public Optional<Pose3d> getCameraPose() {
+//         return cameraPose;
 //     }
 
 //     //distance and angle to specific tag
 //     public void setSmartDashboard() {
+//         Pose3d daPose = cameraPose.get();
 //         if(poseExist) {
-//             SmartDashboard.putNumber("Pose X", collectiveEstimatedPose.getX());
-//             SmartDashboard.putNumber("Pose Y", collectiveEstimatedPose.getY());
-//             SmartDashboard.putNumber("Pose theata", collectiveEstimatedPose.getRotation().getZ());            
+//             SmartDashboard.putNumber("Pose X", daPose.getX());
+//             SmartDashboard.putNumber("Pose Y", daPose.getY());
+//             SmartDashboard.putNumber("Pose theata", daPose.getRotation().getZ());            
 //         } else {
 //             SmartDashboard.putString("Robot Pose", "No pose available");
 //         }
 //         SmartDashboard.putBoolean("There is Target", targetExist);
-//     }
-
-//     public PhotonCommand getCommands() {
-//         return commands;
 //     }
 // }

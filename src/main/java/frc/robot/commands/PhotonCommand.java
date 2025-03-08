@@ -29,6 +29,8 @@
 //     private final ProfiledPIDController yController;
 //     private final ProfiledPIDController rController;
 
+//     private final Translation2d desirTranslation2d;
+
 //     private int targetAprilTagID;
 //     private boolean availablePose = false;
 //     private boolean noTargetFound;
@@ -48,10 +50,12 @@
 
 //     //implement swerve drive subsystem
 
-//     public PhotonCommand(PhotonSubsystem photonSubsystem, CommandSwerveDrivetrain drivetrain) {
+//     public PhotonCommand(PhotonSubsystem photonSubsystem, CommandSwerveDrivetrain drivetrain, Translation2d desiredTranslation2d) {
 //         this.photon = photonSubsystem;
 //         this.drivetrain = drivetrain;
 //         this.robotCentricDrive = new RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+//         this.desiredTranslation2d = desiredTranslation2d;
 
 //         this.noTargetFound = false;
 //         this.withinDesiredRange = false;
@@ -74,6 +78,7 @@
 //     @Override
 //     public void execute() {
 //         try {
+//             //get el target
 //             targetAprilTagID = photon.getClosestTarget().get()[0].intValue();
 
 //         } catch(NoSuchElementException error) {

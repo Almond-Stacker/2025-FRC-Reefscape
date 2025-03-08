@@ -7,6 +7,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -115,4 +116,22 @@ public class Constants {
         public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
     }
 
+    
+    public static final class Photon {
+        public static final double driveConstant = 1;
+        public static final double angleConstant = 0.06;
+
+        public static final class camera0 {
+            public static final String cameraName = "front_photon_camera";
+            public static final double cameraHeight = Units.inchesToMeters(23);
+            public static final double cameraPitch = Units.degreesToRadians(0);
+        }
+
+        public static final class tag4 {
+            public static final int targetID = 4;
+            public static final double tagHeight = Units.inchesToMeters(21);
+            public static final double distance0 = 0.3;
+            public static final double angle0 = 4; 
+        }
+    }
 }
