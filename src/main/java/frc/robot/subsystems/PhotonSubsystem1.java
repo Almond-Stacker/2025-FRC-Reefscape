@@ -74,12 +74,12 @@ public class PhotonSubsystem1 extends SubsystemBase{
                 
                 // calculate key data 
                 targetSeen = true;
-                //targetYaw = target.getYaw();
-                targetRange = PhotonUtils.calculateDistanceToTargetMeters(
-                        cameraHeight, 
-                        Units.inchesToMeters(8.75), 
-                        cameraPitch, 
-                        Units.degreesToRadians(target.getPitch()));
+                // //targetYaw = target.getYaw();
+                // targetRange = PhotonUtils.calculateDistanceToTargetMeters(
+                //         cameraHeight, 
+                //         Units.inchesToMeters(8.75), 
+                //         cameraPitch, 
+                //         Units.degreesToRadians(target.getPitch()));
                 sigma = target.getBestCameraToTarget();//.plus(new Transform3d(-0.1956816, -0.28160218, 0, new Rotation3d()));
                 
                 if(targetYaw.isEmpty() || currentTime - lastTime < 0.2) {

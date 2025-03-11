@@ -29,13 +29,15 @@ public class positionRelativeToAprilTag extends Command{
     private PIDController theataController;
 
 
-    public positionRelativeToAprilTag(PhotonSubsystem1 camera, CommandSwerveDrivetrain drive) {
+    public positionRelativeToAprilTag(PhotonSubsystem1 camera, CommandSwerveDrivetrain drive, double goalYaw, double goalX) {
         this.camera = camera;
         this.drivetrain = drive;
         xController = new PIDController(2, 0, 0);
         yController = new PIDController(2, 0, 0);
         theataController = new PIDController(0.1, 0,0 );
         theataController.enableContinuousInput(-Math.PI, Math.PI);
+        goalY = goalYaw;
+        this.goalX = goalX;
         addRequirements(camera);
     }
 
@@ -78,7 +80,7 @@ public class positionRelativeToAprilTag extends Command{
 
         double realYawSpeed = yawSpeed;
         drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(speed)
-        .withVelocityY(speed1).withRotationalRate(realYawSpeed)).execute();
+        .withVelocityY(speed1).withRotationalRate(0)).execute();
 
         SmartDashboard.putNumber("snhaoetunshao", yawSpeed);
         SmartDashboard.putNumber("x speed", speed);

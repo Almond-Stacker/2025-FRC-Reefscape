@@ -30,7 +30,8 @@ public class States {
         PRE_INTAKE(61.55, 23.5, 90),
         INTAKE(61.55, 21, 61),
        // SIGMA(0, 20, 70),
-        //L1(0,2.15,210),-
+
+        L1(0,2.15,210),
 
         L2(1,7.416,203),
         L3(23.9, 23.5, 200),
@@ -52,14 +53,12 @@ public class States {
         */
         public final double primaryHeight;
         public final double innerHeight;
-        public final double totalRelativeHeight;
         public final double armAngle;
 
         ElevatorStates(double primaryHeight, double innerHeight, double intakeArmAngle) {
             this.primaryHeight = primaryHeight;
             this.innerHeight = innerHeight;
             this.armAngle = intakeArmAngle;
-            this.totalRelativeHeight = Utilities.calculateTotalRelHeight(primaryHeight, innerHeight);
             //this.totalRelativeHeight = calculateTotalRelHeight(primaryHeight, innerHeight);
         }
 
@@ -74,7 +73,6 @@ public class States {
         ElevatorStates() {
             this.primaryHeight = 0;
             this.innerHeight = 0;
-            this.totalRelativeHeight = 0;
             this.armAngle = 0;
            // this.isABS = false;
         }

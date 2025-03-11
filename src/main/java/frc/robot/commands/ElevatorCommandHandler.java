@@ -10,18 +10,13 @@ import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
-import frc.lib.util.Utilities;
-
 public class ElevatorCommandHandler {
     private final InnerElevatorSubsystem innerElevatorSubsystem;
     private final PrimaryElevatorSubsystem primaryElevatorSubsystem;
     private final IntakeArmSubsystem intakeArmSubsystem;
     
-
     private ElevatorStates state;
     private SequentialCommandGroup command; 
-    private double pastHeight;
-    private double pastHeight2;
 
     public ElevatorCommandHandler(InnerElevatorSubsystem innerElevatorSubsystem, PrimaryElevatorSubsystem primaryElevatorSubsystem, IntakeArmSubsystem intakeArmSubsystem) {
         this.innerElevatorSubsystem = innerElevatorSubsystem;
@@ -32,29 +27,22 @@ public class ElevatorCommandHandler {
     }
 
     public SequentialCommandGroup setElevators(ElevatorStates elevatorStates) {
-        // if(state != null && state.innerHeight < ElevatorStates.CRITICAL_POINT.innerHeight && 
-        //         state.armAngle > ElevatorStates.CRITICAL_POINT.armAngle &&
-        //         elevatorStates.armAngle < ElevatorStates.CRITICAL_POINT.armAngle) {
-        //     command = new SequentialCommandGroup(new CriticalPointCommand(intakeArmSubsystem, innerElevatorSubsystem, primaryElevatorSubsystem, elevatorStates));
-        // } else {
-       // }
-       pastHeight = innerElevatorSubsystem.getPIDGoal();
-       pastHeight2 = intakeArmSubsystem.getPIDGoal();
+        command = new SequentialCommandGroup(new InstantCommand(() -> setElevatorStates(elevatorStates)));
 
-       command = new SequentialCommandGroup(new InstantCommand(() -> setElevatorStates(elevatorStates)));
+        if((state.equals(ElevatorStates.L1) || state.equals(ElevatorStates.L2)) && !(elevatorStates.equals(ElevatorStates.L1) && elevatorStates.equals(ElevatorStates.L2))) {
+            command = new SequentialCommandGroup(new InstantCommand (() -> innerElevatorSubsystem.setInnerElevatorState(elevatorStates.innerHeight)),
+                new InstantCommand(() -> primaryElevatorSubsystem.setElevatorState(elevatorStates)), 
+                new WaitCommand(0.3),
+                new InstantCommand(() -> intakeArmSubsystem.setArm(elevatorStates.armAngle)));    
+        }
 
+        if(!(state.equals(ElevatorStates.L1) && state.equals(ElevatorStates.L2)) && (elevatorStates.equals(ElevatorStates.L1) || elevatorStates.equals(ElevatorStates.L2))) {
+            command = new SequentialCommandGroup(new InstantCommand (() -> intakeArmSubsystem.setArm(elevatorStates.armAngle)),
+                new InstantCommand(() -> primaryElevatorSubsystem.setElevatorState(elevatorStates)), 
+                new WaitCommand(0.3),
+                new InstantCommand(() -> innerElevatorSubsystem.setInnerElevatorState(elevatorStates.innerHeight)));
+        }
 
-       SmartDashboard.putBoolean("sigma run", false);
-       System.out.println(elevatorStates.toString());
-       System.out.println(state.toString());
-       if(pastHeight == ElevatorStates.PRE_INTAKE.innerHeight && pastHeight2 == ElevatorStates.PRE_INTAKE.armAngle && 
-            innerElevatorSubsystem.getPIDGoal() == ElevatorStates.INTAKE.innerHeight && intakeArmSubsystem.getPIDGoal() == ElevatorStates.INTAKE.armAngle) {
-        SmartDashboard.putBoolean("sigma run", true);
-        command = new SequentialCommandGroup(new InstantCommand (() -> primaryElevatorSubsystem.setElevatorState(elevatorStates)),
-                                                new InstantCommand(() -> intakeArmSubsystem.setArm(elevatorStates.armAngle)),
-                                                new WaitCommand(1),
-                                                new InstantCommand(() -> innerElevatorSubsystem.setInnerElevatorState(elevatorStates.innerHeight)));
-       }
         this.state = elevatorStates;
         return command;
 

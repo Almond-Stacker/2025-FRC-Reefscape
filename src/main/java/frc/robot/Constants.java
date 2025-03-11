@@ -108,6 +108,9 @@ public class Constants {
 
     public static final class ClimbConsts {
         public static final int climbMotorID = 27;
+        public static final int encoderID = 0;
+        public static final double maxThreshold = 270;
+        public static final double minThreshold = 0;
     }
 
     public static final class DriveVelConsts {
@@ -133,5 +136,13 @@ public class Constants {
             public static final double distance0 = 0.3;
             public static final double angle0 = 4; 
         }
+
+        public static final double rightCoralScoreX = 0.43;
+        public static final double rightCoralScoreY = 0.2;
+
+        public static final double leftCoralScoreX = 0;
+        public static final double leftCoralScoreY = 0;
+
+
     }
 }

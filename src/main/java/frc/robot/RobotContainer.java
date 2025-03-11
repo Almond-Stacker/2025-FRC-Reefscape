@@ -83,8 +83,11 @@ public class RobotContainer {
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
     private final PhotonSubsystem1 sigma = new PhotonSubsystem1("gray_photon_camera", Units.inchesToMeters(10), 0);
     private final PhotonSubsystem1 graySigma = new PhotonSubsystem1("blue_photon_camera",Units.inchesToMeters(10), 0);
-    private final positionRelativeToAprilTag spot = new positionRelativeToAprilTag(graySigma, drivetrain);
-    private final positionRelativeToAprilTag spot1 = new positionRelativeToAprilTag(sigma, drivetrain);
+    private final positionRelativeToAprilTag spot1 = new positionRelativeToAprilTag(sigma, drivetrain, 0.43, 0.2);
+    private final positionRelativeToAprilTag spot12 = new positionRelativeToAprilTag(graySigma, drivetrain, Constants.Photon.leftCoralScoreY, Constants.Photon.leftCoralScoreX);
+
+    private double goalX= 0.43;
+    private double goalY = 0.2; 
    // private final DriveVelSubsystem s_driveVelSubsystem = new DriveVelSubsystem(driver0, drivetrain, drive);
 
     //** Command Handlers **//
@@ -108,8 +111,16 @@ public class RobotContainer {
         new InstantCommand(() -> s_intakeArmSubsystem.setArm(ElevatorStates.INTAKE.armAngle)),
         new InstantCommand(() -> s_primaryElevatorSubsystem.setElevatorState(ElevatorStates.INTAKE)),
         new WaitCommand(0.5),
-        new InstantCommand(() -> s_innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.INTAKE.innerHeight))
-    );
+        new InstantCommand(() -> s_innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.INTAKE.innerHeight)),
+        new InstantCommand(() -> s_intakeArmSubsystem.setIndexState(IndexStates.INTAKE)),
+        new WaitCommand(0.3),
+        new InstantCommand(() -> s_intakeArmSubsystem.setIndexState(IndexStates.STOP)),
+        new InstantCommand(() -> s_innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.PRE_INTAKE.innerHeight)),
+        new InstantCommand(() -> s_primaryElevatorSubsystem.setElevatorState(ElevatorStates.PRE_INTAKE)),
+        new InstantCommand(() -> s_intakeArmSubsystem.setArm(ElevatorStates.PRE_INTAKE.armAngle)));
+
+
+
     //goHome = new ElevatorCommandHandlez  r(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_ABS);
 
    // private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
@@ -120,9 +131,10 @@ public class RobotContainer {
     public RobotContainer() {
         NamedCommands.registerCommand("Score", score);
         NamedCommands.registerCommand("L4", ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
+        NamedCommands.registerCommand("L1", ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
         NamedCommands.registerCommand("Pre intake", ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
-        NamedCommands.registerCommand("intake", new SequentialCommandGroup(c_preIntakeToIntake, ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE),
-                                                                    new WaitCommand(0.5), ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE)));
+        NamedCommands.registerCommand("intake", new SequentialCommandGroup(c_preIntakeToIntake));
+        NamedCommands.registerCommand("LineUp", new WaitCommand(0.1));    
         NamedCommands.registerCommand("Intake", ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE));
         NamedCommands.registerCommand("Stop", ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
 
@@ -165,11 +177,12 @@ public class RobotContainer {
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
-        driver0.y().whileTrue(spot);
         driver0.x().whileTrue(spot1);
 
         // reset the field-centric heading on left bumper press
-        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       //driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
+             new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value))));
     }
 
     private void configureDriver1Commands() {
@@ -182,11 +195,11 @@ public class RobotContainer {
         //elevator system
             //driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-        driver1.pov(90).toggleOnTrue(c_preIntakeToIntake);
         driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
-        driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
-
-        driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.STARTING_POSITION));
+        driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
+        driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
+        driver1.b().toggleOnTrue(c_preIntakeToIntake);
 
         driver1.rightTrigger().onTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE));
         driver1.rightTrigger().onFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
@@ -224,5 +237,10 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return m_chooser.getSelected();
+    }
+
+    public void resetDrive() {
+        drivetrain.runOnce(() -> drivetrain.resetRotation(
+            new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value)));
     }
 }
