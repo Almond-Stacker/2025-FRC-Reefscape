@@ -111,4 +111,16 @@ public class States {
             this.speed = speed;
         }
     }
+
+    public enum LedStates {
+        OFF(0),
+        ON(1),
+        BLINK(2);
+
+        public final double frequency;
+
+        LedStates(double frequency) {
+            this.frequency = frequency;
+        }
+    }
 }

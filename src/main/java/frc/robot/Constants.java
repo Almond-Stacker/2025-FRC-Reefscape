@@ -23,6 +23,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 //if want to import with .* to avoid typing exact class dependances
 //consider seperate constants files
 public class Constants {
+    public static final int ledControllerID = 0; 
     
     public static final class PrimaryElevatorConsts {
         public static final int leftElevatorMotorID = 14;

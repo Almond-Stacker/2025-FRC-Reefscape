@@ -180,7 +180,7 @@ public class RobotContainer {
         driver0.x().whileTrue(spot1);
 
         // reset the field-centric heading on left bumper press
-       //driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
              new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value))));
     }
