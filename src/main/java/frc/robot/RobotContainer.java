@@ -36,7 +36,7 @@ import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IndexCommand;
 import frc.robot.commands.PhotonCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.BeambreakSubsystem;
+import frc.robot.subsystems.BeamBreakSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 //import frc.robot.subsystems.DriveVelSubsystem;
@@ -76,9 +76,9 @@ public class RobotContainer {
     private final InnerElevatorSubsystem s_innerElevatorSubsystem = new InnerElevatorSubsystem();
     private final ArmSubsystem s_armSubsystem = new ArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
-    private final BeambreakSubsystem s_beambreakSubsystem = new BeambreakSubsystem();
-    private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getRotation3d().getAngle());
-    private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle());
+    private final BeamBreakSubsystem s_beambreakSubsystem = new BeamBreakSubsystem();
+    //$private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
+  //  private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
 
     //** Command Handlers **//
     private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
@@ -86,8 +86,8 @@ public class RobotContainer {
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
 
     //** Commands **//
-    private final PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.43, 0.2);
-    private final PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2);
+    // private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.43, 0.2);
+    // private PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2);
 
     private final SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
         ch_elevatorCommandHandler.setArmState(ElevatorStates.INTAKE),
@@ -103,7 +103,7 @@ public class RobotContainer {
     private final SequentialCommandGroup c_score = new SequentialCommandGroup(
         new InstantCommand(() -> s_armSubsystem.setOverride(-0.3, true)),
         ch_indexCommand.setIndexState(IndexStates.OUTTAKE),
-        new WaitCommand(0.5),
+        new WaitCommand(0.7),
         new InstantCommand(() -> s_armSubsystem.setOverride(0, false)),
         ch_indexCommand.setIndexState(IndexStates.STOP),
         ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE)
@@ -126,9 +126,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(driver0.getLeftY()) * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(driver0.getLeftX()) * MaxSpeed * 0.4) // Drive left with negative X (left)
-                    .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate * 0.4) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Utilities.polynomialAccleration(driver0.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-Utilities.polynomialAccleration(driver0.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -138,7 +138,7 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-       driver0.x().onTrue(c_positionToRightPole);
+     //  driver0.x().onTrue(new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2));
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
              new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value))));
     }
@@ -148,7 +148,9 @@ public class RobotContainer {
         driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
         driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
         driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
-        driver1.pov(-1).toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
+       // driver1.pov(-1).toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
+        driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
+        //driver1.x().onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         //driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
         driver1.y().onTrue(c_score);

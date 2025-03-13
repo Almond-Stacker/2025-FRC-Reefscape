@@ -21,6 +21,7 @@ public class ClimbSubsystem extends SubsystemBase{
     public ClimbSubsystem() {
         climbMotor = new SparkFlex(Constants.ClimbConstants.MOTOR_ID, MotorType.kBrushless);
         climbEncoder = new DutyCycleEncoder(Constants.ClimbConstants.ENCODER_ID);
+        state = ClimbStates.STOP;
     }
 
     @Override
