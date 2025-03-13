@@ -28,23 +28,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.lib.util.Utilities;
 
-import frc.robot.Constants.PhotonConsts;
-
 import frc.robot.States.ClimbStates;
 import frc.robot.States.ElevatorStates;
 import frc.robot.States.IndexStates;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
-//import frc.robot.commands.DriveVelCommand;
-//import frc.robot.commands.ElevatorCommandHandler;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.positionRelativeToAprilTag;
-import frc.robot.subsystems.IntakeArmSubsystem;
-import frc.robot.subsystems.PhotonSubsystem1;
+import frc.robot.commands.IndexCommand;
+import frc.robot.commands.PhotonCommand;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BeambreakSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 //import frc.robot.subsystems.DriveVelSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
+import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 import frc.robot.generated.TunerConstants;
@@ -72,100 +69,60 @@ public class RobotContainer {
     private final CommandXboxController driver1 = new CommandXboxController(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
-    //put choreo
-    //private final AutoChooser autoChooser = new AutoChooser();
     private SendableChooser<Command> m_chooser;
 
     //** Subsystems **//
     private final PrimaryElevatorSubsystem s_primaryElevatorSubsystem = new PrimaryElevatorSubsystem();
     private final InnerElevatorSubsystem s_innerElevatorSubsystem = new InnerElevatorSubsystem();
-    private final IntakeArmSubsystem s_intakeArmSubsystem = new IntakeArmSubsystem();
+    private final ArmSubsystem s_armSubsystem = new ArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
-    private final PhotonSubsystem1 sigma = new PhotonSubsystem1("gray_photon_camera", Units.inchesToMeters(10), 0);
-    private final PhotonSubsystem1 graySigma = new PhotonSubsystem1("blue_photon_camera",Units.inchesToMeters(10), 0);
-    private final positionRelativeToAprilTag spot1 = new positionRelativeToAprilTag(sigma, drivetrain, 0.43, 0.2);
-    private final positionRelativeToAprilTag spot12 = new positionRelativeToAprilTag(graySigma, drivetrain, Constants.Photon.leftCoralScoreY, Constants.Photon.leftCoralScoreX);
-
-    private double goalX= 0.43;
-    private double goalY = 0.2; 
-   // private final DriveVelSubsystem s_driveVelSubsystem = new DriveVelSubsystem(driver0, drivetrain, drive);
+    private final BeambreakSubsystem s_beambreakSubsystem = new BeambreakSubsystem();
+    private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getRotation3d().getAngle());
+    private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle());
 
     //** Command Handlers **//
-    private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_innerElevatorSubsystem, s_primaryElevatorSubsystem, s_intakeArmSubsystem);
-    private final ClimbCommand ch_climbCommandHandler = new ClimbCommand(s_climbSubsystem);
-    private final IntakeCommand ch_intakeCommandHandler = new IntakeCommand(s_intakeArmSubsystem);
-    //private final DriveVelCommand ch_driveVelCommand = s_driveVelSubsystem.getCommands();
+    private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
+    private final ClimbCommand ch_climbCommand = new ClimbCommand(s_climbSubsystem);
+    private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
 
     //** Commands **//
-    private final SequentialCommandGroup score = new SequentialCommandGroup(
-        new InstantCommand(() -> s_intakeArmSubsystem.setOverride(-0.3, true)),
-        ch_intakeCommandHandler.setIntakeState(IndexStates.FEED_OUT),
-        new WaitCommand(0.5),
-        new InstantCommand(() -> s_intakeArmSubsystem.setOverride(0, false)),
-        ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE),
-        ch_intakeCommandHandler.setIntakeState(IndexStates.STOP)
+    private final PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.43, 0.2);
+    private final PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2);
 
+    private final SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
+        ch_elevatorCommandHandler.setArmState(ElevatorStates.INTAKE),
+        ch_elevatorCommandHandler.setPrimaryElevatorState(ElevatorStates.INTAKE),
+        //ch_elevatorCommandHandler.setElevators(ElevatorStates.INTAKE),
+        ch_indexCommand.setIndexState(IndexStates.INTAKE),
+        new WaitCommand(0.2),
+        ch_elevatorCommandHandler.setInnerElevatorState(ElevatorStates.INTAKE),
+        new WaitCommand(0.5),
+        ch_indexCommand.setIndexState(IndexStates.STOP),
+        ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
+    
+    private final SequentialCommandGroup c_score = new SequentialCommandGroup(
+        new InstantCommand(() -> s_armSubsystem.setOverride(-0.3, true)),
+        ch_indexCommand.setIndexState(IndexStates.OUTTAKE),
+        new WaitCommand(0.5),
+        new InstantCommand(() -> s_armSubsystem.setOverride(0, false)),
+        ch_indexCommand.setIndexState(IndexStates.STOP),
+        ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE)
     );
 
-    private SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
-        new InstantCommand(() -> s_intakeArmSubsystem.setArm(ElevatorStates.INTAKE.armAngle)),
-        new InstantCommand(() -> s_primaryElevatorSubsystem.setElevatorState(ElevatorStates.INTAKE)),
-        new WaitCommand(0.5),
-        new InstantCommand(() -> s_innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.INTAKE.innerHeight)),
-        new InstantCommand(() -> s_intakeArmSubsystem.setIndexState(IndexStates.INTAKE)),
-        new WaitCommand(0.3),
-        new InstantCommand(() -> s_intakeArmSubsystem.setIndexState(IndexStates.STOP)),
-        new InstantCommand(() -> s_innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.PRE_INTAKE.innerHeight)),
-        new InstantCommand(() -> s_primaryElevatorSubsystem.setElevatorState(ElevatorStates.PRE_INTAKE)),
-        new InstantCommand(() -> s_intakeArmSubsystem.setArm(ElevatorStates.PRE_INTAKE.armAngle)));
-
-
-
-    //goHome = new ElevatorCommandHandlez  r(primaryElevatorSubsystem, innerElevatorSubsystem, intakeArmSubsystem, ElevatorStates.HOME_ABS);
-
-   // private final PhotonSubsystem photonSubsystem = new PhotonSubsystem(PhotonConsts.CAM_NAMES, PhotonConsts.CAM_TO_ROBOT_TRANSFORMS, drivetrain);
-
-    //logging vars 
-   /// private boolean isTrackingAprilTag = false;
-
     public RobotContainer() {
-        NamedCommands.registerCommand("Score", score);
-        NamedCommands.registerCommand("L4", ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-        NamedCommands.registerCommand("L1", ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
-        NamedCommands.registerCommand("Pre intake", ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
-        NamedCommands.registerCommand("intake", new SequentialCommandGroup(c_preIntakeToIntake));
-        NamedCommands.registerCommand("LineUp", new WaitCommand(0.1));    
-        NamedCommands.registerCommand("Intake", ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE));
-        NamedCommands.registerCommand("Stop", ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
-
-        m_chooser = AutoBuilder.buildAutoChooser("Blue Bottom Corner");
-        SmartDashboard.putData(m_chooser);
         configureDriveBindings();
         configureDriver1Commands();
+        configureAuto();
+    }
+
+    private boolean checkRun() {
+        if(!s_beambreakSubsystem.getBeamBroken() && s_innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE)) {
+            return true;
+        }
+        return false;
     }
 
     private void configureDriveBindings() {
-
-        //  drivetrain.setDefaultCommand(
-        // //    // ch_driveVelCommand.setDrive()
-            
-        // //     // new SequentialCommandGroup(
-        // //     //     new InstantCommand(() -> {
-        // //     //         driveVelX = driver0.getLeftX();
-        // //     //         driveVelY = driver0.getLeftY();
-        // //     //     }),
-        //          drivetrain.applyRequest(() ->
-        //              drive.withVelocityX(Utilities.polynomialAccleration(driver0.getLeftX()) * -MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-        //                  .withVelocityY(Utilities.polynomialAccleration(driver0.getLeftY()) * -MaxSpeed * 0.4) // Drive left with negative X (left)
-        //                  .withRotationalRate(Utilities.polynomialAccleration(driver0.getRightX()) * -MaxAngularRate * 0.4 ))// Drive counterclockwise with negativeX (left)
-        // //     //     new InstantCommand(() -> {
-        // //     //         driveVelX = driveVelX * velFriction;
-        // //     //         driveVelY = driveVelY * velFriction;
-        // //     //     })
-
-        // //     // )
-        //  );
-
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
@@ -177,62 +134,44 @@ public class RobotContainer {
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
-        driver0.x().whileTrue(spot1);
+        //driver0.x().whileTrue(spot1);
 
         // reset the field-centric heading on left bumper press
        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       driver0.x().onTrue(c_positionToRightPole);
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
              new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value))));
     }
 
     private void configureDriver1Commands() {
-        // driver1.a().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.CLIMB));
-        // driver1.a().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
-
-        // driver1.b().onTrue(ch_climbCommandHandler.setClimb(ClimbStates.DROP));
-        // driver1.b().onFalse(ch_climbCommandHandler.setClimb(ClimbStates.STOP));
-
-        //elevator system
-            //driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-        driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
+        driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
         driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
         driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        driver1.pov(-1).toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
         driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
-        driver1.b().toggleOnTrue(c_preIntakeToIntake);
+        //driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
+        driver1.y().onTrue(c_score);
 
-        driver1.rightTrigger().onTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.INTAKE));
-        driver1.rightTrigger().onFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
+        driver1.rightTrigger().onTrue(ch_climbCommand.setClimbState(ClimbStates.CLIMB));
+        driver1.rightTrigger().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
 
+        driver1.leftTrigger().onTrue(ch_climbCommand.setClimbState(ClimbStates.DROP));
+        driver1.leftTrigger().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
+    }
 
-        driver1.leftTrigger().onTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.FEED_OUT));
-        driver1.leftTrigger().onFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
+    private void configureAuto() {
+        NamedCommands.registerCommand("Score", c_score);
+        NamedCommands.registerCommand("L4", ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
+        NamedCommands.registerCommand("L1", ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        NamedCommands.registerCommand("Pre intake", ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
+        NamedCommands.registerCommand("intake", c_preIntakeToIntake);
+        NamedCommands.registerCommand("LineUp", new WaitCommand(0.1));    
+        NamedCommands.registerCommand("Intake", ch_indexCommand.setIndexState(IndexStates.INTAKE));
+        NamedCommands.registerCommand("Stop", ch_indexCommand.setIndexState(IndexStates.STOP));
 
-        driver1.y().onTrue(score);
-
-        driver1.b().toggleOnTrue(ch_intakeCommandHandler.setIntakeState(IndexStates.HOLD));
-        driver1.b().toggleOnFalse(ch_intakeCommandHandler.setIntakeState(IndexStates.STOP));
-
-        //driver1.leftBumper().toggleOnTrue(new PhotonCommand(photonSubsystem, drivetrain));
- 
-
-        // driver1.pov(-1).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME));
-        // driver1.pov(0).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.HOME))H;
-        // driver1.pov(90).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
-        // driver1.pov(180).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
-        // driver1.pov(270).onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-
-        // driver1.leftBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0.05);}));
-        // driver1.leftBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
-
-        // driver1.rightBumper().onTrue(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(-0.05);}));
-        // driver1.rightBumper().onFalse(new InstantCommand(() -> {s_innerElevatorSubsystem.setMotorSpeed(0);}));
-
-        // driver1.leftTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0.05);}));
-        // driver1.leftTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
-
-        // driver1.rightTrigger().onTrue(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(-0.05);}));
-        // driver1.rightTrigger().onFalse(new InstantCommand(() -> {s_intakeArmSubsystem.setMotorSpeed(0);}));
+        m_chooser = AutoBuilder.buildAutoChooser("1 Coral Straight");
+        SmartDashboard.putData(m_chooser);
     }
 
     public Command getAutonomousCommand() {

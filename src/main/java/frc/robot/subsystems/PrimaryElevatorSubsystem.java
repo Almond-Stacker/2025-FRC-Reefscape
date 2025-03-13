@@ -1,72 +1,80 @@
-
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants;
 import frc.robot.States.ElevatorStates;
 
-public class PrimaryElevatorSubsystem extends SubsystemBase {
-    private final TalonFX leftElevatorMotor;
-    private final TalonFX rightElevatorMotor;
+public class PrimaryElevatorSubsystem extends SubsystemBase{
+    private final TalonFX leftMotor;
+    private final TalonFX rightMotor;
     private final PIDController elevatorPID;
 
     private ElevatorStates state;
-    private double currentHeight; 
+
+    private double currentHeight;
     private double motorOutput;
     private boolean inBounds;
 
-    public PrimaryElevatorSubsystem() {
-        leftElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.leftElevatorMotorID);
-        rightElevatorMotor = new TalonFX(Constants.PrimaryElevatorConsts.rightElevatorMotorID);  
-        elevatorPID = new PIDController(Constants.PrimaryElevatorConsts.kP, Constants.PrimaryElevatorConsts.kI, Constants.PrimaryElevatorConsts.kD);
-        
-       // state = ElevatorStates.STARTING_POSITION;
-       // setElevatorState(state);
-        leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
-        rightElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+    public PrimaryElevatorSubsystem(){
+        leftMotor = new TalonFX(Constants.PrimaryElevatorConstants.LEFT_ELEVATOR_MOTOR_ID);
+        rightMotor = new TalonFX(Constants.PrimaryElevatorConstants.RIGHT_ELEVATOR_MOTOR_ID);
+        elevatorPID = new PIDController(Constants.PrimaryElevatorConstants.KP, Constants.PrimaryElevatorConstants.KI, Constants.PrimaryElevatorConstants.KD);
+
+        state = ElevatorStates.STARTING_POSITION;
+
+        currentHeight = this.getHeight();
+        motorOutput = 0;
+        inBounds = false;
     }
 
     @Override
     public void periodic() {
-       currentHeight = rightElevatorMotor.getPosition().getValueAsDouble() + 0.5;
-
-        inBounds = false;
+        currentHeight = this.getHeight();
+        
         if(currentHeight >= ElevatorStates.MAX.primaryHeight) {
+            inBounds = false;
             motorOutput = -0.1;
         } else if(currentHeight <= ElevatorStates.MIN.primaryHeight ) {
+            inBounds = false;
             motorOutput = 0.1;
         } else {
             inBounds = true;
             motorOutput = elevatorPID.calculate(currentHeight);
         }
 
-        setElevatorSpeed(motorOutput);
-        setSmartdashboard();
+        setElevatorSpeeds(motorOutput);
+        setSmartDashboardValues();
     }
 
-    public void setElevatorState(ElevatorStates state) {
-        this.elevatorPID.setSetpoint(state.primaryHeight);
+    public void setPrimaryElevatorState(ElevatorStates state) {
         this.state = state;
+        elevatorPID.setSetpoint(state.primaryHeight);
     }
 
-    private void setSmartdashboard() {
-       // SmartDashboard.putString("Primary elevator state", state.toString());
-        SmartDashboard.putNumber("Primary elevator goal position", elevatorPID.getSetpoint());
-        SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
+    public ElevatorStates getPrimaryElevatorState() {
+        return state;
+    }
+
+    public double getHeight() {
+        return rightMotor.getPosition().getValueAsDouble() + 0.5;
+    }
+    
+    private void setElevatorSpeeds(double speed) {
+        leftMotor.set(speed);
+        rightMotor.set(speed);
+    }
+
+    private void setSmartDashboardValues() {
+        SmartDashboard.putNumber("Primary elevator goal position", state.primaryHeight);
         SmartDashboard.putNumber("Primary elevator speed", motorOutput);
-        SmartDashboard.putNumber("Primary elevator position ", currentHeight);
-    }
+        SmartDashboard.putNumber("Primary elevator current height", currentHeight);
+        
+        SmartDashboard.putString("Primary elevator current state", state.toString());      
 
-    private void setElevatorSpeed(double motor) {
-        leftElevatorMotor.set(motor);
-        rightElevatorMotor.set(motor);
+        SmartDashboard.putBoolean("Primary elevator in bounds", inBounds);
     }
 }

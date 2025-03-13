@@ -1,46 +1,50 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.SparkFlexUtil;
-import frc.robot.Constants;
-import frc.robot.Constants.ClimbConsts;
-import frc.robot.States.ClimbStates;
 
+import frc.robot.Constants;
+import frc.robot.States.ClimbStates;
 
 public class ClimbSubsystem extends SubsystemBase{
     private final SparkFlex climbMotor;
     private final DutyCycleEncoder climbEncoder;
+
+    private ClimbStates state;
+    private double currentPosition;
     private double climbSpeed;
 
     public ClimbSubsystem() {
-        climbMotor = new SparkFlex(ClimbConsts.climbMotorID, MotorType.kBrushless);
-        SparkFlexUtil.setSparkFlexBusUsage(climbMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, true);
-        climbEncoder = new DutyCycleEncoder(ClimbConsts.encoderID);
-        climbSpeed = 0; 
+        climbMotor = new SparkFlex(Constants.ClimbConstants.MOTOR_ID, MotorType.kBrushless);
+        climbEncoder = new DutyCycleEncoder(Constants.ClimbConstants.ENCODER_ID);
     }
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-        climbMotor.set(climbSpeed);
-        if(climbEncoder.get() < Constants.ClimbConsts.maxThreshold){
-            climbSpeed = 0.1;
-        } else if (climbEncoder.get() > Constants.ClimbConsts.minThreshold){
-            climbSpeed = -0.1;
+        currentPosition = climbEncoder.get();
+        if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
+            climbMotor.set(0.1);
+            return;
+        } else if (currentPosition < Constants.ClimbConstants.MIN_THRESHOLD) {
+            climbMotor.set(-0.1);
+            return;
         }
+        climbMotor.set(climbSpeed);
+        setSmartDashboardValues();
     }
 
-    public void setClimbState(ClimbStates climbState) {
-        //climbMotor.set(climbState.speed);
-        climbSpeed = climbState.speed;
+    public void setClimbState(ClimbStates state) {
+        this.state = state;
+        climbSpeed = state.speed;
     }
 
+    private void setSmartDashboardValues() {
+        SmartDashboard.putNumber("Climb subsystem current speed", climbSpeed);
+        
+        SmartDashboard.putString("Climb subsystem state", state.toString());
+    }
 }

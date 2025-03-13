@@ -2,38 +2,31 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Constants;
+public class BeambreakSubsystem extends SubsystemBase {
+    private final DigitalInput beamBreak;
 
-public class BeamBreakSubsystem extends SubsystemBase{
-    private DigitalInput BeamBreak;
-    private Timer timer;
-    private double lastBreak; 
-    private double timeSinceLastBreak;
-    private boolean isBroken;
+    private boolean beamBroken;
 
-    public BeamBreakSubsystem() {
-        BeamBreak = new DigitalInput(8);
-        timer = new Timer();
-        isBroken = false;
+    public BeambreakSubsystem() {
+        beamBreak = new DigitalInput(2);
+        beamBroken = false;
     }
-    
 
-    // change to whether break is on 
     @Override
     public void periodic() {
-        if(BeamBreak.get()) {
-            isBroken = true;
-            lastBreak = timer.get();
+        if (beamBreak.get()) {
+            beamBroken = true;
         } else {
-            isBroken = false;
+            beamBroken = false;
         }
-        timeSinceLastBreak = timer.get() - lastBreak;
+
+        SmartDashboard.putBoolean("Beam Broken", beamBroken);
     }
 
-    public boolean isBroken() {
-        return isBroken;
+    public boolean getBeamBroken() {
+        return beamBroken;
     }
-    
 }

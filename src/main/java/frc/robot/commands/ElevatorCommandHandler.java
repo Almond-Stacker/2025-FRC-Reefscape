@@ -1,60 +1,50 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.States.ElevatorStates;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
-import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 public class ElevatorCommandHandler {
-    private final InnerElevatorSubsystem innerElevatorSubsystem;
     private final PrimaryElevatorSubsystem primaryElevatorSubsystem;
-    private final IntakeArmSubsystem intakeArmSubsystem;
-    
-    private ElevatorStates state;
-    private SequentialCommandGroup command; 
+    private final InnerElevatorSubsystem innerElevatorSubsystem;
+    private final ArmSubsystem armSubsystem;
 
-    public ElevatorCommandHandler(InnerElevatorSubsystem innerElevatorSubsystem, PrimaryElevatorSubsystem primaryElevatorSubsystem, IntakeArmSubsystem intakeArmSubsystem) {
-        this.innerElevatorSubsystem = innerElevatorSubsystem;
+    public ElevatorCommandHandler(PrimaryElevatorSubsystem primaryElevatorSubsystem, InnerElevatorSubsystem innerElevatorSubsystem, ArmSubsystem armSubsystem) {
         this.primaryElevatorSubsystem = primaryElevatorSubsystem;
-        this.intakeArmSubsystem = intakeArmSubsystem;
-        state = ElevatorStates.STARTING_POSITION;
-        setElevatorStates(ElevatorStates.STARTING_POSITION);
+        this.innerElevatorSubsystem = innerElevatorSubsystem;
+        this.armSubsystem = armSubsystem;
+
+        primaryElevatorSubsystem.setPrimaryElevatorState(ElevatorStates.STARTING_POSITION);
+        innerElevatorSubsystem.setInnerElevatorState(ElevatorStates.STARTING_POSITION);
+        armSubsystem.setArmState(ElevatorStates.STARTING_POSITION);
     }
 
-    public SequentialCommandGroup setElevators(ElevatorStates elevatorStates) {
-        command = new SequentialCommandGroup(new InstantCommand(() -> setElevatorStates(elevatorStates)));
+    public InstantCommand setPrimaryElevatorState(ElevatorStates state) {
+        return new InstantCommand(() -> primaryElevatorSubsystem.setPrimaryElevatorState(state), primaryElevatorSubsystem);
+    }
 
-        if((state.equals(ElevatorStates.L1) || state.equals(ElevatorStates.L2)) && !(elevatorStates.equals(ElevatorStates.L1) && elevatorStates.equals(ElevatorStates.L2))) {
-            command = new SequentialCommandGroup(new InstantCommand (() -> innerElevatorSubsystem.setInnerElevatorState(elevatorStates.innerHeight)),
-                new InstantCommand(() -> primaryElevatorSubsystem.setElevatorState(elevatorStates)), 
-                new WaitCommand(0.3),
-                new InstantCommand(() -> intakeArmSubsystem.setArm(elevatorStates.armAngle)));    
+    public InstantCommand setInnerElevatorState(ElevatorStates state) {
+        return new InstantCommand(() -> innerElevatorSubsystem.setInnerElevatorState(state), innerElevatorSubsystem);
+    }
+
+    public InstantCommand setArmState(ElevatorStates state) {
+        return new InstantCommand(() -> armSubsystem.setArmState(state), armSubsystem);
+    }
+
+    public SequentialCommandGroup setElevators(ElevatorStates state) {
+        if((innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L1) || innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L2))
+            && (state.equals(ElevatorStates.PRE_INTAKE) || state.equals(ElevatorStates.INTAKE) || state.equals(ElevatorStates.STARTING_POSITION))) {
+            return new SequentialCommandGroup(setPrimaryElevatorState(state), setInnerElevatorState(ElevatorStates.PRE_INTAKE), new WaitCommand(0.3), 
+                setArmState(state), new WaitCommand(0.2), setInnerElevatorState(state));
+        } else if(innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE) && state.equals(ElevatorStates.INTAKE)) {
+            return new SequentialCommandGroup(setPrimaryElevatorState(state), setArmState(state), new WaitCommand(0.3), setInnerElevatorState(state));
+        } else {
+            return new SequentialCommandGroup(setPrimaryElevatorState(state), setInnerElevatorState(state), setArmState(state));
         }
-
-        if(!(state.equals(ElevatorStates.L1) && state.equals(ElevatorStates.L2)) && (elevatorStates.equals(ElevatorStates.L1) || elevatorStates.equals(ElevatorStates.L2))) {
-            command = new SequentialCommandGroup(new InstantCommand (() -> intakeArmSubsystem.setArm(elevatorStates.armAngle)),
-                new InstantCommand(() -> primaryElevatorSubsystem.setElevatorState(elevatorStates)), 
-                new WaitCommand(0.3),
-                new InstantCommand(() -> innerElevatorSubsystem.setInnerElevatorState(elevatorStates.innerHeight)));
-        }
-
-        this.state = elevatorStates;
-        return command;
-
-    }
-
-    public ElevatorStates getCurrentState() {
-        return state;
-    }
-
-    private void setElevatorStates(ElevatorStates state) {
-        innerElevatorSubsystem.setInnerElevatorState(state.innerHeight);
-        primaryElevatorSubsystem.setElevatorState(state);
-        intakeArmSubsystem.setArm(state.armAngle);
     }
 }
+ 
