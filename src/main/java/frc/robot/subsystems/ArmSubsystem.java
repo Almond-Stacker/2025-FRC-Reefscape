@@ -33,7 +33,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
         armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID);
-        armEncoder = new DutyCycleEncoder(Constants.ArmConstants.ENCODER_ID);
+        armEncoder = new DutyCycleEncoder(3);
         indexingMotor = new SparkMax(Constants.ArmConstants.INDEX_MOTOR_ID, MotorType.kBrushless);
 
         armPID = new PIDController(Constants.ArmConstants.KP, Constants.ArmConstants.KI, Constants.ArmConstants.KD);

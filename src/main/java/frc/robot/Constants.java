@@ -50,4 +50,8 @@ public class Constants {
         public static final double MIN_THRESHOLD = 0;
 
     }
+
+    public static final class ControllerConsts {
+        public static final double FRIC = 0.07;
+    }
 }

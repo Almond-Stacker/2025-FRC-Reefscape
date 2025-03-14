@@ -97,52 +97,11 @@ public class PhotonSubsystem extends SubsystemBase {
         if(pipelineResult.hasTargets()) {
             for(PhotonTrackedTarget target: pipelineResult.getTargets()) {
                 targetSeen = true;
-                System.out.println("sigma boy");
                 targetID = target.getFiducialId();
-               tagLocation = target.getBestCameraToTarget();
-                tagTranslation = new Translation3d(tagLocation.getX(), tagLocation.getY(), tagLocation.getZ());
-                tagRotation = new Rotation3d(0, Units.degreesToRadians(target.getPitch()), Units.degreesToRadians(target.getYaw()));
-                SmartDashboard.putNumber(camera.getName() +"sigma rt", Units.degreesToRadians(target.getYaw()));
+                tagLocation = target.getBestCameraToTarget();
+                SmartDashboard.putNumber(camera.getName() + "sigma x x ", tagLocation.getX());
+                SmartDashboard.putNumber(camera.getName() + "sigma yy  ", tagLocation.getY());
 
-                tagPose = new Pose3d(tagTranslation, tagRotation);
-
-                 avgx = 0; 
-                 avgy = 0; 
-
-                for(Translation2d x : drivetrain.getModuleLocations()) {
-                    avgx += x.getX();
-                    avgy += x.getY();
-                }
-                avgx /= 4;
-                avgy /= 4;
-                yaw1 = PhotonUtils.getYawToPose(new Pose2d(avgx, avgy, drivetrain.getRotation3d().toRotation2d()), 
-                    new Pose2d(tagTranslation.getX(), tagTranslation.getY(), new Rotation2d(target.getYaw()))).getDegrees();
-                sigma = PhotonUtils.estimateCameraToTarget(new Translation2d(tagTranslation.getX(), tagTranslation.getY()), 
-                new Pose2d(1,1, new Rotation2d(0)), drivetrain.getRotation3d().toRotation2d());
-
-                SmartDashboard.putNumber(camera.getName() + " ntheauo", yaw1);
-                SmartDashboard.putNumber(camera.getName() + " sigm1 x", sigma.getX());
-                SmartDashboard.putNumber(camera.getName() + " sigm1 y", sigma.getY());
-
-                SmartDashboard.putNumber(camera.getName() + " sigm1 r", sigma.getRotation().getDegrees());
-
-
-                poseEstimator.updateWithTime(Timer.getFPGATimestamp(), drivetrain.getPigeon2().getRotation3d(), positions);
-
-                poseEstimator.addVisionMeasurement(tagPose, Timer.getFPGATimestamp());
-                for(int i = 0; i < 4; i++) {
-                    positions[i] = drivetrain.getModule(i).getPosition(true);
-                }
-                
-                estimatedRobotPose = new EstimatedRobotPose(tagPose, Timer.getFPGATimestamp(), pipelineResult.getTargets(), PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
-                setSmartDashboardValues();
-
-                SmartDashboard.putNumber(camera.getName() + "sigma x", this.getRobotPose().getX());
-                SmartDashboard.putNumber(camera.getName() +"sigma y", this.getRobotPose().getY());
-        
-                SmartDashboard.putNumber(camera.getName() +"sigma r", this.getRobotPose().getRotation().getAngle());
-                SmartDashboard.putNumber(camera.getName() + "tag x", tagLocation.getX());
-                SmartDashboard.putNumber(camera.getName() + "tag y", tagLocation.getY());
             }
         }   
     
@@ -156,38 +115,42 @@ public class PhotonSubsystem extends SubsystemBase {
         return tagLocation;
     }
 
+    private double getRobotYaw() {
+        return Math.abs(currentRobotYaw.get()) % 360;
+    }
+
     public double getYaw() {
         if(allianceBlue) {
             switch (targetID) {
                 case 1:
-                    return 30 - currentRobotYaw.get();
-                case 2:
-                    return 30 - currentRobotYaw.get();
-                case 3:
-                    return 30 - currentRobotYaw.get();
-                case 4:
-                    return 30 - currentRobotYaw.get();
-                case 5:
-                    return 30 - currentRobotYaw.get();
-                case 6:
-                    return 30 - currentRobotYaw.get();
+                    return getRobotYaw();
+                case 22:
+                    return 60 - getRobotYaw();
+                case 17:
+                    return 120 - getRobotYaw();
+                case 18:
+                    return 180 - getRobotYaw();
+                case 19:
+                    return 120 - getRobotYaw();
+                case 20:
+                    return 60 - getRobotYaw();
                 default:
                     return 0; 
             } 
         } else {
             switch (targetID) {
                 case 1:
-                    return 30 - currentRobotYaw.get();
-                case 2:
-                    return 30 - currentRobotYaw.get();
-                case 3:
-                    return 30 - currentRobotYaw.get();
-                case 4:
-                    return 30 - currentRobotYaw.get();
-                case 5:
-                    return 30 - currentRobotYaw.get();
+                    return getRobotYaw();
+                case 11:
+                    return 30 - getRobotYaw();
                 case 6:
-                    return 30 - currentRobotYaw.get();
+                    return 30 - getRobotYaw();
+                case 7:
+                    return 30 - getRobotYaw();
+                case 8:
+                    return 30 - getRobotYaw();
+                case 9:
+                    return 30 - getRobotYaw();
                 default:
                     return 0; 
             }
@@ -201,7 +164,7 @@ public class PhotonSubsystem extends SubsystemBase {
     private void setSmartDashboardValues() {
         SmartDashboard.putNumber(camera.getName() + " target ID", targetID);
         SmartDashboard.putNumber(camera.getName() + " current Robot Yaw", currentRobotYaw.get());
-
+        
         SmartDashboard.putBoolean(camera.getName() + " target seen", targetSeen);
     }
 }

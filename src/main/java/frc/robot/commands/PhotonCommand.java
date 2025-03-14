@@ -71,9 +71,10 @@ public class PhotonCommand extends Command{
 
         if(tagLocation != null) {
             counter = 0; 
-            xSpeed = xController.calculate(tagLocation.getX());
-            ySpeed = yController.calculate(tagLocation.getY());
+            xSpeed = -xController.calculate(tagLocation.getX());
+            ySpeed = -yController.calculate(tagLocation.getY());
             theataSpeed = theataController.calculate(camera.getYaw());
+            //theataSpeed = theataController.calculate(camera.getYaw());
         } else {
             counter += 1;
 
@@ -81,9 +82,11 @@ public class PhotonCommand extends Command{
             ySpeed = 0;
             theataSpeed = 0;
         }
-
+        SmartDashboard.putNumber("x speed", xSpeed);
+        SmartDashboard.putNumber("Y sped", ySpeed);
+        SmartDashboard.putNumber("theat speed", theataSpeed);
         drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(xSpeed)
-        .withVelocityY(ySpeed).withRotationalRate(0)).execute();
+        .withVelocityY(ySpeed).withRotationalRate(theataSpeed)).execute();
     }
 
     @Override

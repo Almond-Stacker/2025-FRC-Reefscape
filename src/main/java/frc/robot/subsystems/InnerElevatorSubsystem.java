@@ -19,6 +19,8 @@ public class InnerElevatorSubsystem extends SubsystemBase{
 
     private ElevatorStates state;
 
+    private double slowStrafe;
+
     private double currentPosition;
     private double motorSpeed;
     private boolean inBounds;
@@ -31,6 +33,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         state = ElevatorStates.STARTING_POSITION;
         
         motorSpeed = 0; 
+        slowStrafe = 1;
         inBounds = false;
         currentPosition = this.getHeight();
 
@@ -42,20 +45,20 @@ public class InnerElevatorSubsystem extends SubsystemBase{
     public void periodic() {
         currentPosition = getHeight(); 
 
-        if(currentPosition >= ElevatorStates.MAX.innerHeight) {
-            // positive goes up 
-            motorSpeed = -0.1;
-            inBounds = false;
-        } else if (currentPosition <= ElevatorStates.MIN.innerHeight) {
-            motorSpeed = 0.1;
-            inBounds = false;
-        } else {
+        // if(currentPosition >= ElevatorStates.MAX.innerHeight) {
+        //     // positive goes up 
+        //     motorSpeed = 0.1;
+        //     inBounds = false;
+        // } else if (currentPosition <= ElevatorStates.MIN.innerHeight) {
+        //     motorSpeed = -0.1;
+        //     inBounds = false;
+        // } else {
             motorSpeed = elevatorPID.calculate(currentPosition) + 0.03;
             if(motorSpeed < -0.1) {
                 motorSpeed *= 0.2;
             }
             inBounds = true;
-        }
+        //}
 
         elevatorMotor.set(motorSpeed);
         setSmartDashboardValues();
@@ -76,6 +79,16 @@ public class InnerElevatorSubsystem extends SubsystemBase{
 
     public boolean atSetPosition() {
         return elevatorPID.atSetpoint();
+    }
+
+    public double getSlowStrafe() {
+        if(state.equals(ElevatorStates.STARTING_POSITION)) {
+            slowStrafe = 1;
+        } else {
+            slowStrafe = 0.5;
+        }
+
+        return slowStrafe;
     }
 
     private void setSmartDashboardValues() {

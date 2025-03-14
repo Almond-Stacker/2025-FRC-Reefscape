@@ -39,6 +39,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.BeamBreakSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ControllerSubsystem;
 //import frc.robot.subsystems.DriveVelSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
@@ -77,17 +78,19 @@ public class RobotContainer {
     private final ArmSubsystem s_armSubsystem = new ArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
     private final BeamBreakSubsystem s_beambreakSubsystem = new BeamBreakSubsystem();
-    //$private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
-  //  private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
+    private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getPigeon2().getYaw().getValueAsDouble(), drivetrain);
+    private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
 
+
+    private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
     //** Command Handlers **//
     private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
     private final ClimbCommand ch_climbCommand = new ClimbCommand(s_climbSubsystem);
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
 
     //** Commands **//
-    // private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.43, 0.2);
-    // private PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2);
+    private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.603, -0.166);
+    private PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.503, 0.13);
 
     private final SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
         ch_elevatorCommandHandler.setArmState(ElevatorStates.INTAKE),
@@ -96,7 +99,7 @@ public class RobotContainer {
         ch_indexCommand.setIndexState(IndexStates.INTAKE),
         new WaitCommand(0.2),
         ch_elevatorCommandHandler.setInnerElevatorState(ElevatorStates.INTAKE),
-        new WaitCommand(0.5),
+        new WaitCommand(0.55),
         ch_indexCommand.setIndexState(IndexStates.STOP),
         ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
     
@@ -113,7 +116,9 @@ public class RobotContainer {
         configureDriveBindings();
         configureDriver1Commands();
         configureAuto();
+       // drivetrain.getPid
     }
+
 
     private boolean checkRun() {
         if(!s_beambreakSubsystem.getBeamBroken() && s_innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE)) {
@@ -126,8 +131,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(driver0.getLeftY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(driver0.getLeftX()) * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY()) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX()) * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -135,31 +140,33 @@ public class RobotContainer {
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
         //driver0.x().whileTrue(spot1);
-
+        
+        driver0.x().whileTrue(c_positionToLeftPole);
+        driver0.y().whileTrue(c_positionToRightPole);
         // reset the field-centric heading on left bumper press
-       driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-     //  driver0.x().onTrue(new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2));
-        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
-             new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value))));
-    }
+        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      // driver0.x().onTrue(new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2));
+        //  driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.resetRotation(
+        //      new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(90).value))));
+     }
 
     private void configureDriver1Commands() {
-        driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-        driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
-        driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
-        driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
+        driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
+        driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
+        driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
        // driver1.pov(-1).toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
-        driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
-        //driver1.x().onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
+        driver1.b().toggleOnTrue(c_preIntakeToIntake);//.onlyIf(() -> checkRun()));
+        driver1.x().onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.STARTING_POSITION));
         driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         //driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
         driver1.y().onTrue(c_score);
 
-        driver1.rightTrigger().onTrue(ch_climbCommand.setClimbState(ClimbStates.CLIMB));
-        driver1.rightTrigger().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
+        driver1.leftBumper().onTrue(ch_climbCommand.setClimbState(ClimbStates.CLIMB));
+        driver1.leftBumper().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
 
-        driver1.leftTrigger().onTrue(ch_climbCommand.setClimbState(ClimbStates.DROP));
-        driver1.leftTrigger().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
+        driver1.rightBumper().onTrue(ch_climbCommand.setClimbState(ClimbStates.DROP));
+        driver1.rightBumper().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
     }
 
     private void configureAuto() {
@@ -181,7 +188,9 @@ public class RobotContainer {
     }
 
     public void resetDrive() {
-        drivetrain.runOnce(() -> drivetrain.resetRotation(
-            new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(180).value)));
-    }
+         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+     }
+    //     drivetrain.runOnce(() -> drivetrain.resetRotation(
+    //         new Rotation2d(SwerveRequest.ForwardPerspectiveValue.valueOf(90).value)));
+    // }
 }
