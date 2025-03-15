@@ -10,23 +10,32 @@ public class States {
         L1(0.6,6,210),
         L2(1,7.416,203),
         L3(23.9, 23, 200),
-        L4(108.5, 25.5, 210);
+        L4(108.5, 25.5, 220);
         public final double primaryHeight; 
         public final double innerHeight;
-        
+        public final double slow;
+
         public final double armAngle;
+
+        ElevatorStates(double primaryHeight, double innerHeight, double intakeArmAngle, double slow) {
+            this.primaryHeight = primaryHeight;
+            this.innerHeight = innerHeight;
+            this.armAngle = intakeArmAngle;
+            this.slow = slow;
+        }
 
         ElevatorStates(double primaryHeight, double innerHeight, double intakeArmAngle) {
             this.primaryHeight = primaryHeight;
             this.innerHeight = innerHeight;
             this.armAngle = intakeArmAngle;
+            this.slow = 1;
         }
     }
 
     public enum IndexStates {
         INTAKE(1),
         OUTTAKE(-1),
-        STOP(0.1);
+        STOP(0);
 
         public final double speed;
 

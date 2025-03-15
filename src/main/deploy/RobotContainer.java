@@ -43,7 +43,6 @@ import frc.robot.subsystems.ControllerSubsystem;
 //import frc.robot.subsystems.DriveVelSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
-import frc.robot.commands.PhotonCommand1;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 import frc.robot.generated.TunerConstants;
@@ -79,8 +78,8 @@ public class RobotContainer {
     private final ArmSubsystem s_armSubsystem = new ArmSubsystem();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
     private final BeamBreakSubsystem s_beambreakSubsystem = new BeamBreakSubsystem();
-    // private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getPigeon2().getYaw().getValueAsDouble(), drivetrain);
-    // private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
+    private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getPigeon2().getYaw().getValueAsDouble(), drivetrain);
+    private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
 
 
     private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
@@ -90,11 +89,8 @@ public class RobotContainer {
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
 
     //** Commands **//
-    // private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
-    // private PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.416, -0.17, () -> driver0.getRightY());
-
-    // private PhotonCommand1 c_positionToRightPole1 = new PhotonCommand1(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
-    // private PhotonCommand1 c_positionToLeftPole1 = new PhotonCommand1(s_bluePhotonVision, drivetrain, 0, 0.416, -0.17, () -> driver0.getRightY());
+    private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.603, -0.166);
+    private PhotonCommand c_positionToLeftPole = new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.503, 0.13);
 
     private final SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
         ch_elevatorCommandHandler.setArmState(ElevatorStates.INTAKE),
@@ -147,9 +143,6 @@ public class RobotContainer {
         
         driver0.x().whileTrue(c_positionToLeftPole);
         driver0.y().whileTrue(c_positionToRightPole);
-
-        driver0.rightTrigger().whileTrue(c_positionToLeftPole1);
-        driver0.leftTrigger().whileTrue(c_positionToRightPole1);
         // reset the field-centric heading on left bumper press
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
       // driver0.x().onTrue(new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2));

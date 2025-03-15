@@ -18,7 +18,7 @@
 // import frc.robot.subsystems.CommandSwerveDrivetrain;
 // import frc.robot.subsystems.PhotonSubsystem;
 
-// public class PhotonCommand extends Command{
+// public class PhotonCommand1 extends Command{
 //     private final PhotonSubsystem camera;
 //     private final SwerveRequest.RobotCentric robotCentricDrive = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 //     private final CommandSwerveDrivetrain drivetrain;
@@ -41,16 +41,16 @@
 //     private int counter; 
 
 
-//     public PhotonCommand(PhotonSubsystem camera, CommandSwerveDrivetrain drive, double goalYaw, double goalX, double goalY, Supplier<Double> input) {
+//     public PhotonCommand1(PhotonSubsystem camera, CommandSwerveDrivetrain drive, double goalYaw, double goalX, double goalY, Supplier<Double> input) {
 //         this.camera = camera;
 //         this.drivetrain = drive;
         
 //         xController = new PIDController(2, 0, 0);
 //         yController = new PIDController(2, 0, 0);
-//         theataController = new PIDController(0.6, 0,0 );
+//         theataController = new PIDController(0.1, 0,0 );
 //         theataController.enableContinuousInput(-Math.PI, Math.PI);
 //         this.yaw = input;
-//         this.goalX = goalX;
+//                 this.goalX = goalX;
 //         this.goalY = goalY;
 //         this.goalYaw = goalYaw;
 //         addRequirements(camera);
@@ -88,7 +88,7 @@
 //         SmartDashboard.putNumber("Y sped", ySpeed);
 //         SmartDashboard.putNumber("theat speed", theataSpeed);
 //         drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(xSpeed)
-//         .withVelocityY(ySpeed).withRotationalRate(0)).execute();
+//         .withVelocityY(ySpeed).withRotationalRate(theataSpeed)).execute();
 //     }
 
 //     @Override

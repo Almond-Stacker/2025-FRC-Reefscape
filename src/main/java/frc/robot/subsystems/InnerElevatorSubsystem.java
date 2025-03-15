@@ -85,7 +85,7 @@ public class InnerElevatorSubsystem extends SubsystemBase{
         if(state.equals(ElevatorStates.STARTING_POSITION)) {
             slowStrafe = 1;
         } else {
-            slowStrafe = 0.5;
+            slowStrafe = 0.2;
         }
 
         return slowStrafe;

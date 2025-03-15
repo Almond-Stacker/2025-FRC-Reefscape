@@ -39,12 +39,16 @@ public class ElevatorCommandHandler {
         if((innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L1) || innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L2))
             && (state.equals(ElevatorStates.PRE_INTAKE) || state.equals(ElevatorStates.INTAKE) || state.equals(ElevatorStates.STARTING_POSITION))) {
             return new SequentialCommandGroup(setPrimaryElevatorState(state), setInnerElevatorState(ElevatorStates.PRE_INTAKE), new WaitCommand(0.3), 
-                setArmState(state), new WaitCommand(0.2), setInnerElevatorState(state));
+                setArmState(state), new WaitCommand(0.4), setInnerElevatorState(state));
         } else if(innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE) && state.equals(ElevatorStates.INTAKE)) {
-            return new SequentialCommandGroup(setPrimaryElevatorState(state), setArmState(state), new WaitCommand(0.3), setInnerElevatorState(state));
+            return new SequentialCommandGroup(setPrimaryElevatorState(state), setArmState(state), new WaitCommand(0.4), setInnerElevatorState(state));
         } else {
             return new SequentialCommandGroup(setPrimaryElevatorState(state), setInnerElevatorState(state), setArmState(state));
         }
+    }
+
+    public ElevatorStates getState() {
+        return innerElevatorSubsystem.getInnerElevatorState();
     }
 }
  
