@@ -15,7 +15,7 @@ import frc.robot.Constants;
 import frc.robot.States.ElevatorStates;
 import frc.robot.States.IndexStates;
 
-public class ArmSubsystem extends SubsystemBase {
+public class IntakeArm extends SubsystemBase {
     private final TalonFX armMotor;
     private final SparkMax indexingMotor;
     private final DutyCycleEncoder armEncoder;
@@ -31,7 +31,7 @@ public class ArmSubsystem extends SubsystemBase {
     private boolean override;
     private boolean inBounds; 
 
-    public ArmSubsystem() {
+    public IntakeArm() {
         armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID);
         armEncoder = new DutyCycleEncoder(3);
         indexingMotor = new SparkMax(Constants.ArmConstants.INDEX_MOTOR_ID, MotorType.kBrushless);
@@ -42,7 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
         indexState = IndexStates.STOP;;
         elevatorState = ElevatorStates.STARTING_POSITION;
 
-        armPosition = getArmAngle();;
+        armPosition = getArmAngle();
         armSpeed = 0;
         override = false;
         inBounds = false;
@@ -54,10 +54,10 @@ public class ArmSubsystem extends SubsystemBase {
         
         if(armPosition >= ElevatorStates.MAX.armAngle) {
             // posotive is up
-            armSpeed = -0.1;
+            armSpeed = 0.1;
             inBounds = false;
         } else if(armPosition <= ElevatorStates.MIN.armAngle) {
-            armSpeed = 0.1;
+            armSpeed = -0.1;
             inBounds = false;
         } else if(!override) {
             armSpeed = armPID.calculate(armPosition) 
@@ -84,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
         indexingMotor.set(state.speed);
     }
     
-    public  double getArmAngle() {
+    public double getArmAngle() {
         return Units.rotationsToDegrees(armEncoder.get()) + 33;
     }
 
