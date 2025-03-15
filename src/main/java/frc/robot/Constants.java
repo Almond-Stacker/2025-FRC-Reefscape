@@ -53,5 +53,14 @@ public class Constants {
 
     public static final class ControllerConsts {
         public static final double FRIC = 0.07;
+        public static final double PRECIECE_ADD_FRIC = 0.7; //how much acceleration will slow when in preciece mode
+        public static final double PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO = 0.4; // how much slower the max speed goes when in preciece mode
+        public static final double PRECIECE_ADD_ROTATIONAL_DEADBAND_RATIO = 0.5; // how much slower the max rotational speed goes when in preciece mode
+        public static final double DEADBAND_RATIO = 0.6;//absolute max speed cutoff when elevator up
+
+        public static final double SLOW_RATIO = 0.4;//how fast it will move when elevator up
+        public static final double STRAFE_RATIO = 0.1;
+        
     }
+
 }
