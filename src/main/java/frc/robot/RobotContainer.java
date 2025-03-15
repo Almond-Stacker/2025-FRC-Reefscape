@@ -34,7 +34,6 @@ import frc.robot.States.IndexStates;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IndexCommand;
-import frc.robot.commands.PhotonCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.BeamBreakSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -42,8 +41,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ControllerSubsystem;
 //import frc.robot.subsystems.DriveVelSubsystem;
 import frc.robot.subsystems.InnerElevatorSubsystem;
-import frc.robot.subsystems.PhotonSubsystem;
-import frc.robot.commands.PhotonCommand1;
+import frc.robot.commands.teleopCommand;
 import frc.robot.subsystems.PrimaryElevatorSubsystem;
 
 import frc.robot.generated.TunerConstants;
@@ -83,11 +81,13 @@ public class RobotContainer {
     // private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
 
 
-    private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
     //** Command Handlers **//
     private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
     private final ClimbCommand ch_climbCommand = new ClimbCommand(s_climbSubsystem);
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
+    
+   private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
+    private teleopCommand teleCommand = new teleopCommand(controllerSubsystem, drivetrain, s_innerElevatorSubsystem);
 
     //** Commands **//
     // private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
@@ -134,22 +134,32 @@ public class RobotContainer {
     private void configureDriveBindings() {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY()) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX()) * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            // drivetrain.applyRequest(() ->
+            //     drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY()) * MaxSpeed) // Drive forward with negative Y (forward)
+            //         .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX()) * MaxSpeed) // Drive left with negative X (left)
+            //         .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            // )
+            teleCommand
         );
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
         //driver0.x().whileTrue(spot1);
         
-        driver0.x().whileTrue(c_positionToLeftPole);
-        driver0.y().whileTrue(c_positionToRightPole);
+        driver0.leftTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(true)));
+        driver0.leftTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
 
-        driver0.rightTrigger().whileTrue(c_positionToLeftPole1);
-        driver0.leftTrigger().whileTrue(c_positionToRightPole1);
+        driver0.rightTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(false)));
+        driver0.rightTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
+
+        driver0.rightBumper().onTrue(new InstantCommand(() -> controllerSubsystem.setPrecision(true)));
+        driver0.rightBumper().onFalse(new InstantCommand(() -> controllerSubsystem.setPrecision(false)));
+
+        // driver0.x().whileTrue(c_positionToLeftPole);
+        // driver0.y().whileTrue(c_positionToRightPole);
+
+        // driver0.rightTrigger().whileTrue(c_positionToLeftPole1);
+        // driver0.leftTrigger().whileTrue(c_positionToRightPole1);
         // reset the field-centric heading on left bumper press
         driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
       // driver0.x().onTrue(new PhotonCommand(s_bluePhotonVision, drivetrain, 0, 0.5, 0.2));
@@ -168,6 +178,8 @@ public class RobotContainer {
         driver1.a().toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         //driver1.b().toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
         driver1.y().onTrue(c_score);
+        driver1.rightTrigger().onTrue(ch_indexCommand.setIndexState(IndexStates.OUTTAKE));
+        driver1.rightTrigger().onFalse(ch_indexCommand.setIndexState(IndexStates.STOP));
 
         driver1.leftBumper().onTrue(ch_climbCommand.setClimbState(ClimbStates.CLIMB));
         driver1.leftBumper().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));
@@ -183,7 +195,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Pre intake", ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         NamedCommands.registerCommand("intake", c_preIntakeToIntake);
         NamedCommands.registerCommand("LineUp", new WaitCommand(0.1));    
-        NamedCommands.registerCommand("Intake", ch_indexCommand.setIndexState(IndexStates.INTAKE));
+        NamedCommands.registerCommand("Intake", ch_indexCommand.setIndexState(IndexStates.OUTTAKE));
         NamedCommands.registerCommand("Stop", ch_indexCommand.setIndexState(IndexStates.STOP));
 
         m_chooser = AutoBuilder.buildAutoChooser("1 Coral Straight");
