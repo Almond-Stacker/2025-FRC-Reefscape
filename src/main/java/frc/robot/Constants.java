@@ -1,5 +1,15 @@
 package frc.robot;
 
+import java.util.concurrent.TransferQueue;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class Constants {
     public static final int BEAMBREAK_ID = 0; 
     
@@ -28,12 +38,12 @@ public class Constants {
     }
 
     public static final class ArmConstants {
-        public static final int ARM_MOTOR_ID = 16;
+        public static final int ARM_MOTOR_ID = 31;
         public static final int INDEX_MOTOR_ID = 25;
         public static final int ENCODER_ID = 0;
 
-        public static final double KP = 0.012;
-        public static final double KI = 0.0;
+        public static final double KP = 0.008;
+        public static final double KI = 0.0;   
         public static final double KD = 0.0;
 
         public static final double KS = 0;
@@ -62,5 +72,27 @@ public class Constants {
         public static final double STRAFE_RATIO = 0.1;
         
     }
+    
 
+    public static final class PhotonConsts  {
+        public static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        
+        public static final Transform3d GRAY_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
+        public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
+
+        public static final String GRAY_CAMERA_NAME = "";
+        public static final String BLUE_CAMERA_NAME = "";
+
+        public static final double LAST_RESULT_TIMEOUT = 0.4;
+                    
+        public static final double CENTER_TO_TAG_DELTA_X = 0.94 + 0.3;
+
+        public static final Transform2d GOAL_LEFT_REEF = new Transform2d(0.416, 0, new Rotation2d() );
+        public static final Transform2d GOAL_RIGHT_REEF = new Transform2d(-0.416, 0, new Rotation2d());
+    }
+
+    public static final class OdometryConsts {
+        public static final double TranslationalThreshold = 0.3;
+        public static final double RotationalThreshold = 0.1;
+    }
 }

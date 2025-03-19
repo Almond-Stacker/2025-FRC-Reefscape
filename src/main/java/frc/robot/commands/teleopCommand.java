@@ -12,7 +12,8 @@ import frc.robot.Constants.ControllerConsts;
 import frc.robot.States.ElevatorStates;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ControllerSubsystem;
-import frc.robot.subsystems.InnerElevatorSubsystem;
+import frc.robot.subsystems.InnerElevator;
+
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -27,19 +28,20 @@ public class teleopCommand extends Command {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1)
             .withRotationalDeadband(MaxAngularRate * 0.1);
-    InnerElevatorSubsystem i; 
+    InnerElevator i; 
 
     private final SwerveRequest.RobotCentric robotCentricDrive = new SwerveRequest.RobotCentric()
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     double strafeSpeed;
 
-    public teleopCommand(ControllerSubsystem c, CommandSwerveDrivetrain d, InnerElevatorSubsystem i) {
+    public teleopCommand(ControllerSubsystem c, CommandSwerveDrivetrain d, InnerElevator i) {
         this.controllerSubsystem = c;
         this.drivetrain = d;
         this.i = i; 
 
         this.strafeSpeed = MaxSpeed * ControllerConsts.STRAFE_RATIO;
+        addRequirements(drivetrain);
     }
 
     @Override 

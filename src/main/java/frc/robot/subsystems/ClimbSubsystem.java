@@ -27,13 +27,13 @@ public class ClimbSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         currentPosition = climbEncoder.get();
-        // if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
-        //     climbMotor.set(0.1);
-        //     return;
-        // } else if (currentPosition < Constants.ClimbConstants.MIN_THRESHOLD) {
-        //     climbMotor.set(-0.1);
-        //     return;
-        // }
+        if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
+            climbMotor.set(0.1);
+            return;
+        } else if (currentPosition < Constants.ClimbConstants.MIN_THRESHOLD) {
+            climbMotor.set(-0.1);
+            return;
+        }
         climbMotor.set(climbSpeed);
         setSmartDashboardValues();
     }
