@@ -36,6 +36,7 @@ import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IndexCommand;
 import frc.robot.commands.OdometryCommand;
+import frc.robot.commands.SwerveTeleop;
 import frc.robot.commands.teleopCommand;
 
 // import frc.robot.subsystems.PhotonSubsystem;
@@ -106,6 +107,7 @@ public class RobotContainer {
 
     // private PhotonCommand1 c_positionToRightPole1 = new PhotonCommand1(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
     // private PhotonCommand1 c_positionToLeftPole1 = new PhotonCommand1(s_bluePhotonVision, drivetrain, 0, 0.416, -0.17, () -> driver0.getRightY());
+    private final SwerveTeleop swerveTeleop = new SwerveTeleop(drivetrain, s_innerElevatorSubsystem, driver0);
 
     private OdometryCommand c_positionToLeftPole = new OdometryCommand(drivetrain, s_grayVision, true);
     private OdometryCommand c_positionToRightPole = new OdometryCommand(drivetrain, s_blueVision, false);
@@ -156,7 +158,7 @@ public class RobotContainer {
             //         .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX()) * MaxSpeed) // Drive left with negative X (left)
             //         .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             // )
-            teleCommand
+           swerveTeleop
         );
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));

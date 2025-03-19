@@ -43,4 +43,12 @@ public class Utilities {
 
         return relPrimaryHeight + relInnerHeight;
     }
+
+    // keep drive values within the range of -1 and 1 
+    public static double clampDriveValues(double driveInput) {
+        driveInput = Math.min(1,driveInput);
+        driveInput = Math.max(-1, driveInput);
+
+        return driveInput; 
+    }
 }

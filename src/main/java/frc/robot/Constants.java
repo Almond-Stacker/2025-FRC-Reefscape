@@ -11,6 +11,15 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class Constants {
+    public static final double SLEW_ROTATION = 0.3; 
+
+    public static final double SLEW_POSITIVE_MAX = 0.1;
+    public static final double SLEW_NEGATIVE_MAX = 0.05;
+
+    public static final double SLEW_POSITIVE_MIN = 0.1;
+    public static final double SLEW_NEGATIVE_MIN = 0.05; 
+
+
     public static final int BEAMBREAK_ID = 0; 
     
     public static final class PrimaryElevatorConstants {
