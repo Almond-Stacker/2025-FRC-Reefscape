@@ -43,20 +43,16 @@ import frc.robot.commands.AprilTagCommands.alignToPose;
 import frc.robot.commands.teleopCommands.SwerveTeleop;
 import frc.robot.commands.teleopCommands.basicTeleop;
 import frc.robot.commands.teleopCommands.teleopCommand;
-
-// import frc.robot.subsystems.PhotonSubsystem;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.BeamBreakSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ControllerSubsystem;
 import frc.robot.subsystems.InnerElevator;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.PrimaryElevator;
 import frc.robot.subsystems.VisionVersions.Vision;
 import frc.robot.subsystems.VisionVersions.Vision3;
-import frc.robot.subsystems.ControllerSubsystem;
-
-import frc.robot.generated.TunerConstants;
 
 
 //overall structure of the robot here, no real robot logic
