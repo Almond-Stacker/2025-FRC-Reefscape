@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.AprilTagCommands;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OdometryConsts;
 import frc.robot.Constants.PhotonConsts;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionVersions.Vision;
+
 import org.photonvision.EstimatedRobotPose;
 
 

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import org.opencv.photo.AlignExposures;
 import org.photonvision.proto.Photon;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -35,9 +36,13 @@ import frc.robot.States.ReefPosition;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ElevatorCommandHandler;
 import frc.robot.commands.IndexCommand;
-import frc.robot.commands.OdometryCommand;
-import frc.robot.commands.SwerveTeleop;
-import frc.robot.commands.teleopCommand;
+import frc.robot.commands.AprilTagCommands.AlignToReefTagRelative;
+import frc.robot.commands.AprilTagCommands.OdometryCommand;
+import frc.robot.commands.AprilTagCommands.OdometryCommand1;
+import frc.robot.commands.AprilTagCommands.alignToPose;
+import frc.robot.commands.teleopCommands.SwerveTeleop;
+import frc.robot.commands.teleopCommands.basicTeleop;
+import frc.robot.commands.teleopCommands.teleopCommand;
 
 // import frc.robot.subsystems.PhotonSubsystem;
 
@@ -47,7 +52,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevator;
 import frc.robot.subsystems.IntakeArm;
 import frc.robot.subsystems.PrimaryElevator;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.VisionVersions.Vision;
+import frc.robot.subsystems.VisionVersions.Vision3;
 import frc.robot.subsystems.ControllerSubsystem;
 
 import frc.robot.generated.TunerConstants;
@@ -83,23 +89,20 @@ public class RobotContainer {
     private final IntakeArm s_armSubsystem = new IntakeArm();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
     private final BeamBreakSubsystem s_beambreakSubsystem = new BeamBreakSubsystem();
-    // private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", () -> drivetrain.getPigeon2().getYaw().getValueAsDouble(), drivetrain);
-    // private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", () -> drivetrain.getRotation3d().getAngle(), drivetrain);
 
     private final Vision s_grayVision = new Vision("gray_photon_camera", drivetrain, PhotonConsts.GRAY_PHOTON_CAMERA_TO_ROBOT);
     private final Vision s_blueVision = new Vision("blue_photon_camera", drivetrain, PhotonConsts.BLUE_PHOTON_CAMERA_TO_ROBOT);
 
-    // private final PhotonSubsystem s_grayPhotonVision = new PhotonSubsystem("gray_photon_camera", drivetrain, PhotonConsts.GRAY_PHOTON_CAMERA_TO_ROBOT);
-    // private final PhotonSubsystem s_bluePhotonVision = new PhotonSubsystem("blue_photon_camera", drivetrain, PhotonConsts.BLUE_PHOTON_CAMERA_TO_ROBOT);
-
+    //private final Vision3 s_grayVision1 = new Vision3("gray_photon_camera", drivetrain, PhotonConsts.GRAY_PHOTON_CAMERA_TO_ROBOT);
+    //private final Vision3 s_blueVision1 = new Vision3("blue_photon_camera", drivetrain, PhotonConsts.BLUE_PHOTON_CAMERA_TO_ROBOT);
 
     //** Command Handlers **//
     private final ElevatorCommandHandler ch_elevatorCommandHandler = new ElevatorCommandHandler(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
     private final ClimbCommand ch_climbCommand = new ClimbCommand(s_climbSubsystem);
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
     
-   private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
-    private teleopCommand teleCommand = new teleopCommand(controllerSubsystem, drivetrain, s_innerElevatorSubsystem);
+    //private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
+    //private teleopCommand teleCommand = new teleopCommand(controllerSubsystem, drivetrain, s_innerElevatorSubsystem);
 
     //** Commands **//
     // private PhotonCommand c_positionToRightPole = new PhotonCommand(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
@@ -107,13 +110,21 @@ public class RobotContainer {
 
     // private PhotonCommand1 c_positionToRightPole1 = new PhotonCommand1(s_grayPhotonVision, drivetrain, 0, 0.416, 0.17, () -> driver0.getRightY());
     // private PhotonCommand1 c_positionToLeftPole1 = new PhotonCommand1(s_bluePhotonVision, drivetrain, 0, 0.416, -0.17, () -> driver0.getRightY());
-    private final SwerveTeleop swerveTeleop = new SwerveTeleop(drivetrain, s_innerElevatorSubsystem, driver0);
+    // private final SwerveTeleop swerveTeleop = new SwerveTeleop(drivetrain, s_innerElevatorSubsystem, driver0);
 
-    private OdometryCommand c_positionToLeftPole = new OdometryCommand(drivetrain, s_grayVision, true);
-    private OdometryCommand c_positionToRightPole = new OdometryCommand(drivetrain, s_blueVision, false);
+    // private OdometryCommand c_positionToLeftPole = new OdometryCommand(drivetrain, s_grayVision, true);
+    // private OdometryCommand c_positionToRightPole = new OdometryCommand(drivetrain, s_blueVision, false);
 
     // private PhotonCommand c_leftPoleAllignment = new PhotonCommand(s_grayPhotonVision, drivetrain, ReefPosition.LEFT);
     // private PhotonCommand c_rightPoleAllignment = new PhotonCommand(s_bluePhotonVision, drivetrain, ReefPosition.RIGHT);
+
+    private final SwerveTeleop teleop = new SwerveTeleop(drivetrain, s_innerElevatorSubsystem, driver0);
+    //private final basicTeleop teleop2 = new basicTeleop(driver0, drivetrain, s_innerElevatorSubsystem);
+
+    private final OdometryCommand odomCommand = new OdometryCommand(drivetrain, s_blueVision, false);
+    private final OdometryCommand1 odometryCommand1 = new OdometryCommand1(drivetrain);
+    private final AlignToReefTagRelative aRelative = new AlignToReefTagRelative(true, drivetrain);
+   //private final alignToPose sigma = new alignToPose(drivetrain, null);
 
     private final SequentialCommandGroup c_preIntakeToIntake = new SequentialCommandGroup(
         ch_elevatorCommandHandler.setArmState(ElevatorStates.INTAKE),
@@ -143,12 +154,12 @@ public class RobotContainer {
     }
 
 
-    private boolean checkRun() {
-        if(!s_beambreakSubsystem.getBeamBroken() && s_innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE)) {
-            return true;
-        }
-        return false;
-    }
+    // private boolean checkRun() {
+    //     if(!s_beambreakSubsystem.getBeamBroken() && s_innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE)) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     private void configureDriveBindings() {
         drivetrain.setDefaultCommand(
@@ -158,21 +169,21 @@ public class RobotContainer {
             //         .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX()) * MaxSpeed) // Drive left with negative X (left)
             //         .withRotationalRate(-Utilities.polynomialAccleration(driver0.getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             // )
-           swerveTeleop
+            teleop
         );
 
         driver0.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver0.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver0.getLeftY(), -driver0.getLeftX()))));
         //driver0.x().whileTrue(spot1);
         
-        driver0.leftTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(true)));
-        driver0.leftTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
+        // driver0.leftTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(true)));
+        // driver0.leftTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
 
-        driver0.rightTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(false)));
-        driver0.rightTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
+        // driver0.rightTrigger().onTrue(new InstantCommand(() -> controllerSubsystem.setStrafeLeft(false)));
+        // driver0.rightTrigger().onFalse(new InstantCommand(() -> controllerSubsystem.setStrafe(false)));
 
-        driver0.rightBumper().onTrue(new InstantCommand(() -> controllerSubsystem.setPrecision(true)));
-        driver0.rightBumper().onFalse(new InstantCommand(() -> controllerSubsystem.setPrecision(false)));
+        // driver0.rightBumper().onTrue(new InstantCommand(() -> controllerSubsystem.setPrecision(true)));
+        // driver0.rightBumper().onFalse(new InstantCommand(() -> controllerSubsystem.setPrecision(false)));
 
         // driver0.x().whileTrue(c_leftPoleAllignment);
         // driver0.y().whileTrue(c_rightPoleAllignment);
@@ -192,10 +203,10 @@ public class RobotContainer {
      }
 
     private void configureDriver1Commands() {
-        // driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
-        // driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
-        // driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
-        // driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        driver1.pov(90).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
+        driver1.pov(0).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L3));
+        driver1.pov(270).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L2));
+        driver1.pov(180).toggleOnTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
        // driver1.pov(-1).toggleOnTrue(c_preIntakeToIntake.onlyIf(() -> checkRun()));
         driver1.b().toggleOnTrue(c_preIntakeToIntake);//.onlyIf(() -> checkRun()));
         driver1.x().onTrue(ch_elevatorCommandHandler.setElevators(ElevatorStates.STARTING_POSITION));
@@ -205,11 +216,11 @@ public class RobotContainer {
         //driver1.rightTrigger().onTrue(ch_indexCommand.setIndexState(IndexStates.OUTTAKE));
         //driver1.rightTrigger().onFalse(ch_indexCommand.setIndexState(IndexStates.STOP));
 
-        driver1.rightTrigger().onTrue(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0.05)));
-        driver1.leftTrigger().onTrue(new InstantCommand(() -> s_armSubsystem.setAddSpeed(-0.05)));
+        // driver1.rightTrigger().onTrue(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0.05)));
+        // driver1.leftTrigger().onTrue(new InstantCommand(() -> s_armSubsystem.setAddSpeed(-0.05)));
 
-        driver1.rightTrigger().onFalse(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0)));
-        driver1.leftTrigger().onFalse(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0)));
+        // driver1.rightTrigger().onFalse(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0)));
+        // driver1.leftTrigger().onFalse(new InstantCommand(() -> s_armSubsystem.setAddSpeed(0)));
 
         driver1.leftBumper().onTrue(ch_climbCommand.setClimbState(ClimbStates.CLIMB));
         driver1.leftBumper().onFalse(ch_climbCommand.setClimbState(ClimbStates.STOP));

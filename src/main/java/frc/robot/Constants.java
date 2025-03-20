@@ -19,6 +19,8 @@ public class Constants {
     public static final double SLEW_POSITIVE_MIN = 0.1;
     public static final double SLEW_NEGATIVE_MIN = 0.05; 
 
+    public static final String LimelightName = "";
+
 
     public static final int BEAMBREAK_ID = 0; 
     
@@ -98,6 +100,24 @@ public class Constants {
 
         public static final Transform2d GOAL_LEFT_REEF = new Transform2d(0.416, 0, new Rotation2d() );
         public static final Transform2d GOAL_RIGHT_REEF = new Transform2d(-0.416, 0, new Rotation2d());
+
+        public static final double KP_TRANSLATION = 1;
+        public static final double KI_TRANSLATION = 0;
+        public static final double KD_TRANSLATION = 0;
+
+        public static final double KP_ROTATION = 0.1;
+        public static final double KI_ROTATION = 0;
+        public static final double KD_ROTATION = 0;
+
+        public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0; 
+        public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 1; 
+        public static final double X_SETPOINT_REEF_ALIGNMENT = 0.416; 
+        public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.05;
+        public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.17; 
+        public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.05; 
+        public static final double DONT_SEE_TAG_WAIT_TIME = 1; 
+        public static final double POSE_VALIDATION_TIME = 0.2; 
+
     }
 
     public static final class OdometryConsts {

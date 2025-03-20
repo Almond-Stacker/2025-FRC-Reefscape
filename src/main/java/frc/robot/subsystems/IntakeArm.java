@@ -70,8 +70,7 @@ public class IntakeArm extends SubsystemBase {
             armSpeed = -0.1;
             inBounds = false;
         } else if(!override) {
-            armSpeed = //armPID.calculate(armPosition)
-            addSpeed + 
+            armSpeed = armPID.calculate(armPosition) + 
                 armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getAbsoluteEncoder().getVelocity());
             inBounds = true;
         }
@@ -85,9 +84,9 @@ public class IntakeArm extends SubsystemBase {
         armPID.setSetpoint(state.armAngle);
     }
 
-    public void setAddSpeed(double addSpeed) {
-        this.addSpeed = addSpeed;
-    }
+    // public void setAddSpeed(double addSpeed) {
+    //     this.addSpeed = addSpeed;
+    // }
 
     public void setOverride(double armSpeed, boolean override) {
         this.override = override;

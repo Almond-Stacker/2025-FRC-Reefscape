@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.teleopCommands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -19,7 +19,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.InnerElevator;
 
-
+// ensure smooth acceleration with variable acceleration in different states 
 public class SwerveTeleop extends Command {
     private final CommandSwerveDrivetrain drivetrain; 
     private final InnerElevator innerElevator;
@@ -41,13 +41,11 @@ public class SwerveTeleop extends Command {
     private final SlewRateLimiter xLimiterRestricted; 
     private final SlewRateLimiter yLimiterRestricted;
 
-    private double xSpeed;
-    private double ySpeed;
-    private double rSpeed;
-    
-    private double xInput;
-    private double yInput; 
-    private double rInput; 
+    private ElevatorStates previousState; 
+    private ElevatorStates currentState;
+
+    private double xSpeed, ySpeed, rSpeed;
+    private double xInput, yInput, rInput; 
 
     public SwerveTeleop(CommandSwerveDrivetrain drivetrain, InnerElevator innerElevator, CommandXboxController controller) {
         this.drivetrain = drivetrain; 
@@ -70,6 +68,9 @@ public class SwerveTeleop extends Command {
         yInput = 0; 
         rInput = 0; 
 
+        currentState = ElevatorStates.STARTING_POSITION;
+        previousState = ElevatorStates.STARTING_POSITION;
+
         addRequirements(drivetrain);
     }
 
@@ -80,8 +81,20 @@ public class SwerveTeleop extends Command {
         yInput = controller.getLeftX();
         rInput = controller.getRightX();
 
+        currentState = innerElevator.getInnerElevatorState(); 
+
+        // if moving elevator states reset slew rate limiters
+        // because of this could remove unused calculation for both since both limiters are kept consistant with this logic 
+        if(!currentState.equals(previousState)) {
+            xLimiterMax.reset(MaxAngularRate);
+            yLimiterMax.reset(MaxAngularRate);
+
+            // keep both limiters updated
+            xLimiterRestricted.reset(MaxAngularRate);
+            yLimiterRestricted.reset(MaxAngularRate);
+        }
         // accelerate slower if inner elevator is up
-        if(innerElevator.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
+        else if(innerElevator.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
             xSpeed = xLimiterMax.calculate(xInput);
             ySpeed = yLimiterMax.calculate(yInput);
 
@@ -109,9 +122,12 @@ public class SwerveTeleop extends Command {
         ySpeed *= MaxSpeed;
         rSpeed *= MaxAngularRate;
 
+        // apply drive speed 
         drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed)
             .withVelocityY(-ySpeed)
             .withRotationalRate(-rSpeed)).execute();
+
+        previousState = currentState; 
     }
 
 }

@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
@@ -27,13 +29,13 @@ public class ClimbSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         currentPosition = climbEncoder.get();
-        if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
-            climbMotor.set(0.1);
-            return;
-        } else if (currentPosition < Constants.ClimbConstants.MIN_THRESHOLD) {
-            climbMotor.set(-0.1);
-            return;
-        }
+        // if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
+        //     climbMotor.set(0.1);
+        //     return;
+        // } else if (currentPosition < Constants.ClimbConstants.MIN_THRESHOLD) {
+        //     climbMotor.set(-0.1);
+        //     return;
+        // }
         climbMotor.set(climbSpeed);
         setSmartDashboardValues();
     }

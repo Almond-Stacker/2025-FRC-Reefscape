@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.AprilTagCommands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;

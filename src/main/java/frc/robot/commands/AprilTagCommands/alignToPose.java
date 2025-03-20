@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.AprilTagCommands;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -7,7 +7,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.Constants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class alignToPose extends Command {
@@ -18,28 +18,28 @@ public class alignToPose extends Command {
 
     private final PIDController xController;
     private final PIDController yController;
-    private final PIDController theataController;
+    private final PIDController rotController;
 
     public alignToPose(CommandSwerveDrivetrain drivetrain, Pose2d goalPose2d) {
         this.drivetrain = drivetrain; 
         this.goalPose = goalPose2d;
 
-        xController = new PIDController(0, 0, 0);
-        yController = new PIDController(0, 0, 0);
-        theataController = new PIDController(0, 0, 0);
+        xController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
+        yController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
+        rotController = new PIDController(Constants.PhotonConsts.KP_ROTATION, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
     }
 
     @Override
     public void initialize() {
         xController.setSetpoint(goalPose.getX());
         yController.setSetpoint(goalPose.getY());
-        theataController.setSetpoint(goalPose.getRotation().getDegrees());
+        rotController.setSetpoint(goalPose.getRotation().getDegrees());
 
         xController.setTolerance(0.1);
         yController.setTolerance(0.1);
-        theataController.setTolerance(0.1);
+        rotController.setTolerance(0.1);
 
-        theataController.enableContinuousInput(180, -180);
+        rotController.enableContinuousInput(180, -180);
     }
 
     @Override
@@ -48,10 +48,10 @@ public class alignToPose extends Command {
 
         double xSpeed = xController.calculate(currentPose.getX());
         double ySpeed = yController.calculate(currentPose.getY());
-        double theataSpeed = theataController.calculate(currentPose.getRotation().getDegrees());
+        double rotSpeed = rotController.calculate(currentPose.getRotation().getDegrees());
 
         drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(xSpeed)
-                 .withVelocityY(ySpeed).withRotationalRate(theataSpeed)).execute();
+                 .withVelocityY(ySpeed).withRotationalRate(rotSpeed)).execute();
     }
 
     @Override
@@ -62,6 +62,6 @@ public class alignToPose extends Command {
     
     @Override
     public boolean isFinished() {
-        return xController.atSetpoint() && yController.atSetpoint() && theataController.atSetpoint();
+        return xController.atSetpoint() && yController.atSetpoint() && rotController.atSetpoint();
     }
 }
