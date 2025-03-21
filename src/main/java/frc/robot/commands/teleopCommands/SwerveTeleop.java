@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Utilities;
@@ -53,11 +54,11 @@ public class SwerveTeleop extends Command {
 
         rLimiter = new SlewRateLimiter(Constants.SLEW_ROTATION);
 
-        xLimiterMax = new SlewRateLimiter(Constants.SLEW_POSITIVE_MAX, Constants.SLEW_NEGATIVE_MAX, 0);
-        yLimiterMax = new SlewRateLimiter(Constants.SLEW_NEGATIVE_MAX, Constants.SLEW_NEGATIVE_MAX, 0);
+        xLimiterMax = new SlewRateLimiter(Constants.SLEW_POSITIVE_MAX, -Constants.SLEW_NEGATIVE_MAX, 0);
+        yLimiterMax = new SlewRateLimiter(Constants.SLEW_POSITIVE_MAX, -Constants.SLEW_NEGATIVE_MAX, 0);
 
-        xLimiterRestricted = new SlewRateLimiter(Constants.SLEW_POSITIVE_MIN, Constants.SLEW_NEGATIVE_MIN, 0);
-        yLimiterRestricted = new SlewRateLimiter(Constants.SLEW_POSITIVE_MIN, Constants.SLEW_NEGATIVE_MIN, 0);
+        xLimiterRestricted = new SlewRateLimiter(Constants.SLEW_POSITIVE_MIN, -Constants.SLEW_NEGATIVE_MIN, 0);
+        yLimiterRestricted = new SlewRateLimiter(Constants.SLEW_POSITIVE_MIN, -Constants.SLEW_NEGATIVE_MIN, 0);
 
         xSpeed = 0; 
         ySpeed = 0; 
@@ -84,30 +85,34 @@ public class SwerveTeleop extends Command {
 
         // if moving elevator states reset slew rate limiters
         // because of this could remove unused calculation for both since both limiters are kept consistant with this logic 
-        if(!currentState.equals(previousState)) {
-            xLimiterMax.reset(MaxAngularRate);
-            yLimiterMax.reset(MaxAngularRate);
+        // if(!currentState.equals(previousState)) {
+        //     xLimiterMax.reset(rInput);
+        //     yLimiterMax.reset(rInput);
 
-            // keep both limiters updated
-            xLimiterRestricted.reset(MaxAngularRate);
-            yLimiterRestricted.reset(MaxAngularRate);
-        }
+        //     // keep both limiters updated
+        //     xLimiterRestricted.reset(rInput);
+        //     yLimiterRestricted.reset(rInput);
+        // }
+        
         // accelerate slower if inner elevator is up
-        else if(innerElevator.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
+
+    
+    // if(innerElevator.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
             xSpeed = xLimiterMax.calculate(xInput);
             ySpeed = yLimiterMax.calculate(yInput);
+            System.out.println(xInput);
 
             // keep both limiters updated
             xLimiterRestricted.calculate(xInput);
             yLimiterRestricted.calculate(yInput);
-        } else {
-            xSpeed = xLimiterRestricted.calculate(xInput);
-            ySpeed = yLimiterRestricted.calculate(yInput);
+        // } else {
+        //     xSpeed = xLimiterRestricted.calculate(xInput);
+        //     ySpeed = yLimiterRestricted.calculate(yInput);
 
-            // keep both limiters updated
-            xLimiterMax.calculate(xInput);
-            yLimiterMax.calculate(yInput);
-        }
+        //     // keep both limiters updated
+        //     xLimiterMax.calculate(xInput);
+        //     yLimiterMax.calculate(yInput);
+        // }
         
         rSpeed = rLimiter.calculate(rInput);
 
@@ -117,16 +122,24 @@ public class SwerveTeleop extends Command {
         rSpeed = Utilities.clampDriveValues(rSpeed);
     
         // adjust to swerve max speed 
-        xSpeed *= MaxSpeed;
-        ySpeed *= MaxSpeed;
-        rSpeed *= MaxAngularRate;
+        // xSpeed *= MaxSpeed;
+        // ySpeed *= MaxSpeed;
+        // rSpeed *= MaxAngularRate;
 
-        // apply drive speed 
-        drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed)
-            .withVelocityY(-ySpeed)
-            .withRotationalRate(-rSpeed)).execute();
+        // // apply drive speed 
+        // if(innerElevator.getPrecise()) {
+        //     drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed * MaxSpeed * 0.5)
+        //         .withVelocityY(-ySpeed * MaxSpeed * 0.5)
+        //         .withRotationalRate(-rSpeed * MaxAngularRate * 0.8)).execute();
+        // } else {
+        drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed * MaxSpeed)
+            .withVelocityY(-ySpeed * MaxSpeed)
+            .withRotationalRate(-rSpeed * MaxAngularRate)).execute();
 
+        // }
+        System.out.println("XSPEED " + xSpeed + " :: YSPEED " + "ySpeed");
         previousState = currentState; 
+        SmartDashboard.putNumber("neoaigaemou", xSpeed);
     }
 
 }

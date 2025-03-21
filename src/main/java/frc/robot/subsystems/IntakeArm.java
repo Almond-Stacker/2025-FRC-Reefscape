@@ -55,7 +55,7 @@ public class IntakeArm extends SubsystemBase {
 
         addSpeed = 0;
 
-        SparkFlexUtil.setSparkFlexBusUsage(armMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
+        SparkFlexUtil.setSparkFlexBusUsage(armMotor, SparkFlexUtil.Usage.kAll, IdleMode.kCoast, false, false);
     }
 
     @Override
@@ -64,18 +64,22 @@ public class IntakeArm extends SubsystemBase {
         
         if(armPosition >= ElevatorStates.MAX.armAngle) {
             // posotive is up
-            armSpeed = 0.1;
-            inBounds = false;
-        } else if(armPosition <= ElevatorStates.MIN.armAngle) {
             armSpeed = -0.1;
             inBounds = false;
-        } else if(!override) {
-            armSpeed = armPID.calculate(armPosition) + 
-                armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getAbsoluteEncoder().getVelocity());
-            inBounds = true;
+        } else if(armPosition <= ElevatorStates.MIN.armAngle) {
+            armSpeed = 0.1;
+            inBounds = false;
+        } else {
+            if(!override) {
+                armSpeed = armPID.calculate(armPosition) + 
+                    armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getAbsoluteEncoder().getVelocity());
+                inBounds = true;
+            }
         }
 
-       // armMotor.set(armSpeed);
+         
+
+        //armMotor.set(armSpeed);
         setSmartDashboardValues();
     }
 

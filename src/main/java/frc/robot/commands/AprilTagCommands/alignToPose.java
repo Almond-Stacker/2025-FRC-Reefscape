@@ -8,7 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.States.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.VisionVersions.Vision3;
 
 public class alignToPose extends Command {
     private final CommandSwerveDrivetrain drivetrain; 
@@ -20,9 +22,22 @@ public class alignToPose extends Command {
     private final PIDController yController;
     private final PIDController rotController;
 
-    public alignToPose(CommandSwerveDrivetrain drivetrain, Pose2d goalPose2d) {
-        this.drivetrain = drivetrain; 
-        this.goalPose = goalPose2d;
+    private final Vision3 visionSubsystem;
+    private final boolean isLeft;
+    private final ReefPosition reefPosition;
+
+    public alignToPose(CommandSwerveDrivetrain drivetrain, Vision3 visionSubsystem, boolean isLeft) {
+        this.drivetrain = drivetrain;
+        this.isLeft = isLeft; 
+
+        if(isLeft) {
+            reefPosition = ReefPosition.LEFT;
+        } else {
+            reefPosition = ReefPosition.RIGHT;
+        }
+
+        this.visionSubsystem = visionSubsystem;
+        this.goalPose = this.visionSubsystem.getRobotPoseForNearestReefAprilTag(drivetrain.getState().Pose, reefPosition);
 
         xController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
         yController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement

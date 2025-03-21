@@ -50,10 +50,11 @@ public class basicTeleop extends Command {
             xSpeed *= 0.4;
             ySpeed *= 0.4;
             rSpeed *= 0.4;
+            System.out.println(")SGIMa");
         } 
 
-        drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed)
-            .withVelocityY(-ySpeed)
-            .withRotationalRate(-rSpeed)).execute();
+        drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed * MaxSpeed)
+            .withVelocityY(-ySpeed * MaxSpeed)
+            .withRotationalRate(-rSpeed * MaxAngularRate)).execute();
     }
 }

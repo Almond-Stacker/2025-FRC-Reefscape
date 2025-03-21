@@ -111,7 +111,14 @@ public class Vision extends SubsystemBase {
 
 
             // add vision measurment. 
-            estimatedRobotPoseField = poseEstimator.update(currentResult.get()).get();
+            if(currentResult.isPresent()) {
+                PhotonPipelineResult elResult = currentResult.get();
+                Optional<EstimatedRobotPose> estimatedRobotPoseFieldFornow = poseEstimator.update(elResult);
+                if(estimatedRobotPoseFieldFornow.isPresent()) {
+                    estimatedRobotPoseField = estimatedRobotPoseFieldFornow.get();
+                }
+                
+            }
             drivetrain.addVisionMeasurement(estimatedRobotPoseRelative, Timer.getFPGATimestamp());
             setSmartDashboardValues();
         }

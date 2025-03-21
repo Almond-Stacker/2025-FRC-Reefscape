@@ -43,7 +43,7 @@ public class ControllerSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        double deadbandRatio;
+        double deadbandRatio = 1;
         double precieceFriction;
 
         if(preciece) {
@@ -57,23 +57,24 @@ public class ControllerSubsystem extends SubsystemBase{
         accY = getDriverLeftY();
         if(!elevatorUp) {
             deadbandRatio = 1;
-            if(accX >= Math.abs(posX)) {
+            if(Math.abs(accX) >= Math.abs(posX)) {
                 posX = accX;
             }
             else {
                 posX += (accX - posX) * ControllerConsts.FRIC * precieceFriction;
             }
 
-            if(accY >= Math.abs(posY)) {
+            if(Math.abs(accY) >= Math.abs(posY)) {
                 posY = accY;
             }
             else {
                 posY += (accY - posY) * ControllerConsts.FRIC * precieceFriction;
             }
         } else {
+            System.out.println("Elevator down " + posX + " :: " + posY);
             deadbandRatio = ControllerConsts.DEADBAND_RATIO;
-            posX += (accX - posX) * ControllerConsts.FRIC * slow * precieceFriction;
-            posY += (accY - posY) * ControllerConsts.FRIC * slow * precieceFriction;
+            posX += (accX - posX) * ControllerConsts.FRIC * slow;// * precieceFriction;
+            posY += (accY - posY) * ControllerConsts.FRIC * slow;// * precieceFriction;
         }
         
         
@@ -81,8 +82,8 @@ public class ControllerSubsystem extends SubsystemBase{
             // posX = Math.max(-1 * slow, Math.min(1 * slow, posX * slow));
             // posY = Math.max(-1 * slow, Math.min(1 * slow, posY * slow));
 
-        posX = Math.max(-1, Math.min(1, posX)) * deadbandRatio;
-        posY = Math.max(-1, Math.min(1, posY)) * deadbandRatio;
+        posX = Math.max(-1 * deadbandRatio, Math.min(1 * deadbandRatio, posX));// * deadbandRatio;
+        posY = Math.max(-1 * deadbandRatio, Math.min(1 * deadbandRatio, posY));// * deadbandRatio;
         
         SmartDashboard.putNumber("posX", posX);
         SmartDashboard.putNumber("posY", posY);

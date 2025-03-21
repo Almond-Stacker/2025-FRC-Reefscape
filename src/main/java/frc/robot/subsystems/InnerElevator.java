@@ -22,6 +22,9 @@ public class InnerElevator extends SubsystemBase {
     private double currentPosition;
     private double motorSpeed;
     private boolean inBounds;
+    private double addSpeed;
+
+    private boolean preciece;
 
     public InnerElevator() {
         elevatorMotor = new SparkFlex(Constants.InnerElevatorConstants.MOTOR_ID, MotorType.kBrushless);
@@ -29,12 +32,15 @@ public class InnerElevator extends SubsystemBase {
         elevatorPID = new PIDController(Constants.InnerElevatorConstants.KP, Constants.InnerElevatorConstants.KI, Constants.InnerElevatorConstants.KD);
 
         state = ElevatorStates.STARTING_POSITION;
+        addSpeed = 0;
+
+        preciece = false;
         
         motorSpeed = 0; 
         inBounds = false;
         currentPosition = this.getHeight();
 
-        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
+        SparkFlexUtil.setSparkFlexBusUsage(elevatorMotor, SparkFlexUtil.Usage.kAll, IdleMode.kCoast, false, false);
     }
 
     @Override
@@ -43,26 +49,32 @@ public class InnerElevator extends SubsystemBase {
 
         if(currentPosition >= ElevatorStates.MAX.innerHeight) {
             // positive goes up 
-            motorSpeed = 0.1;
+            motorSpeed = -0.1;
             inBounds = false;
         } else if (currentPosition <= ElevatorStates.MIN.innerHeight) {
-            motorSpeed = -0.1;
+            motorSpeed = 0.1;
             inBounds = false;
         } else {
             motorSpeed = elevatorPID.calculate(currentPosition) + 0.03;
             if(motorSpeed < -0.1) {
-                motorSpeed *= 0.2;
+                motorSpeed *= 0.3;
             }
             inBounds = true;
         }
+        
+        
 
-        elevatorMotor.set(motorSpeed);
+        //elevatorMotor.set(motorSpeed + addSpeed);
         setSmartDashboardValues();
     }
 
     public void setInnerElevatorState(ElevatorStates state) {
         this.state = state;
         elevatorPID.setSetpoint(state.innerHeight);
+    }
+
+    public void setAddSpeed(double addSpeed) {
+        this.addSpeed = addSpeed;         
     }
 
     public ElevatorStates getInnerElevatorState() {
@@ -75,6 +87,14 @@ public class InnerElevator extends SubsystemBase {
 
     public boolean atSetPosition() {
         return elevatorPID.atSetpoint();
+    }
+
+    public void setPrecision(boolean on) {
+        preciece = on;
+    }
+
+    public boolean getPrecise() {
+        return preciece;
     }
 
     private void setSmartDashboardValues() {

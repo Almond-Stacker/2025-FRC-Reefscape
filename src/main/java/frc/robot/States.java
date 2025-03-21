@@ -8,12 +8,12 @@ public class States {
     public enum ElevatorStates {
         MIN(0, 3.211, 40),
         MAX(112 , 29,220),
-        STARTING_POSITION(0.06, 23,71),
-        PRE_INTAKE(77.55, 25.5, 90),
-        INTAKE(77.55, 19.5, 57),
-        L1(21,24,110),
-        L2(21, 24, 140), //(1,7.416,203),
-        L3(23.9, 24, 200), // angle 200
+        STARTING_POSITION(10, 23,71),
+        PRE_INTAKE(73.55, 25.5, 90),
+        INTAKE(73.55, 16.2, 57),
+        L1(40,24,113),
+        L2(21, 24, 200), //(1,7.416,203),
+        L3(23.9, 23, 205), // angle 200
         L4(108.5, 25.5, 220);
         public final double primaryHeight; 
         public final double innerHeight;

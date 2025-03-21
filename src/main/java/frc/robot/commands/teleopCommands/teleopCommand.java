@@ -54,11 +54,12 @@ public class teleopCommand extends Command {
                     controllerSubsystem.setElevatorUp(true);
                 }
 
+                // System.out.println("DRIVING");
                 drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed)) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed)) // Drive left with negative X (left)
+                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed * 0.5)) // Drive forward with negative Y (forward)
+                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed * 0.5)) // Drive left with negative X (left)
                     .withRotationalRate(-Utilities.polynomialAccleration(controllerSubsystem.getRightPosX()) * MaxAngularRate)// Drive counterclockwise with negative X (left)
-                ); 
+                ).execute(); 
             } else {
                 //strafe Drive
                 if(controllerSubsystem.getStrafeLeft()) {
@@ -75,7 +76,7 @@ public class teleopCommand extends Command {
                 drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed * ControllerConsts.PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO)) // Drive forward with negative Y (forward)
                     .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed * ControllerConsts.PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO)) // Drive left with negative X (left)
                     .withRotationalRate(-Utilities.polynomialAccleration(controllerSubsystem.getRightPosX()) * MaxAngularRate * ControllerConsts.PRECIECE_ADD_ROTATIONAL_DEADBAND_RATIO)// Drive counterclockwise with negative X (left)
-            );
+            ).execute();
         }
     }
 }

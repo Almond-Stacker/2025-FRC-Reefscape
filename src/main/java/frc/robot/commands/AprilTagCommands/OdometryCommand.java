@@ -64,7 +64,7 @@ public class OdometryCommand extends Command {
 
     @Override 
     public void execute() {
-        currentPose = visionSubsystem.getFieldRelativePose().estimatedPose.toPose2d();
+        currentPose = drivetrain.getState().Pose;//visionSubsystem.getFieldRelativePose().estimatedPose.toPose2d();
         Pose2d targetPose = visionSubsystem.getClosestPose().transformBy(goalTransform);
 
         double xSpeed = -xController.calculate(currentPose.getX(), targetPose.getX());

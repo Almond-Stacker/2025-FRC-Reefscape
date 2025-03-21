@@ -5,19 +5,21 @@ import java.util.concurrent.TransferQueue;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class Constants {
-    public static final double SLEW_ROTATION = 0.3; 
+    public static final double SLEW_ROTATION = 2.5; 
 
-    public static final double SLEW_POSITIVE_MAX = 0.1;
-    public static final double SLEW_NEGATIVE_MAX = 0.05;
+    public static final double SLEW_POSITIVE_MAX = 1;
+    public static final double SLEW_NEGATIVE_MAX = 0.8;
 
-    public static final double SLEW_POSITIVE_MIN = 0.1;
-    public static final double SLEW_NEGATIVE_MIN = 0.05; 
+    public static final double SLEW_POSITIVE_MIN = 0.6;
+    public static final double SLEW_NEGATIVE_MIN = 0.6; 
 
     public static final String LimelightName = "";
 
@@ -29,7 +31,7 @@ public class Constants {
         public static final int RIGHT_ELEVATOR_MOTOR_ID = 15;
         public static final int ENCODER_ID = 1;
 
-        public static final double KP = 0.3;
+        public static final double KP = 0.27;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
     }
@@ -37,7 +39,7 @@ public class Constants {
     public static final class InnerElevatorConstants {
         public static final int MOTOR_ID = 22;
 
-        public static final double KP = 0.25;
+        public static final double KP = 0.05; //0.25
         public static final double KI = 0.0;
         public static final double KD = 0.0;
 
@@ -53,12 +55,13 @@ public class Constants {
         public static final int INDEX_MOTOR_ID = 25;
         public static final int ENCODER_ID = 0;
 
+
         public static final double KP = 0.008;
         public static final double KI = 0.0;   
         public static final double KD = 0.0;
 
         public static final double KS = 0;
-        public static final double KG = 0.003;
+        public static final double KG = 0.02;
         public static final double KV = 0;
     }
 
@@ -73,13 +76,13 @@ public class Constants {
     }
 
     public static final class ControllerConsts {
-        public static final double FRIC = 0.07;
+        public static final double FRIC = 0.09;
         public static final double PRECIECE_ADD_FRIC = 0.7; //how much acceleration will slow when in preciece mode
-        public static final double PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO = 0.4; // how much slower the max speed goes when in preciece mode
+        public static final double PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO = 0.6; // how much slower the max speed goes when in preciece mode
         public static final double PRECIECE_ADD_ROTATIONAL_DEADBAND_RATIO = 0.5; // how much slower the max rotational speed goes when in preciece mode
         public static final double DEADBAND_RATIO = 0.6;//absolute max speed cutoff when elevator up
 
-        public static final double SLOW_RATIO = 0.4;//how fast it will move when elevator up
+        public static final double SLOW_RATIO = 0.57;//how fast it will move when elevator up
         public static final double STRAFE_RATIO = 0.1;
         
     }
@@ -88,8 +91,18 @@ public class Constants {
     public static final class PhotonConsts  {
         public static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
         
-        public static final Transform3d GRAY_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
-        public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
+        // public static final Transform3d GRAY_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
+        // public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
+
+        public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d(
+                    new Translation3d(-0.1956816, 0.2815336, 0),
+                    new Rotation3d(0, 0, -0.43633231)
+                );
+
+        public static final Transform3d GRAY_PHOTON_CAMERA_TO_ROBOT = new Transform3d(
+                    new Translation3d(-0.1956816, -0.2815336, 0),
+                    new Rotation3d(0, 0, 0.43633231)
+                );
 
         public static final String GRAY_CAMERA_NAME = "";
         public static final String BLUE_CAMERA_NAME = "";

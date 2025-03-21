@@ -5,36 +5,40 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.lib.util.Utilities;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionVersions.Vision;
 import frc.robot.subsystems.VisionVersions.Vision3;
 
-public class PhotonCommand extends Command {
+public class PhotonAlign extends Command {
   private final PIDController xController, yController, rotController;
   private final SwerveRequest.RobotCentric robotCentricDrive = 
      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
   private final CommandSwerveDrivetrain drivetrain;
-  private final Vision3 camera; 
+  private final Vision3 camera;
+  private final double yOffset; 
 
   private Timer dontSeeTagTimer, stopTimer;
 
   private boolean isRightScore;
 
-  public PhotonCommand(boolean isRightScore, CommandSwerveDrivetrain drivetrain, Vision3 camera) {
-    xController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
-    yController = new PIDController(Constants.PhotonConsts.KP_TRANSLATION, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
-    rotController = new PIDController(Constants.PhotonConsts.KP_ROTATION, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
+  public PhotonAlign(boolean isRightScore, CommandSwerveDrivetrain drivetrain, Vision3 camera, double yOffset) {
+    xController = new PIDController(2, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
+    yController = new PIDController(2, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
+    rotController = new PIDController(0.08, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
     this.isRightScore = isRightScore;
     this.drivetrain = drivetrain;
     this.camera = camera; 
+    this.yOffset = yOffset;
     addRequirements(drivetrain);
+    rotController.enableContinuousInput(0, 360);
   }
 
   @Override
@@ -44,14 +48,16 @@ public class PhotonCommand extends Command {
     this.dontSeeTagTimer = new Timer();
     this.dontSeeTagTimer.start();
 
-    rotController.setSetpoint(Constants.PhotonConsts.ROT_SETPOINT_REEF_ALIGNMENT);
-    rotController.setTolerance(Constants.PhotonConsts.ROT_TOLERANCE_REEF_ALIGNMENT);
+    rotController.setSetpoint(camera.getYaw());
+    SmartDashboard.putNumber("ae,nsthuoeanstu", camera.getYaw());
+    rotController.setTolerance(3);
 
-    xController.setSetpoint(Constants.PhotonConsts.X_SETPOINT_REEF_ALIGNMENT);
-    xController.setTolerance(Constants.PhotonConsts.X_TOLERANCE_REEF_ALIGNMENT);
+    xController.setSetpoint(0.416);
+    xController.setTolerance(0.01);
 
-    yController.setSetpoint(isRightScore ? Constants.PhotonConsts.Y_SETPOINT_REEF_ALIGNMENT : -Constants.PhotonConsts.Y_SETPOINT_REEF_ALIGNMENT);
-    yController.setTolerance(Constants.PhotonConsts.Y_TOLERANCE_REEF_ALIGNMENT);
+   // yController.setSetpoint(isRightScore ? 0.416 : -0.416);
+   yController.setSetpoint(yOffset);
+    yController.setTolerance(0.01);
 
   }
 
@@ -59,14 +65,16 @@ public class PhotonCommand extends Command {
   public void execute() {
     if (camera.getTargetSeen()) {
       this.dontSeeTagTimer.reset();
-      Pose2d positions = camera.getRobotRelativePose();
+      Transform3d positions = camera.getBestTagToCamera();
 
       SmartDashboard.putNumber("x", positions.getX());
 
       double xSpeed = -xController.calculate(positions.getX());
       SmartDashboard.putNumber("xspeed", xSpeed);
       double ySpeed = -yController.calculate(positions.getY());
-      double rotValue = -rotController.calculate(positions.getRotation().getDegrees());
+      double rotValue = rotController.calculate(Utilities.processYaw(drivetrain.getPigeon2().getYaw().getValueAsDouble()));
+      SmartDashboard.putNumber("calculated yaw ", Utilities.processYaw(drivetrain.getPigeon2().getYaw().getValueAsDouble()));
+      SmartDashboard.putNumber("rspeed", rotValue);
 
       drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(xSpeed)
         .withVelocityY(ySpeed).withRotationalRate(rotValue)).execute();
