@@ -34,18 +34,18 @@ public class ClimbSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        if(controller.atSetpoint()) {
-            usePid = false; 
-            climbSpeed = state.speed;
-        }
+        // if(controller.atSetpoint()) {
+        //     usePid = false; 
+        //     climbSpeed = state.speed;
+        // }
 
 
-        currentPosition = climbEncoder.get();
-        if(usePid) {
-            climbSpeed = controller.calculate(currentPosition);
-        } else {
-            climbSpeed = state.speed;
-        }
+        // currentPosition = climbEncoder.get();
+        // if(usePid) {
+        //     climbSpeed = controller.calculate(currentPosition);
+        // } else {
+        //     climbSpeed = state.speed;
+        // }
         // if(currentPosition > Constants.ClimbConstants.MAX_THRESHOLD) {
         //     climbMotor.set(0.1);
         //     return;
@@ -56,6 +56,11 @@ public class ClimbSubsystem extends SubsystemBase{
         climbMotor.set(climbSpeed);
         setSmartDashboardValues();
     }
+
+    public void setPidUseTrue() {
+        this.usePid = true; 
+    }
+
 
     public void setClimbState(ClimbStates state) {
         this.state = state;

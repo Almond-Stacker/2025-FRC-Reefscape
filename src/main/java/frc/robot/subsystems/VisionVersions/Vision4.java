@@ -31,7 +31,7 @@ import frc.robot.Constants.PhotonConsts;
 import frc.robot.States.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-public class Vision3 extends SubsystemBase {
+public class Vision4 extends SubsystemBase {
     private final CommandSwerveDrivetrain drivetrain; 
 
     private final PhotonCamera camera; 
@@ -62,7 +62,7 @@ public class Vision3 extends SubsystemBase {
     private final ArrayList<Pose2d> redReefTags = new ArrayList<>(6);
     private final ArrayList<Pose2d> blueReefTags = new ArrayList<>(6);
 
-    public Vision3(String name, CommandSwerveDrivetrain drive, Transform3d cameraToRobot) {
+    public Vision4(String name, CommandSwerveDrivetrain drive, Transform3d cameraToRobot) {
         this.camera = new PhotonCamera(name);
         this.cameraToRobot = cameraToRobot;
         this.drivetrain = drive;
@@ -95,15 +95,13 @@ public class Vision3 extends SubsystemBase {
         
         closestTarget = -1; 
         leastDistance = Double.MAX_VALUE;
-        currentResult.get().getBestTarget();
+        PhotonTrackedTarget target = currentResult.get().getBestTarget();
 
-
-        for(PhotonTrackedTarget target : currentResult.get().getTargets()) {
             targetSeen = true; 
             SmartDashboard.putBoolean(camera.getName() + " target seen", targetSeen);
             targetid12 = target.getFiducialId();
            // currentTarget.add(target);
-             tagToCamera = target.getBestCameraToTarget();
+            // tagToCamera = target.getBestCameraToTarget();
             // if(nearestTransform == null) {
             //     nearestTransform = tagToCamera;
             // } else if (tagToCamera.getTranslation().getNorm() < nearestTransform.getTranslation().getNorm()) {
@@ -128,10 +126,10 @@ public class Vision3 extends SubsystemBase {
                     drivetrain.getRotation3d().toRotation2d());  
 
             
-            // if(leastDistance > tagToCameraProcessed.getTranslation().getNorm()) {
-            //     closestTarget = target.getFiducialId();
-            //     leastDistance = tagToCameraProcessed.getTranslation().getNorm();
-            // }
+            if(leastDistance > tagToCameraProcessed.getTranslation().getNorm()) {
+                closestTarget = target.getFiducialId();
+                leastDistance = tagToCameraProcessed.getTranslation().getNorm();
+            }
             
             // alternative robot pose estimation could possibly need to be changed later 
             // current version could work out but not too sure 
@@ -167,7 +165,7 @@ public class Vision3 extends SubsystemBase {
             // SmartDashboard.putNumber(camera.getName() + "estimated robot to target x", estimatedRobotPoseRelative.getX());
             // SmartDashboard.putNumber(camera.getName() + "estimated robot to target y", estimatedRobotPoseRelative.getY());
     
-        }
+
         
     }
 

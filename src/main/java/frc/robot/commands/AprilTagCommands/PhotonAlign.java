@@ -50,7 +50,7 @@ public class PhotonAlign extends Command {
 
     rotController.setSetpoint(camera.getYaw());
     SmartDashboard.putNumber("ae,nsthuoeanstu", camera.getYaw());
-    rotController.setTolerance(3);
+    rotController.setTolerance(1);
 
     xController.setSetpoint(0.416);
     xController.setTolerance(0.01);

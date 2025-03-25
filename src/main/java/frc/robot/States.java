@@ -6,15 +6,19 @@ import frc.robot.Constants.PhotonConsts;
 
 public class States {
     public enum ElevatorStates {
-        MIN(0, 3.211, 40),
-        MAX(112 , 29,220),
+        MIN(0, 3.211, 59),
+        MAX(112 , 29,230),
         STARTING_POSITION(10, 23,71),
         PRE_INTAKE(73.55, 25.5, 90),
-        INTAKE(73.55, 16.2, 57),
+        INTAKE(73.55, 15.6, 60),
         L1(40,24,113),
         L2(21, 24, 200), //(1,7.416,203),
-        L3(23.9, 23, 205), // angle 200
-        L4(108.5, 25.5, 220);
+        L3(15.78, 23, 216), // angle 200
+        L4(108.5, 25.5, 220),
+
+        // NEVER SET THE ELEVATORS TO THIS STATE
+        // ONLY SET THE ARM 
+        CLIMB(0,0, 180);
         public final double primaryHeight; 
         public final double innerHeight;
         public final double slow;

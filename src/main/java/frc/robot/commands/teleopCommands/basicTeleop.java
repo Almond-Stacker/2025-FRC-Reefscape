@@ -47,11 +47,15 @@ public class basicTeleop extends Command {
         rSpeed = controller.getRightX();
 
         if(!innerElevator.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
-            xSpeed *= 0.4;
-            ySpeed *= 0.4;
-            rSpeed *= 0.4;
-            System.out.println(")SGIMa");
-        } 
+            xSpeed *= 0.5;
+            ySpeed *= 0.5;
+            rSpeed *= 0.5;
+        } else {
+            xSpeed = Utilities.polynomialAccleration(xSpeed);
+            ySpeed = Utilities.polynomialAccleration(ySpeed);
+            rSpeed = Utilities.polynomialAccleration(rSpeed);
+
+        }
 
         drivetrain.applyRequest(() -> drive.withVelocityX(-xSpeed * MaxSpeed)
             .withVelocityY(-ySpeed * MaxSpeed)

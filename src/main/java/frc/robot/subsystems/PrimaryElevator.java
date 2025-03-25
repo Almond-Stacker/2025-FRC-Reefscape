@@ -19,6 +19,8 @@ public class PrimaryElevator extends SubsystemBase{
     private double motorOutput;
     private boolean inBounds;
 
+    private double addSpeed;
+
     public PrimaryElevator(){
         leftMotor = new TalonFX(Constants.PrimaryElevatorConstants.LEFT_ELEVATOR_MOTOR_ID);
         rightMotor = new TalonFX(Constants.PrimaryElevatorConstants.RIGHT_ELEVATOR_MOTOR_ID);
@@ -46,8 +48,12 @@ public class PrimaryElevator extends SubsystemBase{
             motorOutput = elevatorPID.calculate(currentHeight);
         }
 
-        //setElevatorSpeeds(motorOutput);
+        setElevatorSpeeds(motorOutput);
         setSmartDashboardValues();
+    }
+
+    public void setAddMotor(double add) {
+        addSpeed = add;
     }
 
     public void setPrimaryElevatorState(ElevatorStates state) {

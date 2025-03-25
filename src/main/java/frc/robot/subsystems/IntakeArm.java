@@ -55,7 +55,7 @@ public class IntakeArm extends SubsystemBase {
 
         addSpeed = 0;
 
-        SparkFlexUtil.setSparkFlexBusUsage(armMotor, SparkFlexUtil.Usage.kAll, IdleMode.kCoast, false, false);
+        SparkFlexUtil.setSparkFlexBusUsage(armMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class IntakeArm extends SubsystemBase {
 
          
 
-        //armMotor.set(armSpeed);
+        armMotor.set(armSpeed);
         setSmartDashboardValues();
     }
 

@@ -32,6 +32,7 @@ public class PhotonAlignPress extends Command {
 
   private Timer dontSeeTagTimer, stopTimer;
 
+  private final boolean overrideCommand;
   private boolean isRightScore;
 
   public PhotonAlignPress(boolean isRightScore, CommandSwerveDrivetrain drivetrain, Vision3 camera, double yOffset) {
@@ -42,6 +43,8 @@ public class PhotonAlignPress extends Command {
     this.drivetrain = drivetrain;
     this.camera = camera; 
     this.yOffset = yOffset;
+    this.overrideCommand = camera.getOverride();
+    camera.setOverride(!this.overrideCommand);
     addRequirements(drivetrain);
     rotController.enableContinuousInput(0, 360);
   }
@@ -101,12 +104,14 @@ public class PhotonAlignPress extends Command {
   public void end(boolean interrupted) {
     drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(0)
       .withVelocityY(0).withRotationalRate(0)).execute();
+      camera.setOverride = false;
   }
 
   @Override
   public boolean isFinished() {
     // Requires the robot to stay in the correct position for 0.3 seconds, as long as it gets a tag in the camera
     return this.dontSeeTagTimer.hasElapsed(Constants.PhotonConsts.DONT_SEE_TAG_WAIT_TIME) ||
-        stopTimer.hasElapsed(Constants.PhotonConsts.POSE_VALIDATION_TIME);
+        stopTimer.hasElapsed(Constants.PhotonConsts.POSE_VALIDATION_TIME)
+        || this.overrideCommand = true;
   }
 }
