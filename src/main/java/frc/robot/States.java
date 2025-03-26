@@ -8,9 +8,9 @@ public class States {
     public enum ElevatorStates {
         MIN(0, 3.211, 59),
         MAX(112 , 29,230),
-        STARTING_POSITION(10, 23,71),
+        STARTING_POSITION(25, 23,71),
         PRE_INTAKE(73.55, 25.5, 90),
-        INTAKE(73.55, 15.6, 60),
+        INTAKE(73.55, 16.3, 60),
         L1(40,24,113),
         L2(21, 24, 200), //(1,7.416,203),
         L3(15.78, 23, 216), // angle 200
@@ -65,10 +65,10 @@ public class States {
     }
 
     public enum ReefPosition {
-        LEFT(-0.165),
+        // was 0.17 
+        LEFT(-0.2),//0.185
         CENTER(0.0),
-        RIGHT(0.165);
-
+        RIGHT(0.2);
         public final double yOffset;
         public final Transform2d tagToRobot;
         

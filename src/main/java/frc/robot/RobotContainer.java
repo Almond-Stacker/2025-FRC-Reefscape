@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.lib.util.Utilities;
@@ -46,6 +47,8 @@ import frc.robot.commands.AprilTagCommands.OdometryCommand;
 import frc.robot.commands.AprilTagCommands.OdometryCommand1;
 import frc.robot.commands.AprilTagCommands.PhotonAlign;
 import frc.robot.commands.AprilTagCommands.alignToPose;
+import frc.robot.commands.autoCommands.IntakeBeamCommand;
+import frc.robot.commands.autoCommands.autoPhotonAlign;
 import frc.robot.commands.teleopCommands.SwerveTeleop;
 import frc.robot.commands.teleopCommands.basicTeleop;
 import frc.robot.commands.teleopCommands.teleopCommand;
@@ -92,7 +95,7 @@ public class RobotContainer {
     private final IntakeArm s_armSubsystem = new IntakeArm();
     private final ClimbSubsystem s_climbSubsystem = new ClimbSubsystem();
     private final BeamBreakSubsystem s_beambreakSubsystem = new BeamBreakSubsystem();
-    private final ClimbSubsystem1 s_climbSubsystem1 = new ClimbSubsystem1();
+    //private final ClimbSubsystem1 s_climbSubsystem1 = new ClimbSubsystem1();
 
     // private final Vision s_grayVision = new Vision("gray_photon_camera", drivetrain, PhotonConsts.GRAY_PHOTON_CAMERA_TO_ROBOT);
     // private final Vision s_blueVision = new Vision("blue_photon_camera", drivetrain, PhotonConsts.BLUE_PHOTON_CAMERA_TO_ROBOT);
@@ -100,8 +103,11 @@ public class RobotContainer {
     private final Vision3 s_grayVision1 = new Vision3("gray_photon_camera", drivetrain, PhotonConsts.GRAY_PHOTON_CAMERA_TO_ROBOT);
     private final Vision3 s_blueVision1 = new Vision3("blue_photon_camera", drivetrain, PhotonConsts.BLUE_PHOTON_CAMERA_TO_ROBOT);
 
-    private final PhotonAlign leftPhotonAlign = new PhotonAlign(true, drivetrain, s_blueVision1, -0.17);
-    private final PhotonAlign rightPhotonAlign = new PhotonAlign(false, drivetrain, s_grayVision1, 0.17);
+    private final PhotonAlign leftPhotonAlign = new PhotonAlign(drivetrain, s_grayVision1, false);
+    private final PhotonAlign rightPhotonAlign = new PhotonAlign(drivetrain, s_blueVision1, true);
+
+    private final autoPhotonAlign leftPhotonAlign1 = new autoPhotonAlign(drivetrain, s_grayVision1, false);
+    private final autoPhotonAlign rightPhotonAlign1 = new autoPhotonAlign(drivetrain, s_blueVision1, true);
 
 
     //** Command Handlers **//
@@ -110,9 +116,10 @@ public class RobotContainer {
     private final IndexCommand ch_indexCommand = new IndexCommand(s_armSubsystem);
     
     private final ControllerSubsystem controllerSubsystem = new ControllerSubsystem(driver0);
+    private final IntakeBeamCommand intakeBeamCommand = new IntakeBeamCommand(drivetrain, s_beambreakSubsystem);
     //private teleopCommand teleCommand = new teleopCommand(controllerSubsystem, drivetrain, s_innerElevatorSubsystem);
 
-    private alignToPose alignLeftReef = new alignToPose(drivetrain, s_blueVision1, true);
+    //private alignToPose alignLeftReef = new alignToPose(drivetrain, s_blueVision1, true);
 
    // private alignToPose alignRightReef = new alignToPose(drivetrain, s_grayVision1, false);
 
@@ -155,6 +162,7 @@ public class RobotContainer {
         new WaitCommand(0.7),
         new InstantCommand(() -> s_armSubsystem.setOverride(0, false)),
         ch_indexCommand.setIndexState(IndexStates.STOP),
+
         ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE)
     );//.addRequirements(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
 
@@ -164,7 +172,7 @@ public class RobotContainer {
 
 
     private final SequentialCommandGroup autoSigma = new SequentialCommandGroup( ch_elevatorCommandHandler.setElevators(ElevatorStates.L1), new driveComand(drivetrain), ch_indexCommand.setIndexState(IndexStates.OUTTAKE), new WaitCommand(2), ch_indexCommand.setIndexState(IndexStates.STOP), ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
-   // private final SequentialCommandGroup autoSigma1 = new SequentialCommandGroup(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4), new WaitCommand(1), sigma.until(() -> isdone(Timer.getFPGATimestamp())), c_score);
+  //private final SequentialCommandGroup autoSigma1; //= new SequentialCommandGroup(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4), new WaitCommand(1), leftPhotonAlign.until(() -> isdone(Timer.getFPGATimestamp())), c_score);
     //private final SequentialCommandGroup autoSigma1 = new SequentialCommandGroup(new driveComand(drivetrain), ch_elevatorCommandHandler.setElevators(ElevatorStates.L4), new WaitCommand(3), sigma.withDeadline(new WaitCommand(3)), c_score);
 
 
@@ -176,7 +184,14 @@ public class RobotContainer {
     }
 
     public RobotContainer() {
+        //leftPhotonAlign.addRequirements(s_grayVision1, drivetrain);
+        //rightPhotonAlign.addRequirements(s_blueVision1, drivetrain);
         c_score.addRequirements(s_primaryElevatorSubsystem, s_innerElevatorSubsystem, s_armSubsystem);
+           autoSigma.addRequirements(s_armSubsystem, s_primaryElevatorSubsystem, s_innerElevatorSubsystem, drivetrain);
+        //   autoSigma1 = new SequentialCommandGroup(ch_elevatorCommandHandler.setElevators(ElevatorStates.L4), new WaitCommand(1), leftPhotonAlign.until(() -> isdone(Timer.getFPGATimestamp())), c_score);
+
+         //   autoSigma1.addRequirements(s_armSubsystem, s_primaryElevatorSubsystem, s_innerElevatorSubsystem, drivetrain);
+
         configureDriveBindings();
         configureDriver1Commands();
         configureAuto();
@@ -197,6 +212,7 @@ public class RobotContainer {
     //     }
     //     return false;
     // }
+
 
     private void configureDriveBindings() {
         drivetrain.setDefaultCommand(
@@ -224,10 +240,10 @@ public class RobotContainer {
         // driver0.rightBumper().onFalse(new InstantCommand(() -> controllerSubsystem.setPrecision(false)));
 
          driver0.x().whileTrue(leftPhotonAlign);
-     driver0.y().whileTrue(rightPhotonAlign);
+         driver0.y().whileTrue(rightPhotonAlign);
 
         // reset the field-centric heading on left bumper press
-        driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+       // driver0.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
      }
 
     private void configureDriver1Commands() {
@@ -278,15 +294,20 @@ public class RobotContainer {
         NamedCommands.registerCommand("Score", c_score);
         NamedCommands.registerCommand("L4", ch_elevatorCommandHandler.setElevators(ElevatorStates.L4));
         NamedCommands.registerCommand("L1", ch_elevatorCommandHandler.setElevators(ElevatorStates.L1));
+        NamedCommands.registerCommand("Starting position", ch_elevatorCommandHandler.setElevators(ElevatorStates.STARTING_POSITION));
         NamedCommands.registerCommand("Pre intake", ch_elevatorCommandHandler.setElevators(ElevatorStates.PRE_INTAKE));
         NamedCommands.registerCommand("intake", c_preIntakeToIntake);
-        NamedCommands.registerCommand("LineUp", new WaitCommand(0.1));    
+        NamedCommands.registerCommand("LineUp1", leftPhotonAlign1);//.until(() -> isdone(Timer.getFPGATimestamp())));  
+        NamedCommands.registerCommand("LineUp2", rightPhotonAlign1);//.until(() -> isdone(Timer.getFPGATimestamp())));  
         NamedCommands.registerCommand("Intake", ch_indexCommand.setIndexState(IndexStates.OUTTAKE));
         NamedCommands.registerCommand("Outake", ch_indexCommand.setIndexState(IndexStates.OUTTAKE));
         NamedCommands.registerCommand("Stop", ch_indexCommand.setIndexState(IndexStates.STOP));
+        NamedCommands.registerCommand("WaitUntil Beambreak", new WaitUntilCommand(s_beambreakSubsystem::getBeamBroken));
+        NamedCommands.registerCommand("Drive Back Until Beambreak", intakeBeamCommand);
 
-         m_chooser = AutoBuilder.buildAutoChooser("1 Coral Straight");
+         m_chooser = AutoBuilder.buildAutoChooser();
          m_chooser.addOption("sigma boy ", autoSigma);
+
     //  m_chooser.addOption("sigma boy 1000", autoSigma1);
         // m_chooser.addOption("sigma boy1 ", autoSigma1);
          
@@ -306,6 +327,6 @@ public class RobotContainer {
 
     public void resetPidgeon() {
         drivetrain.getPigeon2().setYaw(0);
-       // drivetrain.setOperatorPerspectiveForward(new Rotation2d(180));
+        //drivetrain.setOperatorPerspectiveForward(new Rotation2d(180));
     }
 }

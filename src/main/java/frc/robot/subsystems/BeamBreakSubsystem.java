@@ -9,21 +9,30 @@ public class BeamBreakSubsystem extends SubsystemBase {
     private final DigitalInput beamBreak;
 
     private boolean beamBroken;
+    private Timer brokenTimer;
 
     public BeamBreakSubsystem() {
         beamBreak = new DigitalInput(2);
         beamBroken = false;
+
+        this.brokenTimer = new Timer();
+        this.brokenTimer.start();
     }
 
     @Override
     public void periodic() {
         if (beamBreak.get()) {
-            beamBroken = true;
-        } else {
             beamBroken = false;
+            brokenTimer.reset();
+        } else {
+            beamBroken = true;
         }
 
         SmartDashboard.putBoolean("Beam Broken", beamBroken);
+    }
+
+    public double getBrokenTime() {
+        return brokenTimer.get();
     }
 
     public boolean getBeamBroken() {

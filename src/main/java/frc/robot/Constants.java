@@ -108,8 +108,10 @@ public class Constants {
         public static final String BLUE_CAMERA_NAME = "";
 
         public static final double LAST_RESULT_TIMEOUT = 0.4;
-                    
-        public static final double CENTER_TO_TAG_DELTA_X = 0.94 + 0.3;
+            
+        // wAS 0.416
+        public static final double CENTER_TO_TAG_DELTA_X = 0.5
+        ;
 
         public static final Transform2d GOAL_LEFT_REEF = new Transform2d(0.416, 0, new Rotation2d() );
         public static final Transform2d GOAL_RIGHT_REEF = new Transform2d(-0.416, 0, new Rotation2d());
@@ -126,10 +128,15 @@ public class Constants {
         public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 1; 
         public static final double X_SETPOINT_REEF_ALIGNMENT = 0.416; 
         public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.05;
-        public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.17; 
+
+        // was 0.18
+        public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.18; 
         public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.05; 
         public static final double DONT_SEE_TAG_WAIT_TIME = 1; 
         public static final double POSE_VALIDATION_TIME = 0.2; 
+
+        public static final double ROTATIONAL_TOLERANCE = 1;
+        public static final double TRANSLATIONAL_TOLERANCE = 0.1;
 
     }
 

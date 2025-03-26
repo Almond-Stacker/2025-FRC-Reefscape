@@ -1,4 +1,4 @@
-package frc.robot.commands.AprilTagCommands;
+package frc.robot.commands.autoCommands;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.VisionVersions.Vision;
 import frc.robot.subsystems.VisionVersions.Vision3;
 
-public class PhotonAlign extends Command {
+public class autoPhotonAlign extends Command {
   private final PIDController xController, yController, rotController;
   private final SwerveRequest.RobotCentric robotCentricDrive = 
      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -27,14 +27,15 @@ public class PhotonAlign extends Command {
   private final Vision3 camera;
   private final double yOffset; 
   private double desiredYaw;
+  private double startTime; 
 
   private Timer dontSeeTagTimer, stopTimer;
 
 
-  public PhotonAlign(CommandSwerveDrivetrain drivetrain, Vision3 camera, boolean isRight) {
-    xController = new PIDController(1.7, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
-    yController = new PIDController(1.7, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
-    rotController = new PIDController(0.04, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
+  public autoPhotonAlign(CommandSwerveDrivetrain drivetrain, Vision3 camera, boolean isRight) {
+    xController = new PIDController(1.5, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
+    yController = new PIDController(1.5, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
+    rotController = new PIDController(0.06, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
     this.drivetrain = drivetrain;
     this.camera = camera; 
     if(isRight) {
@@ -55,6 +56,7 @@ public class PhotonAlign extends Command {
     this.dontSeeTagTimer = new Timer();
     this.dontSeeTagTimer.start();
     this.desiredYaw = camera.getYaw();
+    this.startTime = Timer.getFPGATimestamp();
 
     rotController.setSetpoint(this.desiredYaw);
     SmartDashboard.putNumber("Desired Yaw", this.desiredYaw);
@@ -108,8 +110,14 @@ public class PhotonAlign extends Command {
 
   @Override
   public boolean isFinished() {
-    // Requires the robot to stay in the correct position for 0.3 seconds, as long as it gets a tag in the camera
-    return this.dontSeeTagTimer.hasElapsed(Constants.PhotonConsts.DONT_SEE_TAG_WAIT_TIME) ||
-        stopTimer.hasElapsed(Constants.PhotonConsts.POSE_VALIDATION_TIME);
+    System.out.println("sigma");
+    if(Timer.getFPGATimestamp() - startTime > 2) {
+        return true;
+    }
+
+    if(xController.atSetpoint() && yController.atSetpoint() && rotController.atSetpoint()) {
+        return true; 
+    }
+    return false; 
   }
 }
