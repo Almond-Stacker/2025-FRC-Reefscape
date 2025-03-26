@@ -33,9 +33,10 @@ public class autoPhotonAlign extends Command {
 
 
   public autoPhotonAlign(CommandSwerveDrivetrain drivetrain, Vision3 camera, boolean isRight) {
-    xController = new PIDController(1.5, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
-    yController = new PIDController(1.5, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
-    rotController = new PIDController(0.06, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
+    xController = new PIDController(2.1, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
+    yController = new PIDController(2.1, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
+    rotController = new PIDController(0.07
+    , Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
     this.drivetrain = drivetrain;
     this.camera = camera; 
     if(isRight) {
@@ -96,7 +97,8 @@ public class autoPhotonAlign extends Command {
       }
     } else {
       drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(0)
-        .withVelocityY(0).withRotationalRate(0)).execute();    
+        .withVelocityY(0).withRotationalRate(0)).execute(); 
+        System.out.println("sigma nga") ;  
     }
 
     SmartDashboard.putNumber("Pose Validation Timer", stopTimer.get());
@@ -111,7 +113,7 @@ public class autoPhotonAlign extends Command {
   @Override
   public boolean isFinished() {
     System.out.println("sigma");
-    if(Timer.getFPGATimestamp() - startTime > 2) {
+    if(Timer.getFPGATimestamp() - startTime > 4) {
         return true;
     }
 

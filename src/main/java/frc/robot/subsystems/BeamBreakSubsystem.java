@@ -9,21 +9,22 @@ public class BeamBreakSubsystem extends SubsystemBase {
     private final DigitalInput beamBreak;
 
     private boolean beamBroken;
-    private Timer brokenTimer;
+    private double brokenTimer;
+
 
     public BeamBreakSubsystem() {
         beamBreak = new DigitalInput(2);
         beamBroken = false;
 
-        this.brokenTimer = new Timer();
-        this.brokenTimer.start();
+
+        this.brokenTimer = Timer.getFPGATimestamp();
     }
 
     @Override
     public void periodic() {
         if (beamBreak.get()) {
             beamBroken = false;
-            brokenTimer.reset();
+            brokenTimer = Timer.getFPGATimestamp();
         } else {
             beamBroken = true;
         }
@@ -32,7 +33,7 @@ public class BeamBreakSubsystem extends SubsystemBase {
     }
 
     public double getBrokenTime() {
-        return brokenTimer.get();
+        return Timer.getFPGATimestamp() - brokenTimer;
     }
 
     public boolean getBeamBroken() {

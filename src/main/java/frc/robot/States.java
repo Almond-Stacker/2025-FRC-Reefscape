@@ -6,15 +6,15 @@ import frc.robot.Constants.PhotonConsts;
 
 public class States {
     public enum ElevatorStates {
-        MIN(0, 3.211, 59),
-        MAX(112 , 29,230),
-        STARTING_POSITION(25, 23,71),
-        PRE_INTAKE(73.55, 25.5, 90),
-        INTAKE(73.55, 16.3, 60),
-        L1(40,24,113),
-        L2(21, 24, 200), //(1,7.416,203),
-        L3(15.78, 23, 216), // angle 200
-        L4(108.5, 25.5, 220),
+        MIN(0, 3.211, 62),
+        MAX(113 , 29,217),
+        STARTING_POSITION(20, 23,74),
+        PRE_INTAKE(73.55, 25.5, 98),
+        INTAKE(73.55, 15.6, 62),
+        L1(40,24,116),
+        L2(21, 24, 203), //(1,7.416,203),
+        L3(19.78, 23, 214), // angle 200
+        L4(110.5, 25.5, 215),
 
         // NEVER SET THE ELEVATORS TO THIS STATE
         // ONLY SET THE ARM 
@@ -66,9 +66,9 @@ public class States {
 
     public enum ReefPosition {
         // was 0.17 
-        LEFT(-0.2),//0.185
-        CENTER(0.0),
-        RIGHT(0.2);
+        LEFT(-0.13),//0.185
+        CENTER(0.0),//was 20 for left reef - left cam, right reef - right cam
+        RIGHT(0.18);
         public final double yOffset;
         public final Transform2d tagToRobot;
         

@@ -95,12 +95,12 @@ public class Constants {
         // public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d();
 
         public static final Transform3d BLUE_PHOTON_CAMERA_TO_ROBOT = new Transform3d(
-                    new Translation3d(-0.1956816, 0.2815336, 0),
+                    new Translation3d(-0.1956816, -0.2815336, 0),
                     new Rotation3d(0, 0, -0.43633231)
                 );
 
         public static final Transform3d GRAY_PHOTON_CAMERA_TO_ROBOT = new Transform3d(
-                    new Translation3d(-0.1956816, -0.2815336, 0),
+                    new Translation3d(0.1956816, -0.2815336, 0),
                     new Rotation3d(0, 0, 0.43633231)
                 );
 
@@ -135,8 +135,8 @@ public class Constants {
         public static final double DONT_SEE_TAG_WAIT_TIME = 1; 
         public static final double POSE_VALIDATION_TIME = 0.2; 
 
-        public static final double ROTATIONAL_TOLERANCE = 1;
-        public static final double TRANSLATIONAL_TOLERANCE = 0.1;
+        public static final double ROTATIONAL_TOLERANCE = 0.7;
+        public static final double TRANSLATIONAL_TOLERANCE = 0.04;
 
     }
 

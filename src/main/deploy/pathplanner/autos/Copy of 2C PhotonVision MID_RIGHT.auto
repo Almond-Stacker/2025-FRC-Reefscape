@@ -23,7 +23,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.6
                 }
               },
               {
@@ -66,19 +66,13 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.4
+                  "waitTime": 0.6
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "WaitUntil Beambreak"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0
+                  "name": "Drive Back Until Beambreak"
                 }
               },
               {
@@ -115,13 +109,19 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.0
+                  "waitTime": 0.6
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LineUp2"
+                  "name": "LineUp1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Score"
                 }
               },
               {
