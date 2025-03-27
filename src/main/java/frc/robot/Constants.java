@@ -31,7 +31,7 @@ public class Constants {
         public static final int RIGHT_ELEVATOR_MOTOR_ID = 15;
         public static final int ENCODER_ID = 1;
 
-        public static final double KP = 0.27;
+        public static final double KP = 0.25;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
     }
@@ -76,7 +76,8 @@ public class Constants {
     }
 
     public static final class ControllerConsts {
-        public static final double FRIC = 0.09;
+        public static final double FRIC = 0.08;
+        public static final double ROTATIONAL_FRIC = 0.4;
         public static final double PRECIECE_ADD_FRIC = 0.7; //how much acceleration will slow when in preciece mode
         public static final double PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO = 0.6; // how much slower the max speed goes when in preciece mode
         public static final double PRECIECE_ADD_ROTATIONAL_DEADBAND_RATIO = 0.5; // how much slower the max rotational speed goes when in preciece mode

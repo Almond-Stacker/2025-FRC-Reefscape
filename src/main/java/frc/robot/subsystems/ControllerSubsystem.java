@@ -17,6 +17,9 @@ public class ControllerSubsystem extends SubsystemBase{
     double accY;
     double posY;
 
+    double accR;
+    double posR;
+
     double slow;
 
     boolean elevatorUp;
@@ -32,6 +35,9 @@ public class ControllerSubsystem extends SubsystemBase{
         accY = 0;
         posY = 0;
 
+        accR = 0;
+        posR = 0;
+
         slow = ControllerConsts.SLOW_RATIO;
         elevatorUp = false;
         strafe = false;
@@ -43,51 +49,58 @@ public class ControllerSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        double deadbandRatio = 1;
-        double precieceFriction;
-
-        if(preciece) {
-            precieceFriction = ControllerConsts.PRECIECE_ADD_FRIC;
-        } else {
-            precieceFriction = 1;
-        }
+        // double deadbandRatio = 1;
 
         rightPosX = getDriverRightX();
         accX = getDriverLeftX();
         accY = getDriverLeftY();
-        if(!elevatorUp) {
-            deadbandRatio = 1;
+        accR = getDriverRightX();
+        // if(!elevatorUp) {
+            // deadbandRatio = 1;
+
+        double diffX = posX - accX;
+        double diffY = posY - accY;
+
+        double frictionX = ControllerConsts.FRIC + Math.abs(diffX) * 0.25;
+        double frictionY = ControllerConsts.FRIC + Math.abs(diffY) * 0.25;
+        
             if(Math.abs(accX) >= Math.abs(posX)) {
                 posX = accX;
             }
             else {
-                posX += (accX - posX) * ControllerConsts.FRIC * precieceFriction;
+                posX += (accX - posX) * frictionX;// * precieceFriction;
             }
 
             if(Math.abs(accY) >= Math.abs(posY)) {
                 posY = accY;
             }
             else {
-                posY += (accY - posY) * ControllerConsts.FRIC * precieceFriction;
+                posY += (accY - posY) * frictionY;
             }
-        } else {
-            System.out.println("Elevator down " + posX + " :: " + posY);
-            deadbandRatio = ControllerConsts.DEADBAND_RATIO;
-            posX += (accX - posX) * ControllerConsts.FRIC * slow;// * precieceFriction;
-            posY += (accY - posY) * ControllerConsts.FRIC * slow;// * precieceFriction;
-        }
+
+            if(Math.abs(accR) >= Math.abs(posR)) {
+                posR = accR;
+            }
+            else {
+                posR += (accR - posR) * ControllerConsts.ROTATIONAL_FRIC;// * precieceFriction;
+            }
+        // } else {
+        //     System.out.println("Elevator down " + posX + " :: " + posY);
+        //     deadbandRatio = ControllerConsts.DEADBAND_RATIO;
+        //     posX += (accX - posX) * ControllerConsts.FRIC * slow;// * precieceFriction;
+        //     posY += (accY - posY) * ControllerConsts.FRIC * slow;// * precieceFriction;
+        // }
         
         
         
             // posX = Math.max(-1 * slow, Math.min(1 * slow, posX * slow));
             // posY = Math.max(-1 * slow, Math.min(1 * slow, posY * slow));
 
-        posX = Math.max(-1 * deadbandRatio, Math.min(1 * deadbandRatio, posX));// * deadbandRatio;
-        posY = Math.max(-1 * deadbandRatio, Math.min(1 * deadbandRatio, posY));// * deadbandRatio;
+        posX = Math.max(-1, Math.min(1, posX));// * deadbandRatio;
+        posY = Math.max(-1, Math.min(1, posY));// * deadbandRatio;
         
         SmartDashboard.putNumber("posX", posX);
         SmartDashboard.putNumber("posY", posY);
-        SmartDashboard.putBoolean("elevator up", elevatorUp);
         // SmartDashboard.putNumber("addedFRIC", addedFRIC);
     }
 
@@ -144,6 +157,10 @@ public class ControllerSubsystem extends SubsystemBase{
 
     public double getPosY() {
         return posY;
+    }
+
+    public double getPosR() {
+        return posR;
     }
 
 }

@@ -12,14 +12,9 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -38,15 +33,11 @@ public class Vision4 extends SubsystemBase {
     private final Transform3d cameraToRobot;
     private final PhotonPoseEstimator poseEstimator; 
 
-    private List<PhotonPipelineResult> results;
-    private ArrayList<PhotonTrackedTarget> currentTarget;
-    private Transform3d tagToCamera; 
+    private List<PhotonPipelineResult> results;    private Transform3d tagToCamera; 
     private Transform2d tagToCameraProcessed; 
     private Pose2d estimatedRobotPoseRelative; 
     private EstimatedRobotPose estimatedRobotPoseField; 
     private int targetid12; 
-    private Transform3d nearestTransform; 
-    private int bestTargetId; 
 
     private int closestTarget; 
     private double leastDistance; 
@@ -82,7 +73,6 @@ public class Vision4 extends SubsystemBase {
         targetSeen = false; 
         results = camera.getAllUnreadResults();
         Optional<PhotonPipelineResult> currentResult = Optional.empty();
-        nearestTransform = null; 
 
         for(var change : results) {
             currentResult = Optional.of(change);

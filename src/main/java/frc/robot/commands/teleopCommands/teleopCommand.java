@@ -46,37 +46,18 @@ public class teleopCommand extends Command {
 
     @Override 
     public void execute() {
-        if(!controllerSubsystem.getPrecision()) {
-            if(!controllerSubsystem.getStrafe()) {
-                if(i.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
-                    controllerSubsystem.setElevatorUp(false);
-                } else {
-                    controllerSubsystem.setElevatorUp(true);
-                }
-
-                // System.out.println("DRIVING");
-                drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed * 0.5)) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed * 0.5)) // Drive left with negative X (left)
-                    .withRotationalRate(-Utilities.polynomialAccleration(controllerSubsystem.getRightPosX()) * MaxAngularRate)// Drive counterclockwise with negative X (left)
-                ).execute(); 
-            } else {
-                //strafe Drive
-                if(controllerSubsystem.getStrafeLeft()) {
-                    //left
-                    strafeSpeed *= -1;
-                } 
-                
-                //idk if correct input ofc.
-                drivetrain.applyRequest(() ->  robotCentricDrive.withVelocityX(0)
-                    .withVelocityY(strafeSpeed).withRotationalRate(0)).execute();
-            }
+        
+        if(i.getInnerElevatorState().equals(ElevatorStates.STARTING_POSITION)) {
+            controllerSubsystem.setElevatorUp(false);
         } else {
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed * ControllerConsts.PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO)) // Drive forward with negative Y (forward)
-                    .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed * ControllerConsts.PRECIECE_ADD_TRANSLATIONAL_DEADBAND_RATIO)) // Drive left with negative X (left)
-                    .withRotationalRate(-Utilities.polynomialAccleration(controllerSubsystem.getRightPosX()) * MaxAngularRate * ControllerConsts.PRECIECE_ADD_ROTATIONAL_DEADBAND_RATIO)// Drive counterclockwise with negative X (left)
-            ).execute();
+            controllerSubsystem.setElevatorUp(true);
         }
+
+        // System.out.println("DRIVING");
+        drivetrain.applyRequest(() ->
+        drive.withVelocityX(-Utilities.polynomialAccleration(controllerSubsystem.getPosY() * MaxSpeed * 0.5)) // Drive forward with negative Y (forward)
+            .withVelocityY(-Utilities.polynomialAccleration(controllerSubsystem.getPosX() * MaxSpeed * 0.5)) // Drive left with negative X (left)
+            .withRotationalRate(-Utilities.polynomialAccleration(controllerSubsystem.getPosR()) * MaxAngularRate)// Drive counterclockwise with negative X (left)
+        ).execute(); 
     }
 }
