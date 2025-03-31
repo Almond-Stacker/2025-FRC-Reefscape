@@ -6,15 +6,16 @@ import frc.robot.Constants.PhotonConsts;
 
 public class States {
     public enum ElevatorStates {
-        MIN(0, 3.211, 62),
+        MIN(0, 3.211, 60),
         MAX(113 , 29,217),
-        STARTING_POSITION(20, 23,74),
-        PRE_INTAKE(73.55, 25.5, 98),
-        INTAKE(73.55, 15.6, 62),
-        L1(40,24,116),
-        L2(21, 24, 203), //(1,7.416,203),
-        L3(19.78, 23, 214), // angle 200
-        L4(110.5, 25.5, 215),
+        STARTING_POSITION(18, 23,74),
+        PRE_INTAKE(73.55, 26, 67),
+        HIGH_PRE_INTAKE(73.55, 28, 98),
+        INTAKE(73.55, 15.6, 67),
+        L1(38,23.66,116),
+        L2(15, 20.13, 214), //(1,7.416,203),
+        L3(28.2011, 19.13, 214), // angle 200
+        L4(108, 25.5, 215),
 
         // NEVER SET THE ELEVATORS TO THIS STATE
         // ONLY SET THE ARM 
@@ -43,7 +44,7 @@ public class States {
     public enum IndexStates {
         INTAKE(1),
         OUTTAKE(-1),
-        STOP(0.05);
+        STOP(0.02);
 
         public final double speed;
 
@@ -66,9 +67,12 @@ public class States {
 
     public enum ReefPosition {
         // was 0.17 
-        LEFT(-0.13),//0.185
+        // LEFT(-0.13),//0.185
+        // CENTER(0.0),//was 20 for left reef - left cam, right reef - right cam
+        // RIGHT(0.17);
+        LEFT(-0.15),//0.185 // was 0.18 durring practive - Vegas
         CENTER(0.0),//was 20 for left reef - left cam, right reef - right cam
-        RIGHT(0.18);
+        RIGHT(0.225);//was 0.225 durring practice match - Vegas
         public final double yOffset;
         public final Transform2d tagToRobot;
         
@@ -76,10 +80,10 @@ public class States {
             this.yOffset = yOffset;
             this.tagToRobot = 
                 new Transform2d(
-                    PhotonConsts.CENTER_TO_TAG_DELTA_X,
+                    PhotonConsts.CENTER_TO_TAG_DELTA_X_DEFAULT,
                     yOffset,
                     Rotation2d.kPi
-                );
+                );//not used currently 3/27/25
         }
     }
 }

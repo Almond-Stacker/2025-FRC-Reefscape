@@ -29,7 +29,7 @@ public class ClimbSubsystem extends SubsystemBase{
         this.controller = new PIDController(5, 0,0);
         controller.setSetpoint(0.32);
         controller.setTolerance(0.01);
-        usePid = true;
+        usePid = false;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ClimbSubsystem extends SubsystemBase{
 
         // currentPosition = climbEncoder.get();
         // if(usePid) {
-        //     climbSpeed = controller.calculate(currentPosition);
+        //     climbSpeed = -controller.calculate(currentPosition);
         // } else {
         //     climbSpeed = state.speed;
         // }
@@ -69,7 +69,7 @@ public class ClimbSubsystem extends SubsystemBase{
 
     private void setSmartDashboardValues() {
         SmartDashboard.putNumber("Climb subsystem current speed", climbSpeed);
-        SmartDashboard.putNumber("sigma boy", climbEncoder.get());
+        SmartDashboard.putNumber("Climb Position", climbEncoder.get());
         SmartDashboard.putString("Climb subsystem state", state.toString());
     }
 }

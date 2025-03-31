@@ -14,26 +14,36 @@ import frc.lib.util.Utilities;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.PhotonConsts;
+import frc.robot.States.ElevatorStates;
 import frc.robot.States.ReefPosition;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.InnerElevator;
 import frc.robot.subsystems.VisionVersions.Vision;
 import frc.robot.subsystems.VisionVersions.Vision3;
 
-public class PhotonAlign extends Command {
+public class PhotonAlignL3 extends Command {
   private final PIDController xController, yController, rotController;
   private final SwerveRequest.RobotCentric robotCentricDrive = 
      new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final InnerElevator innerElevatorSubsystem; 
+
   private final CommandSwerveDrivetrain drivetrain;
   private final Vision3 camera;
   private final double yOffset; 
+    private double xOffset;
+    private double translationTolerance; 
+
   private double desiredYaw;
 
   private Timer dontSeeTagTimer, stopTimer;
 
 
-  public PhotonAlign(CommandSwerveDrivetrain drivetrain, Vision3 camera, boolean isRight) {
-    xController = new PIDController(1.7, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
-    yController = new PIDController(1.7, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
+  public PhotonAlignL3(CommandSwerveDrivetrain drivetrain, Vision3 camera, boolean isRight, InnerElevator innerElevatorSubsystem) {
+    this.innerElevatorSubsystem = innerElevatorSubsystem;
+
+    xController = new PIDController(2, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Vertical movement
+    yController = new PIDController(2, Constants.PhotonConsts.KI_TRANSLATION, Constants.PhotonConsts.KD_TRANSLATION);  // Horitontal movement
     rotController = new PIDController(0.04, Constants.PhotonConsts.KI_ROTATION, Constants.PhotonConsts.KD_ROTATION);  // Rotation
     this.drivetrain = drivetrain;
     this.camera = camera; 
@@ -50,6 +60,14 @@ public class PhotonAlign extends Command {
 
   @Override
   public void initialize() {
+    if(innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L3)) {
+        xOffset = PhotonConsts.CENTER_TO_TAG_DELTA_X_L3;
+        translationTolerance = 0.04;
+    } else {
+        xOffset = PhotonConsts.CENTER_TO_TAG_DELTA_X_DEFAULT;
+        translationTolerance = 0.04;
+    }
+
     this.stopTimer = new Timer();
     this.stopTimer.start();
     this.dontSeeTagTimer = new Timer();
@@ -61,11 +79,15 @@ public class PhotonAlign extends Command {
 
     rotController.setTolerance(PhotonConsts.ROTATIONAL_TOLERANCE);
 
-    xController.setSetpoint(PhotonConsts.CENTER_TO_TAG_DELTA_X_DEFAULT);
-    xController.setTolerance(PhotonConsts.TRANSLATIONAL_TOLERANCE);
+    xController.setSetpoint(xOffset);
+   // xController.setTolerance(PhotonConsts.TRANSLATIONAL_TOLERANCE);
+    xController.setTolerance(translationTolerance);
+
 
     yController.setSetpoint(yOffset);
-    yController.setTolerance(PhotonConsts.TRANSLATIONAL_TOLERANCE);
+   // yController.setTolerance(PhotonConsts.TRANSLATIONAL_TOLERANCE);
+   yController.setTolerance(translationTolerance);
+
 
   }
 
@@ -74,8 +96,13 @@ public class PhotonAlign extends Command {
     if (camera.getTargetSeen()) {
       this.dontSeeTagTimer.reset();
       Transform3d positions = camera.getBestTagToCamera();
-      double xSpeed = -xController.calculate(positions.getX());
-      double ySpeed = -yController.calculate(positions.getY());
+      double diffY = Math.max(-0.19, positions.getY() - yOffset);
+      double diffX = Math.max(-0.19, positions.getX() - xOffset);
+      double addedX = Math.max(0, Math.min(0.6, Math.log(diffX + 0.12) * 0.8 + 0.5));
+      double addedY = Math.max(0, Math.min(Math.log(diffY + 0.12) * 0.8 + 0.5, 0.6));
+    
+      double xSpeed = -xController.calculate(positions.getX() + addedX);
+      double ySpeed = -yController.calculate(positions.getY() + addedY);
       double rotValue = rotController.calculate(Utilities.processYaw(drivetrain.getPigeon2().getYaw().getValueAsDouble()));
 
       SmartDashboard.putNumber("X Target Offset", positions.getX());

@@ -64,7 +64,7 @@ public class autoPhotonAlign extends Command {
 
     rotController.setTolerance(PhotonConsts.ROTATIONAL_TOLERANCE);
 
-    xController.setSetpoint(PhotonConsts.CENTER_TO_TAG_DELTA_X);
+    xController.setSetpoint(PhotonConsts.CENTER_TO_TAG_DELTA_X_DEFAULT);
     xController.setTolerance(PhotonConsts.TRANSLATIONAL_TOLERANCE);
 
     yController.setSetpoint(yOffset);

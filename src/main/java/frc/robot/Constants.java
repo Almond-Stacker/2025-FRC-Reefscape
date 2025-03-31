@@ -31,8 +31,8 @@ public class Constants {
         public static final int RIGHT_ELEVATOR_MOTOR_ID = 15;
         public static final int ENCODER_ID = 1;
 
-        public static final double KP = 0.25;
-        public static final double KI = 0.0;
+        public static final double KP = 0.28;
+        public static final double KI = 0;
         public static final double KD = 0.0;
     }
 
@@ -56,9 +56,9 @@ public class Constants {
         public static final int ENCODER_ID = 0;
 
 
-        public static final double KP = 0.008;
+        public static final double KP = 0.0085;
         public static final double KI = 0.0;   
-        public static final double KD = 0.0;
+        public static final double KD = 0;
 
         public static final double KS = 0;
         public static final double KG = 0.02;
@@ -111,8 +111,8 @@ public class Constants {
         public static final double LAST_RESULT_TIMEOUT = 0.4;
             
         // wAS 0.416
-        public static final double CENTER_TO_TAG_DELTA_X = 0.5
-        ;
+        public static final double CENTER_TO_TAG_DELTA_X_DEFAULT = 0.5;
+        public static final double CENTER_TO_TAG_DELTA_X_L3 = 0.5 - 0.02;
 
         public static final Transform2d GOAL_LEFT_REEF = new Transform2d(0.416, 0, new Rotation2d() );
         public static final Transform2d GOAL_RIGHT_REEF = new Transform2d(-0.416, 0, new Rotation2d());

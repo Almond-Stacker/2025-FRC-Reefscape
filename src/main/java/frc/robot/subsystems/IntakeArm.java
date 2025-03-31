@@ -55,6 +55,8 @@ public class IntakeArm extends SubsystemBase {
 
         addSpeed = 0;
 
+        armPID.setTolerance(0.235);
+
         SparkFlexUtil.setSparkFlexBusUsage(armMotor, SparkFlexUtil.Usage.kAll, IdleMode.kBrake, false, false);
     }
 
@@ -71,7 +73,13 @@ public class IntakeArm extends SubsystemBase {
             inBounds = false;
         } else {
             if(!override) {
-                armSpeed = armPID.calculate(armPosition) + 
+                double speed = armPID.calculate(armPosition);
+                
+                if(speed < 0) {
+                    speed *= 0.9;
+                }
+
+                armSpeed = speed + 
                     armFeedforward.calculate(Units.degreesToRadians(armPosition), armMotor.getAbsoluteEncoder().getVelocity());
                 inBounds = true;
             }
@@ -105,9 +113,14 @@ public class IntakeArm extends SubsystemBase {
     public double getArmAngle() {
         return Units.rotationsToDegrees(armEncoder.get()) + 33;
     }
+    
+    public boolean atSetpoint() {
+        return armPID.atSetpoint();
+    }
 
     private void setSmartDashboardValues() {
         SmartDashboard.putNumber("Arm Subsystem goal angle", elevatorState.armAngle);
+        SmartDashboard.putNumber("Arm PID setpoint ", armPID.getSetpoint());
         SmartDashboard.putNumber("Arm Subsystem position", armPosition);
         SmartDashboard.putNumber("Arm Subsystem motor speed", armSpeed);     
         

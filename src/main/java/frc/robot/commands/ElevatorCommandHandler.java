@@ -40,7 +40,7 @@ public class ElevatorCommandHandler {
         SequentialCommandGroup command = new SequentialCommandGroup();
         if((innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L1) || innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.L2))
             && (state.equals(ElevatorStates.PRE_INTAKE) || state.equals(ElevatorStates.INTAKE) || state.equals(ElevatorStates.STARTING_POSITION))) {
-            command.addCommands(setPrimaryElevatorState(state), setInnerElevatorState(ElevatorStates.PRE_INTAKE), new WaitCommand(0.3), 
+            command.addCommands(setPrimaryElevatorState(state), setInnerElevatorState(ElevatorStates.HIGH_PRE_INTAKE), new WaitCommand(0.3), 
                 setArmState(state), new WaitCommand(0.4), setInnerElevatorState(state));
         } else if(innerElevatorSubsystem.getInnerElevatorState().equals(ElevatorStates.PRE_INTAKE) && state.equals(ElevatorStates.INTAKE)) {
             command.addCommands(setPrimaryElevatorState(state), setArmState(state), new WaitCommand(0.4), setInnerElevatorState(state));

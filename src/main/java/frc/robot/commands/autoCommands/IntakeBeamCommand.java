@@ -61,7 +61,7 @@ public class IntakeBeamCommand extends Command {
         //amt time for it to be recognized for it to be valid
         //so it can slide in lowkey, but also with timeout
         SmartDashboard.getNumber("BROKEN TIME ", beamBreakSubsystem.getBrokenTime());
-        if(Timer.getFPGATimestamp() - startTime > 0.7) {//Timer.getFPGATimestamp() - loadedTime > 0.2 || Timer.getFPGATimestamp() - startTime > 4) {
+        if(Timer.getFPGATimestamp() - startTime > 1.7) {//Timer.getFPGATimestamp() - loadedTime > 0.2 || Timer.getFPGATimestamp() - startTime > 4) {
             return true;
         }
         return false;

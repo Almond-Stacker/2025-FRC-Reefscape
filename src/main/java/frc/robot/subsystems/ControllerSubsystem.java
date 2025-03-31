@@ -61,8 +61,8 @@ public class ControllerSubsystem extends SubsystemBase{
         double diffX = posX - accX;
         double diffY = posY - accY;
 
-        double frictionX = ControllerConsts.FRIC + Math.abs(diffX) * 0.25;
-        double frictionY = ControllerConsts.FRIC + Math.abs(diffY) * 0.25;
+        double frictionX = ControllerConsts.FRIC + Math.abs(diffX) * 0.3;
+        double frictionY = ControllerConsts.FRIC + Math.abs(diffY) * 0.3;
         
             if(Math.abs(accX) >= Math.abs(posX)) {
                 posX = accX;
