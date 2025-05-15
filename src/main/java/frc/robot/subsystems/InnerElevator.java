@@ -64,7 +64,7 @@ public class InnerElevator extends SubsystemBase {
         
         
 
-        elevatorMotor.set(motorSpeed + addSpeed);
+       // elevatorMotor.set(motorSpeed + addSpeed);
         setSmartDashboardValues();
     }
 

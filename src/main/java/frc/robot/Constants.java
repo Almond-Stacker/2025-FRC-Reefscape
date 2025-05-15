@@ -29,7 +29,7 @@ public class Constants {
     public static final class PrimaryElevatorConstants {
         public static final int LEFT_ELEVATOR_MOTOR_ID = 14;
         public static final int RIGHT_ELEVATOR_MOTOR_ID = 15;
-        public static final int ENCODER_ID = 1;
+        public static final int ENCODER_ID = 0;
 
         public static final double KP = 0.28;
         public static final double KI = 0;
@@ -53,7 +53,7 @@ public class Constants {
     public static final class ArmConstants {
         public static final int ARM_MOTOR_ID = 31;
         public static final int INDEX_MOTOR_ID = 25;
-        public static final int ENCODER_ID = 0;
+        public static final int ENCODER_ID = 1;
 
 
         public static final double KP = 0.0085;

@@ -48,7 +48,7 @@ public class PrimaryElevator extends SubsystemBase{
             motorOutput = elevatorPID.calculate(currentHeight);
         }
 
-        setElevatorSpeeds(motorOutput);
+       // setElevatorSpeeds(motorOutput);
         setSmartDashboardValues();
     }
 

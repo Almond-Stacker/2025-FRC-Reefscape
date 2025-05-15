@@ -87,7 +87,7 @@ public class IntakeArm extends SubsystemBase {
 
          
 
-        armMotor.set(armSpeed);
+        // armMotor.set(armSpeed);
         setSmartDashboardValues();
     }
 
